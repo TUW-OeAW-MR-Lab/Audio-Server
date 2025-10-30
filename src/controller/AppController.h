@@ -157,6 +157,8 @@ private:
     std::unique_ptr<AppStopTimer> appStopTimer;                  ///< Helper used in stopAllApps().
 
     MRLAB_IMPLEMENT_LISTENER_INTERFACE
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AppController)
 };
 
 } // namespace mrlab::controller

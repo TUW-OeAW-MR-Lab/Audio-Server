@@ -209,6 +209,8 @@ private:
     std::unique_ptr<std::jthread> captureThread; ///< Thread for asynchronous output capturing.
 
     MRLAB_IMPLEMENT_LISTENER_INTERFACE
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AppHandle)
 };
 
 } // namespace mrlab::controller

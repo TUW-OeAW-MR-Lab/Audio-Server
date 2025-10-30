@@ -68,6 +68,8 @@ private:
     AppController& appController;
 
     std::unique_ptr<CivetServer> civetServer; ///< The wrapped civetweb server instance.
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WebServerController)
 };
 
 } // namespace mrlab::controller

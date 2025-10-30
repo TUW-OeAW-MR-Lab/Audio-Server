@@ -38,6 +38,8 @@ private:
     AppConfigController appConfigController;
     AppController appController;
     WebServerController webServerController;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainController)
 };
 
 } // namespace mrlab::controller
