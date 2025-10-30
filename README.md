@@ -83,7 +83,7 @@ Both options can also be set via environment variables of the same names (i.e., 
 The app binary can be directly run from its build directory, e.g.
 
 ```
-build-release/mrlabctrl_artefacts/Release/mrlabctrl
+build-release/mrlabctrl_App_artefacts/Release/mrlabctrl
 ```
 
 ## Application configuration data and resources
