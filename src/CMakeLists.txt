@@ -20,6 +20,8 @@ target_sources (mrlabctrl_Common
         controller/AppHandle.cpp
         controller/MainController.h
         controller/MainController.cpp
+        controller/OscController.h
+        controller/OscController.cpp
         controller/WebServerController.h
         controller/WebServerController.cpp
 
