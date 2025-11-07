@@ -11,6 +11,7 @@
 
 #include "AppConfigController.h"
 #include "AppController.h"
+#include "OscController.h"
 #include "WebServerController.h"
 
 namespace mrlab::controller
@@ -26,6 +27,9 @@ public:
     /** @returns a reference to the AppController. */
     AppController& getAppController() { return appController; }
 
+    /** @returns a reference to the OscController. */
+    OscController& getOscController() { return oscController; }
+
     /** @returns a reference to the WebServerController. */
     WebServerController& getWebServerController() { return webServerController; }
 
@@ -37,6 +41,7 @@ private:
     //==============================================================================
     AppConfigController appConfigController;
     AppController appController;
+    OscController oscController;
     WebServerController webServerController;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainController)
