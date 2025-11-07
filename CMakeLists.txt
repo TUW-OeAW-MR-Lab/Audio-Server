@@ -29,8 +29,7 @@ set (CTEST_TEST_TARGET_ALIAS run_tests)
 include (CTest)
 
 # JUCE dependency
-# Specify version (@x) and tag (#x) since JUCE does not follow the 'v' prefix tag convention.
-CPMAddPackage ("gh:juce-framework/JUCE@8.0.10#8.0.10")
+CPMAddPackage ("gh:juce-framework/JUCE#8.0.10")
 
 # CivetWeb for webserver and websocket
 CPMAddPackage (
@@ -41,6 +40,18 @@ CPMAddPackage (
     "CIVETWEB_ENABLE_ASAN OFF"
     "CIVETWEB_ENABLE_CXX ON"
     "CIVETWEB_ENABLE_WEBSOCKETS ON"
+)
+
+# liblo osc library
+CPMAddPackage (
+    URI "gh:radarsat1/liblo#0.34"
+    SOURCE_SUBDIR "cmake"
+    OPTIONS
+    "WITH_TOOLS OFF"
+    "WITH_TESTS OFF"
+    "WITH_EXAMPLES OFF"
+    "WITH_CPP_TESTS OFF"
+    "WITH_STATIC ON"
 )
 
 #====================================================================================
@@ -70,6 +81,7 @@ target_compile_definitions (mrlabctrl_Common
         DONT_SET_USING_JUCE_NAMESPACE=1
         JUCE_WEB_BROWSER=0
         JUCE_USE_CURL=0
+        LO_USE_EXCEPTIONS=1
 )
 
 target_compile_features (mrlabctrl_Common
@@ -85,6 +97,7 @@ target_link_libraries (mrlabctrl_Common
         juce::juce_core
         juce::juce_gui_extra
         civetweb-cpp
+        liblo_static
 )
 
 target_link_libraries (mrlabctrl_App
