@@ -10,6 +10,7 @@
 #pragma once
 
 #include <vector>
+#include <span>
 #include <memory>
 #include <juce_core/juce_core.h>
 #include <util/ListenerInterface.h>
@@ -58,19 +59,39 @@ public:
     /**
 
      */
-    bool addServer (const juce::Identifier& id, juce::String subPath, int port);
+    bool addSubPathServer (const juce::Identifier& id, std::string subPath, int listenPort, const juce::String& destination, int destinationPort);
 
     /**
 
      */
     bool removeServer (const juce::Identifier& id);
 
+    /**
+
+     */
+    bool dispatchRaw (std::span<std::byte> data);
+
 private:
     //==============================================================================
+    inline static const juce::Identifier mainServerId = "_main";
+
+    //==============================================================================
+    /**
+      */
+    bool addMainServer (int port);
+
+    bool addToServers (const juce::Identifier& id, int port);
+
     /**
 
      */
     void handleIncomingMessage (std::string_view path, const lo::Message& message);
+
+    /**
+        @param path
+        @param message
+     */
+    void handleIncomingAppControlMessage (std::string_view path, const lo::Message& message);
 
     //==============================================================================
     MainController& mainController;
