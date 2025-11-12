@@ -95,7 +95,7 @@ public:
             @note Whenever this is called, previously captured output will have been discarded
                   and also getOutput() will only return newOutput.
          */
-        virtual void appOutputAvailable (AppHandle& app, const juce::String& newOutput) = 0;
+        virtual void appOutputAvailable (AppHandle& /*app*/, const juce::String& /*newOutput*/) {}
     };
 
     //==============================================================================
