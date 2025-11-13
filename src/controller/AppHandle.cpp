@@ -24,7 +24,15 @@ AppHandle::AppState AppHandle::start()
     int streamFlags = (config.captureStdOut ? juce::ChildProcess::wantStdOut : 0) |
                       (config.captureStdErr ? juce::ChildProcess::wantStdErr : 0);
 
+    // Set app working directory (save and restore current one).
+    auto currentWorkingDir = juce::File::getCurrentWorkingDirectory();
+    // TODO: Check for success (IMRV-53).
+    config.workingDir.setAsCurrentWorkingDirectory();
+
     setStateAndNotify (process.start (config.startCommand, streamFlags) ? AppState::alive : AppState::startFailed);
+
+    currentWorkingDir.setAsCurrentWorkingDirectory();
+
     startTimerHz (stateUpdateHz);
 
     // Start reading the output asynchronously as it is blocking.

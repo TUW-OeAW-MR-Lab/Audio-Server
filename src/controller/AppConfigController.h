@@ -28,6 +28,8 @@ struct AppConfig
     juce::StringArray startCommand; ///< Command line to execute for launching (executable and arguments).
     juce::StringArray stopCommand;  ///< Command line to execute for quitting (if empty, kill will be used).
 
+    juce::File workingDir;          ///< Working directory for app launching.
+
     bool captureStdOut = true;      ///< Flag to indicate whether to capture the app's std output.
     bool captureStdErr = true;      ///< Flag to indicate whether to capture the app's std error.
 };
