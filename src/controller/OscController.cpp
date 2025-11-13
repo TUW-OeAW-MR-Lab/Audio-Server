@@ -47,7 +47,8 @@ bool OscController::addSubPathServer (const juce::Identifier& id, std::string su
 
         // Forward to subserver with subPath stripped from the path.
         auto strippedPath = path.substr (subPathLength);
-        addr.send_from (*subServer, strippedPath, message);
+        // addr.send_from (*subServer, strippedPath, message);
+        lo_send_message_from (addr, lo_server (*subServer), strippedPath.data(), message);
 
         return 1; // Continue searching for other handlers.
     });
