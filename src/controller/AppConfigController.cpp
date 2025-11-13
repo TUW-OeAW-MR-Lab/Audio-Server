@@ -42,8 +42,11 @@ AppConfig AppConfigController::findConfig (const juce::Identifier& appId) const
             .name = "Pd YAMI 1",
             .description = "Pd with YAMI test patch",
 #if JUCE_WINDOWS
-            .startCommand = juce::StringArray ("C:\\Program Files\\Pd\\bin\\Pd",
-                                               "C:\\Users\\fux\\Documents\\Pd\\test_stdout.pd")
+            .startCommand = juce::StringArray ("F:\\YAMI_20250311\\YAMI\\My YAMI2.bat"),
+            .workingDir = juce::File ("F:\\YAMI_20250311\\YAMI")
+            
+            //.startCommand = juce::StringArray ("C:\\Program Files\\Pd\\bin\\Pd",
+            //                                   "C:\\Users\\fux\\Documents\\Pd\\test_stdout.pd")
 #elif JUCE_MAC
             .startCommand = juce::StringArray ("/Applications/Pd-0.56-1.app/Contents/MacOS/Pd",
                                                "/Users/rm/Documents/Pd/test_stdout.pd")
