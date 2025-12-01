@@ -1,0 +1,113 @@
+{
+  "version": 8,
+  "$schema": "https://cmake.org/cmake/help/latest/_downloads/3e2d73bff478d88a7de0de736ba5e361/schema.json",
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 28,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "common",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "build-${presetName}",
+      "cacheVariables": {
+        "CPM_SOURCE_CACHE": "$env{HOME}$env{USERPROFILE}/.cache/CPM",
+        "CPM_USE_NAMED_CACHE_DIRECTORIES": "ON"
+      }
+    },
+    {
+      "name": "debug",
+      "displayName": "Debug",
+      "description": "Default Debug configuration",
+      "inherits": "common",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "release",
+      "displayName": "Release",
+      "description": "Default Release configuration",
+      "inherits": "common",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "relwithdebinfo",
+      "displayName": "RelWithDebInfo",
+      "description": "Default Release (with debug symbols) configuration",
+      "inherits": "common",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    },
+    {
+      "name": "release-universal",
+      "displayName": "Release Universal",
+      "description": "Release configuration for universal binaries",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "inherits": "common",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+	"CMAKE_OSX_ARCHITECTURES": "arm64;x86_64"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "app-debug",
+      "displayName": "App Debug",
+      "configurePreset": "debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "app-release",
+      "displayName": "App Release",
+      "configurePreset": "release",
+      "configuration": "Release"
+    },
+    {
+      "name": "app-relwithdebinfo",
+      "displayName": "App RelWithDebInfo",
+      "configurePreset": "relwithdebinfo",
+      "configuration": "RelWithDebInfo"
+    },
+    {
+      "name": "app-release-universal",
+      "displayName": "App Release Universal",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "configurePreset": "release-universal",
+      "configuration": "Release"
+    },
+    {
+      "name": "test-release",
+      "displayName": "Test Release",
+      "configurePreset": "release",
+      "configuration": "Release",
+      "targets": "mrlabctrl_UnitTest"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "test-release",
+      "displayName": "Test run",
+      "configurePreset": "release",
+      "output": { "outputOnFailure": true },
+      "execution": {
+        "noTestsAction": "error",
+        "stopOnFailure": true
+      }
+    }
+  ]
+}

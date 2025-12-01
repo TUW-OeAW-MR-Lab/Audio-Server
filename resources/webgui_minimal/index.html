@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>mrlab webgui test</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script/osc-browser.min.js"></script>
+    <script>
+      var oscPort = new osc.WebSocketPort({
+          url: "ws://localhost:8080/ws",
+          metadata: true
+      });
+      oscPort.open();
+
+      function send(address) {
+          oscPort.send({
+              address: address
+          });
+      };
+
+      oscPort.on("ready", function () {
+          send("/ping");
+      });
+    </script>
+  </head>
+  <body>
+    <h1>mrlabctrl webgui test</h1>
+    <p>
+      This is a minimal test web gui for mrlabctrl.
+    </p>
+    <p>
+      <button onClick="send('/reaper-empty-0/launch')">Launch Reaper</button>
+      <button onClick="send('/reaper-empty-0/quit')">Quit Reaper</button>
+    </p>
+    <p>
+      <button onClick="send('/pd-yami-1/launch')">Launch Pd</button>
+      <button onClick="send('/pd-yami-1/quit')">Quit Pd</button>
+    </p>
+  </body>
+</html>
