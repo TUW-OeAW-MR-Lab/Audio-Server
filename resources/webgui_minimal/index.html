@@ -88,6 +88,9 @@
     <p>
       <button onClick="send('/app/reaper-empty-0/control', 'launch')">Launch Reaper</button>
       <button onClick="send('/app/reaper-empty-0/control', 'quit')">Quit Reaper</button>
+      <button onClick="sendNoArgs('/app/pd-yami-1/osc/play')">Play</button>
+      <button onClick="sendNoArgs('/app/pd-yami-1/osc/pause')">Pause</button>
+      <button onClick="sendNoArgs('/app/pd-yami-1/osc/stop')">Stop</button>
       Status: <b id="reaper-empty-0_status">null</b>
     </p>
     <p>
