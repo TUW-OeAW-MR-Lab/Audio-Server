@@ -43,6 +43,7 @@ AppConfig AppConfigController::findConfig (const juce::Identifier& appId) const
             .description = "Pd with YAMI test patch",
 #if JUCE_WINDOWS
             .startCommand = juce::StringArray ("F:\\YAMI_20250311\\YAMI\\My YAMI2.bat"),
+            .stopCommand = juce::StringArray ("C:\\Windows\\System32\\taskkill", "/IM", "pd.com", "/T", "/F"),
             //            .startCommand = juce::StringArray ("F:\\YAMI_20250311\\bin\\pd",
             //                                               "-r 48000 -channels 2 -audiodev 0",
             //                                              "-lib lib\\iemlib1 -lib lib\\iemlib2 -lib lib\\OSC -lib lib\\comport -lib lib\\vasp -lib lib\\zexy -lib lib\\dyn~",
