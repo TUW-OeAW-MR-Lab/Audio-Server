@@ -74,20 +74,38 @@ AppHandle::AppState AppHandle::stop()
         return state;
 
     if (config.stopCommand.isEmpty())
-        kill();
+        return kill();
 
-    // TODO: implement app stop request (IMRV-32)
+    juce::ChildProcess stopProcess;
+
+    if (! (stopProcess.start (config.stopCommand) &&
+           stopProcess.waitForProcessToFinish (1000) &&
+           stopProcess.getExitCode() == 0))
+    {
+        if (stopProcess.isRunning())
+        {
+            std::cerr << "AppHandle::stop(): stopCommand is taking too long, killing it..." << std::endl;
+            stopProcess.kill();
+        }
+        else
+        {
+            std::cerr << "AppHandle::stop(): stopCommand returned " << stopProcess.getExitCode() << ": "
+                      << stopProcess.readAllProcessOutput() << std::endl;
+        }
+
+        setStateAndNotify (AppState::stopRequestFailed);
+        return state;
+    }
 
     setStateAndNotify (AppState::stopRequested);
 
     return state;
 }
 
-
 AppHandle::AppState AppHandle::kill()
 {
     if (process.isRunning())
-        setStateAndNotify (process.kill() ? AppState::killRequested : AppState::killFailed);
+        setStateAndNotify (process.kill() ? AppState::killRequested : AppState::killRequestFailed);
 
     return state;
 }

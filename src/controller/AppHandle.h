@@ -53,8 +53,9 @@ public:
         lost,                           ///< Connection to the app was lost.
 
         stopRequested,                  ///< App has been requested to stop gracefully.
+        stopRequestFailed,              ///< Failure while requesting to stop gracefully.
         killRequested,                  ///< System was requested to kill the app.
-        killFailed                      ///< Attempt to kill the app failed.
+        killRequestFailed               ///< Attempt to kill the app failed.
     };
 
     /** AppState values as display strings. */
@@ -70,8 +71,9 @@ public:
           { AppState::busy, "busy" },
           { AppState::lost, "lost" },
           { AppState::stopRequested, "quitting..." },
+          { AppState::stopRequestFailed, "quitting failed" },
           { AppState::killRequested, "killing..." },
-          { AppState::killFailed, "kill failed" } }
+          { AppState::killRequestFailed, "kill failed" } }
     );
 
     //==============================================================================
