@@ -59,8 +59,10 @@ public:
     AppConfigController();
 
     // Temporary test config ids
-    inline static const auto testConfig0 = juce::Identifier ("reaper-empty-0");
-    inline static const auto testConfig1 = juce::Identifier ("pd-yami-1");
+    inline static const auto configFly = juce::Identifier ("pd-fly");		
+    inline static const auto configReverb = juce::Identifier ("reaper-reverb");
+    inline static const auto configJungle = juce::Identifier ("pd-jungle");
+    inline static const auto configMusic = juce::Identifier ("reaper-music");
 
     /** Get the app configuration for appId.
 

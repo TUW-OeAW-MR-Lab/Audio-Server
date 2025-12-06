@@ -9,6 +9,7 @@
 html {
     overflow-y: scroll;
     height: 100%;
+		width: 100%;
     font: 100%/1.5 sans-serif;
     word-wrap: break-word;
     margin: 0 auto;
@@ -21,12 +22,18 @@ html {
         max-width: 42em;
  } }
 
-h1, h2, h3, h4 {
+h1 {
+    margin: 2.5rem 0 1.5rem 0;
+    line-height: 1.25;
+    color: white;
+ }
+
+h2, h3, h4 {
     margin: 2.5rem 0 1.5rem 0;
     line-height: 1.25;
     color: #333;
  }
-
+ 
 a {
     color: #fa6432;
     text-decoration: none;
@@ -190,4 +197,95 @@ header a + a {
     vertical-align: middle;
     padding-right: 2rem;
     color: grey;
+}
+
+/* Styling the new top button container */
+.top-menu-bar {
+    background-color: #0061a0; /* Dark background */
+    padding: 10px 20px;
+    display: flex; /* Arrange buttons horizontally */
+    gap: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+		color: white;
+}
+
+.top-menu-bar button {
+    padding: 8px 15px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.top-menu-bar button:hover {
+    background-color: #2980b9;
+}
+
+.top-menu-bar a {
+    color: white;
+    text-decoration: none;
+ }
+.top-menu-bar a:hover, a:focus, a:active {
+    text-decoration: underline;
+ }
+
+/* The container holding the left menu and the main content */
+.top-menu {
+    background-color: #333;
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: flex-start; /* Place links on the left or center */
+    /* Other styles for links (a tags) inside here... */
+}
+
+/* The container holding the left sidebar and the main content */
+.main-layout-horizontal {
+    display: flex;
+    /* Ensure it takes up the rest of the page height */
+    min-height: calc(100vh - 54px); /* Full viewport height minus the header height (approx) */
+}
+
+/* Styling the new Left Buttons Sidebar */
+.left-buttons-sidebar {
+    width: 200px; /* Fixed width for the button bar */
+    background-color: #f4f4f4;
+    padding: 20px;
+    
+    display: flex;
+    flex-direction: column; /* Stack the buttons vertically */
+    gap: 10px; /* Space between the buttons */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+}
+
+.left-buttons-sidebar button {
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #9da0a5;
+    cursor: pointer;
+    text-align: left; /* Make text align left within the button */
+}
+
+.left-buttons-sidebar .active-button {
+    background-color: #0061a0; /* A noticeable color like green */
+    color: white; /* White text for contrast */
+    font-weight: bold;
+    border-color: #4CAF50;
+}
+
+/* Main Content Area (takes up remaining space) */
+.content {
+    flex-grow: 1; /* Allows content area to fill the rest of the space */
+    padding: 20px;
+}
+
+.content-section {
+    display: none;
+    padding: 20px;
+}
+
+#page-home {
+    display: block; /* Default visible section */
 }

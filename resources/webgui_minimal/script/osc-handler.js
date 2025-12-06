@@ -1,0 +1,72 @@
+      var oscPort = new osc.WebSocketPort({
+          url: "ws://localhost:7080/ws",
+          metadata: true
+      });
+      oscPort.open();
+
+      function send(address, value) {
+          oscPort.send({
+              address: address,
+	      args: [
+		  {
+		      type: "s",
+		      value: value
+		  }
+	      ]
+          });
+      };
+
+      function sendResponse(address) {
+          oscPort.send({
+              address: address,
+	      args: [
+		  {
+		      type: "s",
+		      value: "connect"
+		  },
+		  {
+		      type: "s",
+		      value: "localhost"
+		  },
+		  {
+			  type: "i",
+			  value: 9336
+		  }
+		  ]
+          });
+      };
+
+      function sendNoArgs(address) {
+          oscPort.send({
+              address: address
+          });
+      };
+
+      oscPort.on("ready", function () {
+          oscPort.send({ address: "/ping" });
+      });
+
+      oscPort.on("message", function (oscMsg) {
+		console.log("OSC message received: ", oscMsg);
+
+		path = oscMsg.address.substring(1).split("/");
+
+		if (path[0] == "app" && path[2] == "state") {
+			// Show status info.
+			document.getElementById(path[1] + "_status").innerHTML = oscMsg.args[1].value;
+			return;
+		};
+
+		if (path[1] != "pd-fly") {
+			console.log("No OSC message handler: ", oscMsg.address);
+			return;
+		};
+			
+		if (path[2] == "osc" && path[3] == "Control") {
+			// Show response infos.
+			document.getElementById(path[1] + "_" + path[4]).innerHTML = oscMsg.args[0].value;
+			return;
+		};
+
+		console.log("No OSC message handler: ", oscMsg.address);	
+      });
