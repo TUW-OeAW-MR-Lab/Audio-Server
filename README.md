@@ -102,10 +102,9 @@ Below this base path, the following subdirectories are used:
 The server is configured for the following applications:
 
 * Fly: a pd-based demo, will be started as `C:\\PD\\YAMI\\FLY.bat` and must listen to port 10003
-* Reverb: a Reaper-based demo, will be started as `reaper -` and must listen to port 10005
+* Reverb: a Reaper-based demo, will be started as `reaper.rpp` and must listen to port 10005
 * Jungle: a pd-based demo, will be started as `C:\\PD\\YAMI\\JUNGLE.bat` and must listen to port 10007
-* Music: a Reaper-based demo, will be started as `xxx` and must listen to port 10009
-
+* Music: a Reaper-based demo, will be started as `jungle.rpp` and must listen to port 10009
 
 
 ### Webgui
