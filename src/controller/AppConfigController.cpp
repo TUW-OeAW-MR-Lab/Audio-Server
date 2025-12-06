@@ -43,7 +43,7 @@ AppConfig AppConfigController::findConfig (const juce::Identifier& appId) const
             .description = "Reaper DAW with artificial reverb",
 #if JUCE_WINDOWS
             .startCommand = juce::StringArray ("C:\\Program Files\\REAPER (x64)\\reaper",
-                                               "-reverb.rpp")
+                                               "reverb.rpp")
 #elif JUCE_MAC
             .startCommand = juce::StringArray ("/Applications/REAPER.app/Contents/MacOS/REAPER",
                                                "-new")
@@ -75,7 +75,7 @@ AppConfig AppConfigController::findConfig (const juce::Identifier& appId) const
             .description = "Reaper DAW with music example",
 #if JUCE_WINDOWS
             .startCommand = juce::StringArray ("C:\\Program Files\\REAPER (x64)\\reaper",
-                                               "-music.rpp")
+                                               "music.rpp")
 #elif JUCE_MAC
             .startCommand = juce::StringArray ("/Applications/REAPER.app/Contents/MacOS/REAPER",
                                                "-new")
