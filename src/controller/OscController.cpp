@@ -21,7 +21,10 @@ OscController::OscController (MainController& newMainController)
     addMainServer (7081);
 
     // Temporary hardcoded app-specific relay server.
-    addSubPathServer (AppConfigController::testConfig1, "/app/pd-yami-1/osc", 9336, "localhost", 10003);
+    addSubPathServer (AppConfigController::configFly, "/app/pd-fly/osc", 9336, "localhost", 10003);
+		addSubPathServer (AppConfigController::configReverb, "/app/reaper-reverb/osc", 9338, "localhost", 10005);
+		addSubPathServer (AppConfigController::configJungle, "/app/pd-jungle/osc", 9340, "localhost", 10007);
+		addSubPathServer (AppConfigController::configMusic, "/app/reaper-music/osc", 9342, "localhost", 10009);
 }
 
 OscController::~OscController()

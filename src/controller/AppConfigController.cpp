@@ -18,40 +18,15 @@ AppConfigController::AppConfigController()
 
 AppConfig AppConfigController::findConfig (const juce::Identifier& appId) const
 {
-    // Reaper test config
-    if (appId == testConfig0)
-    {
-        return {
-            .id = testConfig0,
-            .name = "Reaper Empty 0",
-            .description = "Reaper DAW with empty test session",
+	if (appId == configFly)
+	{		return {
+            .id = configFly,
+            .name = "Pd Fly",
+            .description = "Pd with Fly demonstration",
 #if JUCE_WINDOWS
-            .startCommand = juce::StringArray ("C:\\Program Files\\REAPER (x64)\\reaper",
-                                               "-new")
-#elif JUCE_MAC
-            .startCommand = juce::StringArray ("/Applications/REAPER.app/Contents/MacOS/REAPER",
-                                               "-new")
-#endif
-        };
-    }
-
-    if (appId == testConfig1)
-    {
-        return {
-            .id = testConfig1,
-            .name = "Pd YAMI 1",
-            .description = "Pd with YAMI test patch",
-#if JUCE_WINDOWS
-            .startCommand = juce::StringArray ("F:\\YAMI_20250311\\YAMI\\My YAMI2.bat"),
+            .startCommand = juce::StringArray ("C:\\PD\\YAMI\\FLY.bat"),
             .stopCommand = juce::StringArray ("C:\\Windows\\System32\\taskkill", "/IM", "pd.com", "/T", "/F"),
-            //            .startCommand = juce::StringArray ("F:\\YAMI_20250311\\bin\\pd",
-            //                                               "-r 48000 -channels 2 -audiodev 0",
-            //                                              "-lib lib\\iemlib1 -lib lib\\iemlib2 -lib lib\\OSC -lib lib\\comport -lib lib\\vasp -lib lib\\zexy -lib lib\\dyn~",
-            //                                               "-open patches\\YAMI2.pd -path ..\\YAMI -path abs -path ..\\YAMI\\extra\\vbap"),
-            .workingDir = juce::File ("F:\\YAMI_20250311\\YAMI")
-
-            //.startCommand = juce::StringArray ("C:\\Program Files\\Pd\\bin\\Pd",
-            //                                   "C:\\Users\\fux\\Documents\\Pd\\test_stdout.pd")
+            .workingDir = juce::File ("C:\\PD\\YAMI")
 #elif JUCE_MAC
             .startCommand = juce::StringArray ("/Applications/Pd-0.56-2.app/Contents/MacOS/Pd",
                                                "/Users/rm/Documents/Pd/test_stdout.pd"),
@@ -59,9 +34,56 @@ AppConfig AppConfigController::findConfig (const juce::Identifier& appId) const
             .workingDir = juce::File ("/Users/rm/Documents/Pd")
 #endif
         };
-    }
+	}
+			
+	if (appId == configReverb)
+	{		return {
+            .id = configReverb,
+            .name = "Reaper Reverb",
+            .description = "Reaper DAW with artificial reverb",
+#if JUCE_WINDOWS
+            .startCommand = juce::StringArray ("C:\\Program Files\\REAPER (x64)\\reaper",
+                                               "-reverb.rpp")
+#elif JUCE_MAC
+            .startCommand = juce::StringArray ("/Applications/REAPER.app/Contents/MacOS/REAPER",
+                                               "-new")
+#endif
+        };
+	}
 
-    throw AppConfigNotFoundException (appId);
+	if (appId == configJungle)
+	{		return {
+            .id = configJungle,
+            .name = "Pd Jungle",
+            .description = "Pd with Jungle demonstration",
+#if JUCE_WINDOWS
+            .startCommand = juce::StringArray ("C:\\PD\\YAMI\\JUNGLE.bat"),
+            .stopCommand = juce::StringArray ("C:\\Windows\\System32\\taskkill", "/IM", "pd.com", "/T", "/F"),
+            .workingDir = juce::File ("C:\\PD\\YAMI")
+#elif JUCE_MAC
+            .startCommand = juce::StringArray ("/Applications/Pd-0.56-2.app/Contents/MacOS/Pd",
+                                               "/Users/rm/Documents/Pd/test_stdout.pd"),
+            .stopCommand = juce::StringArray ("killall", "Pd")
+#endif
+        };
+	}
+
+	if (appId == configMusic)
+	{		return {
+            .id = configMusic,
+            .name = "Reaper Music",
+            .description = "Reaper DAW with music example",
+#if JUCE_WINDOWS
+            .startCommand = juce::StringArray ("C:\\Program Files\\REAPER (x64)\\reaper",
+                                               "-music.rpp")
+#elif JUCE_MAC
+            .startCommand = juce::StringArray ("/Applications/REAPER.app/Contents/MacOS/REAPER",
+                                               "-new")
+#endif
+        };
+	}
+
+	throw AppConfigNotFoundException (appId);
 }
 
 } // namespace mrlab::controller
