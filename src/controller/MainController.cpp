@@ -30,8 +30,8 @@ MainController::MainController()
     juce::Timer::callAfterDelay (1200, [&] {
         appController.add (AppConfigController::configFly);
         appController.add (AppConfigController::configReverb);
-        //appController.add (AppConfigController::configJungle);
-        //appController.add (AppConfigController::configMusic);
+        appController.add (AppConfigController::configJungle);
+        appController.add (AppConfigController::configMusic);
     });
 }
 
