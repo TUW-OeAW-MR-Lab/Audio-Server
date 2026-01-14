@@ -13,13 +13,13 @@ namespace mrlab::controller
 {
 
 AppConfigController::AppConfigController()
-{
-}
+{}
 
 AppConfig AppConfigController::findConfig (const juce::Identifier& appId) const
 {
-	if (appId == configFly)
-	{		return {
+    if (appId == configFly)
+    {
+        return {
             .id = configFly,
             .name = "Pd Fly",
             .description = "Pd with Fly demonstration",
@@ -34,10 +34,11 @@ AppConfig AppConfigController::findConfig (const juce::Identifier& appId) const
             .workingDir = juce::File ("/Users/rm/Documents/Pd")
 #endif
         };
-	}
-			
-	if (appId == configReverb)
-	{		return {
+    }
+
+    if (appId == configReverb)
+    {
+        return {
             .id = configReverb,
             .name = "Reaper Reverb",
             .description = "Reaper DAW with artificial reverb",
@@ -49,10 +50,11 @@ AppConfig AppConfigController::findConfig (const juce::Identifier& appId) const
                                                "-new")
 #endif
         };
-	}
+    }
 
-	if (appId == configJungle)
-	{		return {
+    if (appId == configJungle)
+    {
+        return {
             .id = configJungle,
             .name = "Pd Jungle",
             .description = "Pd with Jungle demonstration",
@@ -66,10 +68,11 @@ AppConfig AppConfigController::findConfig (const juce::Identifier& appId) const
             .stopCommand = juce::StringArray ("killall", "Pd")
 #endif
         };
-	}
+    }
 
-	if (appId == configMusic)
-	{		return {
+    if (appId == configMusic)
+    {
+        return {
             .id = configMusic,
             .name = "Reaper Music",
             .description = "Reaper DAW with music example",
@@ -81,9 +84,9 @@ AppConfig AppConfigController::findConfig (const juce::Identifier& appId) const
                                                "-new")
 #endif
         };
-	}
+    }
 
-	throw AppConfigNotFoundException (appId);
+    throw AppConfigNotFoundException (appId);
 }
 
 } // namespace mrlab::controller

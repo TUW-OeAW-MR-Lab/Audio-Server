@@ -22,14 +22,13 @@ OscController::OscController (MainController& newMainController)
 
     // Temporary hardcoded app-specific relay server.
     addSubPathServer (AppConfigController::configFly, "/app/pd-fly/osc", 9336, "localhost", 10003);
-		addSubPathServer (AppConfigController::configReverb, "/app/reaper-reverb/osc", 9338, "localhost", 10005);
-		addSubPathServer (AppConfigController::configJungle, "/app/pd-jungle/osc", 9340, "localhost", 10007);
-		addSubPathServer (AppConfigController::configMusic, "/app/reaper-music/osc", 9342, "localhost", 10009);
+    addSubPathServer (AppConfigController::configReverb, "/app/reaper-reverb/osc", 9338, "localhost", 10005);
+    addSubPathServer (AppConfigController::configJungle, "/app/pd-jungle/osc", 9340, "localhost", 10007);
+    addSubPathServer (AppConfigController::configMusic, "/app/reaper-music/osc", 9342, "localhost", 10009);
 }
 
 OscController::~OscController()
-{
-}
+{}
 
 bool OscController::addSubPathServer (const juce::Identifier& id, std::string subPath, int listenPort, const juce::String& destination, int destinationPort)
 {
