@@ -48,7 +48,7 @@ The build folders used by the presets are `build-release` and `build-debug` for 
 This will configure and build the default targets (i.e., the main app) in *release* configuration in the `build` subdirectory, using the *Ninja* generator:
 
 ```
-cmake -B build -G Ninja -D CMAKE\_BUILD\_TYPE=Release
+cmake -B build -G Ninja -D CMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
 
@@ -75,19 +75,19 @@ The project uses [CPM](https://github.com/cpm-cmake/CPM.cmake) for dependency ma
 When using manual `cmake` commands (or manually configuring an IDE), it is recommended to specify a cache directory for CPM in order to avoid repeated downloading, e.g.:
 
 ```
-cmake -B build -G Ninja -D CMAKE\_BUILD\_TYPE=Debug -D CPM\_SOURCE\_CACHE=$HOME/.cache/CPM -D CPM\_USE\_NAMED\_CACHE\_DIRECTORIES=1
+cmake -B build -G Ninja -D CMAKE_BUILD_TYPE=Debug -D CPM_SOURCE_CACHE=$HOME/.cache/CPM -D CPM_USE_NAMED_CACHE_DIRECTORIES=1
 ```
 
-Note that you might have to explicitly specify the full path for `CPM\_SOURCE\_CACHE` instead of using `$HOME` in case your IDE does not perform environment variable expansion.  The option `CPM\_USE\_NAMED\_CACHE\_DIRECTORIES` makes the dependency directories look better in IDEs like CLion.
+Note that you might have to explicitly specify the full path for `CPM_SOURCE_CACHE` instead of using `$HOME` in case your IDE does not perform environment variable expansion.  The option `CPM_USE_NAMED_CACHE_DIRECTORIES` makes the dependency directories look better in IDEs like CLion.
 
-Both options can also be set via environment variables of the same names (i.e., `CPM\_SOURCE\_CACHE`).
+Both options can also be set via environment variables of the same names (i.e., `CPM_SOURCE_CACHE`).
 
 ## Running
 
 The app binary can be directly run from its build directory, e.g.
 
 ```
-build-release/mrlabctrl\_App\_artefacts/Release/mrlabctrl
+build-release/mrlabctrl_App_artefacts/Release/mrlabctrl
 ```
 
 ## Application configuration data and resources
@@ -102,14 +102,13 @@ Below this base path, the following subdirectories are used:
 The server is configured for the following applications:
 
 * Fly: a pd-based demo, will be started as `C:\\PD\\YAMI\\FLY.bat` and must listen to port 10003
-* Reverb: a Reaper-based demo, will be started as `reaper.rpp` and must listen to port 10005
+* Reverb: a Reaper-based demo, will be started as `reverb.rpp` and must listen to port 10005
 * Jungle: a pd-based demo, will be started as `C:\\PD\\YAMI\\JUNGLE.bat` and must listen to port 10007
 * Music: a Reaper-based demo, will be started as `jungle.rpp` and must listen to port 10009
 
 
 ### Webgui
 
-The repository includes a very simple proof-of-concept webgui project in `resources/webgui\_minimal`. Its contents need to be copied to the webserver document root (see above).
+The repository includes a very simple proof-of-concept webgui project in `resources/webgui_minimal`. Its contents need to be copied to the webserver document root (see above).
 
 The default listening port of the webserver is `7080`, so pointing the browser to [http://localhost:7080](http://localhost:7080) should show the webgui.
-
