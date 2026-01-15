@@ -7,6 +7,7 @@
 
 target_sources (mrlabctrl_App
     PRIVATE
+        Config.h
         Main.cpp
 )
 
