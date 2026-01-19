@@ -14,6 +14,10 @@ juce_add_console_app (mrlabctrl_UnitTest
     BUNDLE_ID     com.sonible.mrlabctrl_unittest
 )
 
+# We do not intend to use JuceHeader.h generally,
+# this is just for exploiting its ProjectInfo:: facility.
+juce_generate_juce_header (mrlabctrl_UnitTest)
+
 add_dependencies (run_tests mrlabctrl_UnitTest)
 
 set_target_properties (mrlabctrl_UnitTest
