@@ -1,13 +1,18 @@
 <div id="demo-jungle" class="scene-main">
-	<button onClick="send('/app/pd-jungle/control', 'launch')">Launch pd</button>
-	<button onClick="send('/app/pd-jungle/control', 'quit')">Quit pd</button>
+	<h2>Demo: Jungle</h2>
+	<button onClick="launchApp('demo-jungle', 'pd-jungle')">Launch App</button>
+	<br>
+	Status: <b id="pd-jungle_status">unclear</b>
+	<br><hr><br>
 	<button onClick="sendResponse('/app/pd-jungle/osc/Control/Response')">Connect Response</button>
+	<br><hr><br>
 	<button onClick="sendNoArgs('/app/pd-jungle/osc/Control/Version')">Get Version</button>
 	<button onClick="sendNoArgs('/app/pd-jungle/osc/Control/SampleRate')">Get Samplerate</button>
 	<button onClick="sendNoArgs('/app/pd-jungle/osc/Control/CPULoad')">Get CPU</button>
 	<br />
-		Status: <b id="pd-jungle_status">null</b>
-		Version: <b id="pd-jungle_Version">null</b>
-		Samplerate: <b id="pd-jungle_SampleRate">null</b>
-		CPU %: <b id="pd-jungle_CPULoad">null</b>				
+		Version: <b id="pd-jungle_Version">null</b><br>
+		Samplerate: <b id="pd-jungle_SampleRate">null</b><br>
+		CPU %: <b id="pd-jungle_CPULoad">null</b><br>
+	<hr>
+	<button onClick="quitApp('demo-jungle', 'pd-jungle')">Quit App</button>
 </div>

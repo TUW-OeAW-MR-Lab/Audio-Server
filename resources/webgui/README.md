@@ -6,13 +6,15 @@ Buttons on the left side: Scenes
 
 ## Scenes
 
-* Must start with ` <div id="YourSceneName" class="scene-main"> `
+* Must start with `<div id="YourSceneName" class="scene-main">`
 
-* Must end with `</div> `
+* Must end with `</div>`
 
-* To start an app: ` <button onClick="send('/app/YourAppName/control', 'launch')">Launch YourAppName</button> `.
+* The highest level of header must be `<h2>Your Scene</h2>`.
 
-* To quit an app: ` <button onClick="send('/app/YourAppName/control', 'quit')">Quit YourAppName</button> `.
+* To start an app: ` <button onClick="launchApp(YourSceneName, YourAppName)">Launch App</button>`.
+
+* To quit an app: ` <button onClick="quitApp(YourSceneName, YourAppName)">Quit App</button>.
 
 * To connect to the app for a response channel: ` <button onClick="sendResponse('/app/YourAppName/YourPathToEstablishTheResponse')">Establish Response</button> `.
 

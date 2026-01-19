@@ -1,13 +1,18 @@
 <div id="demo-fly" class="scene-main">
-	<button onClick="send('/app/pd-fly/control', 'launch')">Launch pd</button>
-	<button onClick="send('/app/pd-fly/control', 'quit')">Quit pd</button>
+	<h2>Demo: Fly</h2>
+	<button onClick="launchApp('demo-fly', 'pd-fly')">Launch App</button>
+	<br>
+	Status: <b id="pd-fly_status">unclear</b>
+	<br><hr><br>
 	<button onClick="sendResponse('/app/pd-fly/osc/Control/Response')">Connect Response</button>
+	<br><hr><br>
 	<button onClick="sendNoArgs('/app/pd-fly/osc/Control/Version')">Get Version</button>
 	<button onClick="sendNoArgs('/app/pd-fly/osc/Control/SampleRate')">Get Samplerate</button>
 	<button onClick="sendNoArgs('/app/pd-fly/osc/Control/CPULoad')">Get CPU</button>
 	<br />
-		Status: <b id="pd-fly_status">null</b>
-		Version: <b id="pd-fly_Version">null</b>
-		Samplerate: <b id="pd-fly_SampleRate">null</b>
-		CPU %: <b id="pd-fly_CPULoad">null</b>				
+		Version: <b id="pd-fly_Version">null</b><br>
+		Samplerate: <b id="pd-fly_SampleRate">null</b><br>
+		CPU %: <b id="pd-fly_CPULoad">null</b><br>
+	<hr>
+	<button onClick="quitApp('demo-fly', 'pd-fly')">Quit App</button>
 </div>

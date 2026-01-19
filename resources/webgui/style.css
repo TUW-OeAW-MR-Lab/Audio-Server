@@ -30,8 +30,7 @@ h1 {
     color: white;
  }
 
-h2, h3, h4 {
-    margin: 2.5rem 0 1.5rem 0;
+h2, h3, h4 {    
     line-height: 1.25;
     color: #333;
  }
@@ -258,12 +257,19 @@ header a + a {
     cursor: pointer;
     text-align: left;
 }
-
+/* Properties of the active */
 .scenes-sidebar .active-scene {
     background-color: #0061a0;
     color: white;
     font-weight: bold;
     border-color: #4CAF50;
+}
+/* Properties of a scene with a launched app */
+.scenes-sidebar .launched-scene {
+    background-color: #800000;
+    color: white;
+    font-weight: bold;
+    border-color: #FF0000;
 }
 
 /* Port for the Scene Area (takes up remaining space) */
