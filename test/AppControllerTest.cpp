@@ -22,8 +22,8 @@ TEST_CASE ("App configurations and handles", "[AppControllerTest]")
 
     SECTION ("Access hardcoded example configurations")
     {
-        REQUIRE_NOTHROW (appConfigController.findConfig (controller::AppConfigController::testConfig0));
-        REQUIRE_NOTHROW (appConfigController.findConfig (controller::AppConfigController::testConfig1));
+        REQUIRE_NOTHROW (appConfigController.findConfig (controller::AppConfigController::configFly));
+        REQUIRE_NOTHROW (appConfigController.findConfig (controller::AppConfigController::configReverb));
         REQUIRE_THROWS (appConfigController.findConfig (juce::Identifier ("non-existent")));
     }
 
@@ -31,14 +31,14 @@ TEST_CASE ("App configurations and handles", "[AppControllerTest]")
 
     SECTION ("Add and access example configurations")
     {
-        appController.add (controller::AppConfigController::testConfig0);
-        appController.add (controller::AppConfigController::testConfig1);
+        appController.add (controller::AppConfigController::configFly);
+        appController.add (controller::AppConfigController::configReverb);
 
         REQUIRE (appController.getApps().size() == 2);
 
-        auto& app = appController.getApp (controller::AppConfigController::testConfig0);
+        auto& app = appController.getApp (controller::AppConfigController::configFly);
 
-        REQUIRE (app.getConfig().id == controller::AppConfigController::testConfig0);
+        REQUIRE (app.getConfig().id == controller::AppConfigController::configFly);
         REQUIRE (app.getState() == controller::AppHandle::AppState::initial);
     }
 }

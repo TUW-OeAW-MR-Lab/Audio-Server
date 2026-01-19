@@ -24,18 +24,31 @@ AppHandle::AppState AppHandle::start()
     int streamFlags = (config.captureStdOut ? juce::ChildProcess::wantStdOut : 0) |
                       (config.captureStdErr ? juce::ChildProcess::wantStdErr : 0);
 
-    // Set app working directory (save and restore current one).
-    auto currentWorkingDir = juce::File::getCurrentWorkingDirectory();
-    // TODO: Check for success (IMRV-53).
-    config.workingDir.setAsCurrentWorkingDirectory();
+    // Save current working directory later restore after app launch.
+    const auto currentWorkingDir = juce::File::getCurrentWorkingDirectory();
 
-    setStateAndNotify (process.start (config.startCommand, streamFlags) ? AppState::alive : AppState::startFailed);
+    // Change to configured app working directory if specified (non-empty).
+    if (config.workingDir != juce::String() && ! config.workingDir.setAsCurrentWorkingDirectory())
+    {
+        std::cerr << "AppHandle::start(): Could not set working directory " << config.workingDir.getFullPathName() << std::endl;
+        setStateAndNotify (AppState::startFailed);
+        return state;
+    }
 
+    // Try to launch app.
+    const auto success = process.start (config.startCommand, streamFlags);
+
+    // Restore previously saved working directory.
     currentWorkingDir.setAsCurrentWorkingDirectory();
+
+    setStateAndNotify (success ? AppState::alive : AppState::startFailed);
+
+    if (! success)
+        return state;
 
     startTimerHz (stateUpdateHz);
 
-    // Start reading the output asynchronously as it is blocking.
+    // Start reading the output asynchronously as juce::ChildProcess::readProcessOutput() is blocking.
     if (streamFlags)
     {
         auto readOutput = [&] (std::stop_token stopToken) {

@@ -11,6 +11,7 @@
 #include <juce_core/juce_core.h>
 #include <juce_events/juce_events.h>
 #include <iostream>
+#include <util/SupportFileLocation.h>
 
 namespace mrlab::controller
 {
@@ -20,10 +21,13 @@ MainController::MainController()
       oscController (*this),
       webServerController (*this)
 {
+    // set up logger facility
+    Logger::setCurrentLogger (&logger);
+
     startWebServer();
 
     // Simulate dynamic run-time adding after construction time...
-    juce::Timer::callAfterDelay(1200, [&] {
+    juce::Timer::callAfterDelay (1200, [&] {
         appController.add (AppConfigController::configFly);
         appController.add (AppConfigController::configReverb);
         appController.add (AppConfigController::configJungle);
@@ -38,27 +42,15 @@ void MainController::startWebServer()
 
     config.listenPort = 7080;
 
-#if JUCE_WINDOWS
-   const auto appSupportDir = juce::File (juce::SystemStats::getEnvironmentVariable ("APPDATA", juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory).getFullPathName()));
-#elif JUCE_MAC
-   const auto appSupportDir = juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory).getChildFile ("Application Support");
-#elif JUCE_LINUX
-   const auto appSupportDir = juce::File::getSpecialLocation (juce::File::userHomeDirectory).getChildFile (".local/share");
-#else
-   jassertfalse; // Undefined platform.
-   const auto appSupportDir = juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory);
-#endif
+    config.documentRoot = APP_SUPPORT_DIR.getChildFile ("webgui");
 
-   config.documentRoot = appSupportDir.getChildFile ("mrlabctrl/webgui");
+    Logger::logInfo (juce::String ("WebGUI document root is: ") + config.documentRoot.getFullPathName());
 
-   std::cout << "INFO: WebGUI document root is: " << config.documentRoot.getFullPathName() << std::endl;
+    if (! config.documentRoot.isDirectory())
+        Logger::logWarn ("WebGUI document root does not exist!");
 
-   // TODO: Log errors to log instead of stdout (IMRV-37)
-   if (! config.documentRoot.isDirectory())
-       std::cerr << "WARNING: WebGUI document root does not exist!" << std::endl;
-
-   if (! webServerController.start (config))
-       std::cerr << "ERROR: Starting the webserver failed!" << std::endl;
+    if (! webServerController.start (config))
+        Logger::logError ("Starting the webserver failed!");
 }
 
 } // namespace mrlab::controller

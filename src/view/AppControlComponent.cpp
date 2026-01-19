@@ -8,7 +8,7 @@
  */
 
 #include "AppControlComponent.h"
-
+#include <util/Logger.h>
 
 namespace mrlab::view
 {
@@ -36,7 +36,7 @@ AppControlComponent::AppControlComponent (controller::AppHandle& appHandle)
     // TODO: Implement app output to logging (IMRV-38).
     // Just post the app output to stdout on button click for now.
     openOutputButton.onClick = [&] {
-        std::cout << app.getOutput().toStdString();
+        Logger::logInfo (juce::String ("OpenOutputButton.onClick(): ") + app.getOutput());
         openOutputButton.setEnabled (false);
     };
 

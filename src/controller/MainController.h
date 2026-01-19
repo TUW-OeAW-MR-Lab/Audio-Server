@@ -13,6 +13,7 @@
 #include "AppController.h"
 #include "OscController.h"
 #include "WebServerController.h"
+#include <util/Logger.h>
 
 namespace mrlab::controller
 {
@@ -43,6 +44,8 @@ private:
     AppController appController;
     OscController oscController;
     WebServerController webServerController;
+
+    Logger logger;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainController)
 };
