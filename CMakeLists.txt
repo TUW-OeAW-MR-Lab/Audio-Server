@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: EUPL-1.2
 # SPDX-FileCopyrightText: Copyright (c) 2025 Martin Rumori/sonible GmbH
 
-cmake_minimum_required (VERSION 3.16)
+cmake_minimum_required (VERSION 3.22)
 
 # This setting has to occur BEFORE the project call to work correctly
 set (CMAKE_OSX_DEPLOYMENT_TARGET "11.0" CACHE STRING "macOS deployment target" FORCE)
@@ -29,7 +29,7 @@ set (CTEST_TEST_TARGET_ALIAS run_tests)
 include (CTest)
 
 # JUCE dependency
-CPMAddPackage ("gh:juce-framework/JUCE#8.0.10")
+CPMAddPackage ("gh:juce-framework/JUCE#8.0.12")
 
 # yaml-cpp
 set (CMAKE_POLICY_VERSION_MINIMUM "3.5")
