@@ -67,7 +67,8 @@ public:
 
     ~AppController();
 
-    void populateFromConfigFileLocation();
+    /** Read all configurations from the scene config dir. */
+    void populateFromSceneConfigDir();
 
     /** Add an app handle for appId to this controller.
 

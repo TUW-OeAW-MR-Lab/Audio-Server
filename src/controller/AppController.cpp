@@ -10,7 +10,7 @@
 #include "AppController.h"
 #include "AppHandle.h"
 #include "AppConfigController.h"
-#include <util/SupportFileLocation.h>
+#include <Config.h>
 #include <util/Logger.h>
 
 namespace mrlab::controller
@@ -23,18 +23,18 @@ AppController::AppController (AppConfigController& configController)
 AppController::~AppController()
 {}
 
-void AppController::populateFromConfigFileLocation()
+void AppController::populateFromSceneConfigDir()
 {
-    const auto configFileLocation = APP_SUPPORT_DIR.getChildFile ("Scenes");
+    const auto sceneConfigDir = Config::getSceneConfigDir();
 
-    if (! configFileLocation.isDirectory())
+    if (! sceneConfigDir.isDirectory())
     {
-        Logger::logError ("Config file location " + configFileLocation.getFullPathName() + " does not exist.");
+        Logger::logError ("AppController: Scene config directory " + sceneConfigDir.getFullPathName() + " does not exist.");
         return;
     }
 
-    Logger::logInfo ("Scanning config file location " + configFileLocation.getFullPathName() + " for YAML configuration files.");
-    const auto yamlConfigs = configFileLocation.findChildFiles (juce::File::TypesOfFileToFind::findFiles, true, "*.yaml");
+    Logger::logInfo ("AppController: Scanning scene config directory " + sceneConfigDir.getFullPathName() + " for YAML configuration files.");
+    const auto yamlConfigs = sceneConfigDir.findChildFiles (juce::File::TypesOfFileToFind::findFiles, true, "*.yaml");
 
     for (const auto& config : yamlConfigs)
         add (config);

@@ -11,7 +11,7 @@
 #include <juce_core/juce_core.h>
 #include <juce_events/juce_events.h>
 #include <iostream>
-#include <util/SupportFileLocation.h>
+#include <Config.h>
 
 namespace mrlab::controller
 {
@@ -21,31 +21,47 @@ MainController::MainController()
       oscController (*this),
       webServerController (*this)
 {
-    // set up logger facility
-    Logger::setCurrentLogger (&logger);
+    // Initialisation tasks of this controller.
+    initialise();
 
+    // Start web server.
     startWebServer();
 
     juce::Timer::callAfterDelay (1200, [&] {
-        appController.populateFromConfigFileLocation();
+        appController.populateFromSceneConfigDir();
     });
+}
+
+void MainController::initialise()
+{
+    // set up logger facility
+    Logger::setCurrentLogger (&logger);
+
+    // check for/create application support directory
+    const auto appSupportDir = Config::getAppSupportDir();
+
+    if (! appSupportDir.isDirectory())
+    {
+        Logger::logWarn (juce::String ("App support dir does not exist, creating it: ") + appSupportDir.getFullPathName());
+
+        const auto result = appSupportDir.createDirectory();
+
+        if (! result)
+            Logger::logFatal (juce::String ("Could not create app support dir, error: ") + result.getErrorMessage());
+    }
 }
 
 void MainController::startWebServer()
 {
     // TODO: Read Config from central configuration file (IMRV-42)
-    WebServerController::Config config;
+    const auto documentRoot = Config::getWebServerDocumentRootDir();
 
-    config.listenPort = 7080;
+    Logger::logInfo (juce::String ("WebGUI document root is: ") + documentRoot.getFullPathName());
 
-    config.documentRoot = APP_SUPPORT_DIR.getChildFile ("webgui");
-
-    Logger::logInfo (juce::String ("WebGUI document root is: ") + config.documentRoot.getFullPathName());
-
-    if (! config.documentRoot.isDirectory())
+    if (! documentRoot.isDirectory())
         Logger::logWarn ("WebGUI document root does not exist!");
 
-    if (! webServerController.start (config))
+    if (! webServerController.start())
         Logger::logError ("Starting the webserver failed!");
 }
 

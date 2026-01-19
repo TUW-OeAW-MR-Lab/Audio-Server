@@ -36,24 +36,14 @@ class WebServerController : public CivetWebSocketHandler,
 {
 public:
     //==============================================================================
-    /** Configuration class for the webserver. */
-    struct Config
-    {
-        uint16_t listenPort;     ///< Port to listen to (should bind to all local interfaces).
-        juce::File documentRoot; ///< Root directory of the file resources to serve via http.
-    };
-
-    //==============================================================================
     WebServerController (MainController& mainControllerIn);
     ~WebServerController() override;
 
     /** Start the webserver.
 
-        @param config Configuration to use.
-
         @return true on success, false on failure or server already running.
     */
-    bool start (const Config& config);
+    bool start();
 
     /** Stop the webserver.
 

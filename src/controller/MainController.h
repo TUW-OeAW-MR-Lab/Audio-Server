@@ -36,6 +36,9 @@ public:
 
 private:
     //==============================================================================
+    /** Perform a few initialisation tasks/checks. */
+    void initialise();
+
     /** Start the webserver with a default configuration. */
     void startWebServer();
 

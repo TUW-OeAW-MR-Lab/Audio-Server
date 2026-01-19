@@ -14,6 +14,7 @@
 #include <iostream>
 #include <lo/lo_cpp.h>
 #include <util/Logger.h>
+#include <Config.h>
 
 namespace mrlab::controller
 {
@@ -34,7 +35,7 @@ WebServerController::~WebServerController()
     mg_exit_library();
 }
 
-bool WebServerController::start (const Config& config)
+bool WebServerController::start()
 {
     if (civetServer != nullptr)
         return false;
@@ -42,9 +43,9 @@ bool WebServerController::start (const Config& config)
     std::vector<std::string> civetOptions;
 
     civetOptions.push_back ("document_root");
-    civetOptions.push_back (config.documentRoot.getFullPathName().toStdString());
+    civetOptions.push_back (Config::getWebServerDocumentRootDir().getFullPathName().toStdString());
     civetOptions.push_back ("listening_ports");
-    civetOptions.push_back (std::to_string (config.listenPort));
+    civetOptions.push_back (std::to_string (Config::getWebServerListeningPort()));
     civetOptions.push_back ("websocket_timeout_ms");
     civetOptions.push_back (std::to_string (5000));
     civetOptions.push_back ("enable_websocket_ping_pong");

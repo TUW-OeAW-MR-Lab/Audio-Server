@@ -10,7 +10,7 @@
 #pragma once
 
 #include <juce_core/juce_core.h>
-#include <util/SupportFileLocation.h>
+#include <Config.h>
 #include <util/ListenerInterface.h>
 
 namespace mrlab
@@ -45,13 +45,16 @@ public:
     };
 
     //==============================================================================
-    Logger() : juce::FileLogger (APP_SUPPORT_DIR.getChildFile ("MRLabLog.txt"), "\n\n==== MRLabLog Session Start ====", maxFileSizeBytes) {}
+    Logger() : juce::FileLogger (Config::getAppSupportDir().getChildFile ("MRLabLog.txt"), "\n\n==== MRLabLog Session Start ====", maxFileSizeBytes) {}
 
     //==============================================================================
     /** Convenience wrapper to write an info log message. */
     static void logInfo (const juce::String& message) { log (LogLevel::Info, message); }
 
-    /** Convenience wrapper to write a debug log message. Debug messages are ignored for non-debug builds. */
+    /** Convenience wrapper to write a debug log message.
+
+        @note Debug messages are ignored in non-debug builds.
+     */
     static void logDebug (const juce::String& message) { log (LogLevel::Debug, message); }
 
     /** Convenience wrapper to write a warn log message. */
@@ -73,7 +76,8 @@ public:
 #endif
 
         // clang-format off
-        switch (level) {
+        switch (level)
+        {
             case LogLevel::Info:  return writeToLog (juce::String ("Info:  ") + message);
             case LogLevel::Debug: return writeToLog (juce::String ("Debug: ") + message);
             case LogLevel::Warn:  return writeToLog (juce::String ("Warn:  ") + message);
@@ -84,7 +88,10 @@ public:
     }
 
     //==============================================================================
-    /** Log message to file and also notify listeners. Do not call this directly, rather use the static logInfo() etc. functions above. */
+    /** Log message to file and also notify listeners.
+
+        Do not call this directly, rather use the static logInfo() etc. functions above.
+     */
     void logMessage (const juce::String& message) override
     {
         // log to std::cout
@@ -101,6 +108,7 @@ public:
     }
 
 private:
+    //==============================================================================
     static constexpr auto maxFileSizeBytes = 10 * 1024 * 1024; // 10 MB
 
     //==============================================================================
