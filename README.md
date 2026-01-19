@@ -20,7 +20,7 @@ Use your IDE's built-in *git* facility or the command line to clone the reposito
 git clone https://github.com/sonible/mrlab-audio-server.git
 ```
 
-### Building from the command line
+### Building and runnung from the command line
 
 Note that on Windows with Visual Studio, the *Developer Command Prompt* or the *Developer Power Shell* should be used in order set the correct environment for the build toolchain.
 
@@ -51,6 +51,15 @@ This will configure and build the default targets (i.e., the main app) in *relea
 cmake -B build -G Ninja -D CMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
+
+#### Running
+
+The app binary can be then directly run from its build directory, e.g.
+
+```
+build-release/mrlabctrl_App_artefacts/Release/mrlabctrl.exe
+```
+
 
 ### Building and running in Visual Studio
 
