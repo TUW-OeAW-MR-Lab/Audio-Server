@@ -16,11 +16,13 @@ html {
     padding: 1.5em;
  }
 
-@media (min-width: 768px) {
-    html {
-        font-size: 125%;
-        max-width: 42em;
- } }
+@media (min-width: 768px) 
+{
+	html {
+			font-size: 125%;
+			max-width: 42em;
+	} 
+}
 
 h1 {
     margin: 2.5rem 0 1.5rem 0;
@@ -199,7 +201,7 @@ header a + a {
     color: grey;
 }
 
-/* Styling the new top button container */
+/* The top horizontal menu bar */
 .top-menu-bar {
     background-color: #0061a0; /* Dark background */
     padding: 10px 20px;
@@ -208,7 +210,6 @@ header a + a {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 		color: white;
 }
-
 .top-menu-bar button {
     padding: 8px 15px;
     background-color: #3498db;
@@ -218,11 +219,9 @@ header a + a {
     border-radius: 4px;
     transition: background-color 0.2s;
 }
-
 .top-menu-bar button:hover {
     background-color: #2980b9;
 }
-
 .top-menu-bar a {
     color: white;
     text-decoration: none;
@@ -231,25 +230,16 @@ header a + a {
     text-decoration: underline;
  }
 
-/* The container holding the left menu and the main content */
-.top-menu {
-    background-color: #333;
-    color: white;
-    padding: 15px 20px;
-    display: flex;
-    justify-content: flex-start; /* Place links on the left or center */
-    /* Other styles for links (a tags) inside here... */
-}
 
-/* The container holding the left sidebar and the main content */
+/* The container holding the left sidebar and the scene content */
 .main-layout-horizontal {
     display: flex;
     /* Ensure it takes up the rest of the page height */
     min-height: calc(100vh - 54px); /* Full viewport height minus the header height (approx) */
 }
 
-/* Styling the new Left Buttons Sidebar */
-.left-buttons-sidebar {
+/* Sidebar with the Buttons activating the Scenes */
+.scenes-sidebar {
     width: 200px; /* Fixed width for the button bar */
     background-color: #f4f4f4;
     padding: 20px;
@@ -260,29 +250,31 @@ header a + a {
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
 }
 
-.left-buttons-sidebar button {
+/* Button to activate a Scene */
+.scenes-sidebar button {
     padding: 10px;
     border: 1px solid #ccc;
     background-color: #9da0a5;
     cursor: pointer;
-    text-align: left; /* Make text align left within the button */
+    text-align: left;
 }
 
-.left-buttons-sidebar .active-button {
-    background-color: #0061a0; /* A noticeable color like green */
-    color: white; /* White text for contrast */
+.scenes-sidebar .active-scene {
+    background-color: #0061a0;
+    color: white;
     font-weight: bold;
     border-color: #4CAF50;
 }
 
-/* Main Content Area (takes up remaining space) */
-.content {
+/* Port for the Scene Area (takes up remaining space) */
+.scene-port {
     flex-grow: 1; /* Allows content area to fill the rest of the space */
     padding: 20px;
 }
 
-.content-section {
-    display: none;
+/* Main Scene Area */
+.scene-main {
+    display: block;
     padding: 20px;
 }
 

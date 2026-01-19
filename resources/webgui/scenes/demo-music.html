@@ -1,0 +1,8 @@
+<div id="demo-music" class="scene-main">
+	<button onClick="send('/app/reaper-music/control', 'launch')">Launch Reaper</button>
+	<button onClick="send('/app/reaper-music/control', 'quit')">Quit Reaper</button>
+	<button onClick="sendNoArgs('/app/reaper-music/osc/play')">Play</button>
+	<button onClick="sendNoArgs('/app/reaper-music/osc/pause')">Pause</button>
+	<button onClick="sendNoArgs('/app/reaper-music/osc/stop')">Stop</button>
+	Status: <b id="reaper-music_status">null</b>
+</div>

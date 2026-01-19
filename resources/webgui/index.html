@@ -2,82 +2,35 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>MR-Lab</title>
+    <title>Mixed-Reality Lab: Audio Server</title>
     <link rel="stylesheet" href="style.css">
-    <script src="script/osc-browser.min.js"></script>
-		<script src="script/main.js"></script>
-    <script src="script/osc-handler.js"></script>
+    <script src="scripts/osc-browser.min.js"></script>
+		<script src="scripts/main.js"></script>
+    <script src="scripts/osc-handler.js"></script>
   </head>
   <body>
 	
 	<header class="top-menu-bar">
 		<h1>MR Lab</h1>
-		<nav class="top-menu-nav">
-			<a href="index.html">Demos</a>		
-			<a href="scenes.html">Scenes</a>
-			<a href="sources.html">Sources</a>
-			<a href="outputs.html">Outputs</a>
-		</nav>
 	</header>
 	
 	<div class="main-layout-horizontal">
 		
-		<aside class="left-buttons-sidebar">
-			<button class="active-button" onclick="showContent('demo-fly', this)">Fly</button>
-			<button onclick="showContent('demo-reverb', this)">Reverb</button>
-			<button onclick="showContent('demo-jungle', this)">Jungle</button>
-			<button onclick="showContent('demo-music', this)">Music</button>
+		<aside class="scenes-sidebar">
+			<button onclick="loadScene('demo-fly', this)">Fly</button>
+			<button onclick="loadScene('demo-reverb', this)">Reverb</button>
+			<button onclick="loadScene('demo-jungle', this)">Jungle</button>
+			<button onclick="loadScene('demo-music', this)">Music</button>
+			<button onclick="loadScene('error', this)">Error</button>
 		</aside>
 
-		<main class="content">
-		
-			<div id="demo-fly" class="content-section">
-				<button onClick="send('/app/pd-fly/control', 'launch')">Launch pd</button>
-				<button onClick="send('/app/pd-fly/control', 'quit')">Quit pd</button>
-				<button onClick="sendResponse('/app/pd-fly/osc/Control/Response')">Connect Response</button>
-				<button onClick="sendNoArgs('/app/pd-fly/osc/Control/Version')">Get Version</button>
-				<button onClick="sendNoArgs('/app/pd-fly/osc/Control/SampleRate')">Get Samplerate</button>
-				<button onClick="sendNoArgs('/app/pd-fly/osc/Control/CPULoad')">Get CPU</button>
-				<br />
-					Status: <b id="pd-fly_status">null</b>
-					Version: <b id="pd-fly_Version">null</b>
-					Samplerate: <b id="pd-fly_SampleRate">null</b>
-					CPU %: <b id="pd-fly_CPULoad">null</b>				
+		<main class="scene-port" id="scene-port">
+			<div class="scene-main">
+				<h2>Welcome to the Audio Server of the Mixed-Reality Lab.</h2>
+				<p>Select a scene on the left.</p>
 			</div>
+    </main>		
 
-			<div id="demo-reverb" class="content-section">
-				<button onClick="send('/app/reaper-reverb/control', 'launch')">Launch Reaper</button>
-				<button onClick="send('/app/reaper-reverb/control', 'quit')">Quit Reaper</button>
-				<button onClick="sendNoArgs('/app/reaper-reverb/osc/play')">Play</button>
-				<button onClick="sendNoArgs('/app/reaper-reverb/osc/pause')">Pause</button>
-				<button onClick="sendNoArgs('/app/reaper-reverb/osc/stop')">Stop</button>
-				Status: <b id="reaper-reverb_status">null</b>
-			</div>
-						
-			<div id="demo-jungle" class="content-section">
-				<button onClick="send('/app/pd-jungle/control', 'launch')">Launch pd</button>
-				<button onClick="send('/app/pd-jungle/control', 'quit')">Quit pd</button>
-				<button onClick="sendResponse('/app/pd-jungle/osc/Control/Response')">Connect Response</button>
-				<button onClick="sendNoArgs('/app/pd-jungle/osc/Control/Version')">Get Version</button>
-				<button onClick="sendNoArgs('/app/pd-jungle/osc/Control/SampleRate')">Get Samplerate</button>
-				<button onClick="sendNoArgs('/app/pd-jungle/osc/Control/CPULoad')">Get CPU</button>
-				<br />
-					Status: <b id="pd-jungle_status">null</b>
-					Version: <b id="pd-jungle_Version">null</b>
-					Samplerate: <b id="pd-jungle_SampleRate">null</b>
-					CPU %: <b id="pd-jungle_CPULoad">null</b>				
-			</div>
-
-			<div id="demo-music" class="content-section">
-				<button onClick="send('/app/reaper-music/control', 'launch')">Launch Reaper</button>
-				<button onClick="send('/app/reaper-music/control', 'quit')">Quit Reaper</button>
-				<button onClick="sendNoArgs('/app/reaper-music/osc/play')">Play</button>
-				<button onClick="sendNoArgs('/app/reaper-music/osc/pause')">Pause</button>
-				<button onClick="sendNoArgs('/app/reaper-music/osc/stop')">Stop</button>
-				Status: <b id="reaper-music_status">null</b>
-			</div>
-			
-		</main>
 	</div>		
   </body>
 </html>
