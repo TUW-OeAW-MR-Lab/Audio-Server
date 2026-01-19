@@ -1,16 +1,16 @@
-id: "configFlyMac"
 name: "Pd Fly Mac"
 description: "Pd with Fly demonstration"
 
-startCommand:
-  - "/Applications/Pd-0.56-2.app/Contents/MacOS/Pd"
-  - "/Users/rm/Documents/Pd/test_stdout.pd"
+app:
+  startCommand:
+    - "/Applications/Pd-0.56-2.app/Contents/MacOS/Pd"
+    - "/Users/rm/Documents/Pd/test_stdout.pd"
 
-stopCommand:
-  - "killall"
-  - "Pd"
+  stopCommand:
+    - "killall"
+    - "Pd"
 
-workingDir: ""
+  workingDir: ""
 
-captureStdOut: false
-captureStdErr: false
+  captureStdOut: false
+  captureStdErr: false

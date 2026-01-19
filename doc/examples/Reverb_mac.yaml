@@ -1,14 +1,14 @@
-id: "configReverbMac"
 name: "Reaper Reverb Mac"
 description: "Reaper DAW with artificial reverb"
 
-startCommand:
-  - "/Applications/REAPER.app/Contents/MacOS/REAPER"
-  - "-new"
+app:
+  startCommand:
+    - "/Applications/REAPER.app/Contents/MacOS/REAPER"
+    - "-new"
 
-stopCommand: []
+  stopCommand: []
 
-workingDir: ""
+  workingDir: ""
 
-captureStdOut: false
-captureStdErr: false
+  captureStdOut: false
+  captureStdErr: false
