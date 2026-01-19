@@ -26,6 +26,13 @@ AppController::~AppController()
 void AppController::populateFromConfigFileLocation()
 {
     const auto configFileLocation = APP_SUPPORT_DIR.getChildFile ("Scenes");
+
+    if (! configFileLocation.isDirectory())
+    {
+        Logger::logError ("Config file location " + configFileLocation.getFullPathName() + " does not exist.");
+        return;
+    }
+
     Logger::logInfo ("Scanning config file location " + configFileLocation.getFullPathName() + " for YAML configuration files.");
     const auto yamlConfigs = configFileLocation.findChildFiles (juce::File::TypesOfFileToFind::findFiles, true, "*.yaml");
 

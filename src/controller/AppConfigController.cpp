@@ -109,30 +109,30 @@ std::optional<AppConfig> AppConfigController::loadConfigFromFile (const juce::Fi
     }
 
     AppConfig cfg;
-    auto root = doc.node;
+    auto appRoot = doc.node["app"];
 
     try
     {
         // Required strings
-        cfg.id = juce::Identifier (root["id"].as<std::string>());
-        cfg.name = root["name"].as<std::string>();
-        cfg.description = root["description"].as<std::string>();
-        cfg.workingDir = juce::File (root["workingDir"].as<std::string>());
+        cfg.id = juce::Identifier (yamlFile.getFileNameWithoutExtension());
+        cfg.name = appRoot["name"].as<std::string>();
+        cfg.description = appRoot["description"].as<std::string>();
+        cfg.workingDir = juce::File (appRoot["workingDir"].as<std::string>());
 
         // Arrays
         cfg.startCommand.clear();
-        for (const auto& child : root["startCommand"])
+        for (const auto& child : appRoot["startCommand"])
             cfg.startCommand.add (child.as<std::string>());
 
         cfg.stopCommand.clear();
-        for (const auto& child : root["stopCommand"])
+        for (const auto& child : appRoot["stopCommand"])
             cfg.stopCommand.add (child.as<std::string>());
 
         // Booleans (optional, default true)
-        if (root["captureStdOut"])
-            cfg.captureStdOut = (root["captureStdOut"].as<bool>());
-        if (root["captureStdErr"])
-            cfg.captureStdErr = (root["captureStdErr"].as<bool>());
+        if (appRoot["captureStdOut"])
+            cfg.captureStdOut = (appRoot["captureStdOut"].as<bool>());
+        if (appRoot["captureStdErr"])
+            cfg.captureStdErr = (appRoot["captureStdErr"].as<bool>());
     }
     catch (const std::exception& e)
     {
@@ -167,25 +167,28 @@ bool AppConfigController::parseYamlFile (const juce::File& yamlFile, YamlDocumen
 
 bool AppConfigController::validateYamlDocument (const YamlDocument& document)
 {
-    const auto root = document.node;
-
-    // Check required string entries
-    for (const char* key : { "id", "name", "description", "workingDir" })
+    if (document.node["app"])
     {
-        if (! root[key])
+        const auto appRoot = document.node["app"];
+
+        // Check required string entries
+        for (const char* key : {"name", "description", "workingDir" })
         {
-            Logger::logError (juce::String ("Missing key '") + key + "'");
-            return false;
+            if (! appRoot[key])
+            {
+                Logger::logError (juce::String ("Missing key '") + key + "'");
+                return false;
+            }
         }
-    }
 
-    // Check startCommand and stopCommand arrays
-    for (const char* key : { "startCommand", "stopCommand" })
-    {
-        if (! root[key] || ! root[key].IsSequence())
+        // Check startCommand and stopCommand arrays
+        for (const char* key : { "startCommand", "stopCommand" })
         {
-            Logger::logError (juce::String ("Missing or invalid '") + key + "' (must be a sequence)");
-            return false;
+            if (! appRoot[key] || ! appRoot[key].IsSequence())
+            {
+                Logger::logError (juce::String ("Missing or invalid '") + key + "' (must be a sequence)");
+                return false;
+            }
         }
     }
 
