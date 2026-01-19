@@ -31,6 +31,17 @@ include (CTest)
 # JUCE dependency
 CPMAddPackage ("gh:juce-framework/JUCE#8.0.10")
 
+# yaml-cpp
+set (CMAKE_POLICY_VERSION_MINIMUM "3.5")
+CPMAddPackage (
+    URI "gh:jbeder/yaml-cpp#0.8.0"
+    OPTIONS
+        "YAML_BUILD_SHARED_LIBS OFF"
+        "YAML_CPP_BUILD_TESTS OFF"
+        "YAML_CPP_BUILD_TOOLS OFF"
+)
+unset (CMAKE_POLICY_VERSION_MINIMUM)
+
 # CivetWeb for webserver and websocket
 CPMAddPackage (
     URI "gh:civetweb/civetweb#dfdfdb6926765541751cab055472f70daa9aa2dd"
@@ -98,6 +109,7 @@ target_link_libraries (mrlabctrl_Common
         juce::juce_gui_extra
         civetweb-cpp
         liblo_static
+        yaml-cpp::yaml-cpp
 )
 
 target_link_libraries (mrlabctrl_App

@@ -10,6 +10,8 @@
 #include "AppController.h"
 #include "AppHandle.h"
 #include "AppConfigController.h"
+#include <util/SupportFileLocation.h>
+#include <util/Logger.h>
 
 namespace mrlab::controller
 {
@@ -21,11 +23,37 @@ AppController::AppController (AppConfigController& configController)
 AppController::~AppController()
 {}
 
+void AppController::populateFromConfigFileLocation()
+{
+    const auto configFileLocation = APP_SUPPORT_DIR.getChildFile ("Scenes");
+    Logger::logInfo ("Scanning config file location " + configFileLocation.getFullPathName() + " for YAML configuration files.");
+    const auto yamlConfigs = configFileLocation.findChildFiles (juce::File::TypesOfFileToFind::findFiles, true, "*.yaml");
+
+    for (const auto& config : yamlConfigs)
+        add (config);
+}
+
 bool AppController::add (const juce::Identifier& appId)
 {
     auto appConfig = appConfigController.findConfig (appId); // may throw
 
     auto [iter, success] = apps.try_emplace (appId, std::make_unique<AppHandle> (std::move (appConfig)));
+
+    if (success)
+        listeners.call (&Listener::appAdded, *iter->second);
+
+    return success;
+}
+
+bool AppController::add (const juce::File& file)
+{
+    auto appConfig = appConfigController.loadConfigFromFile (file);
+    if (! appConfig.has_value())
+        return false;
+
+    const auto id = appConfig->id;
+
+    auto [iter, success] = apps.try_emplace (id, std::make_unique<AppHandle> (std::move (*appConfig)));
 
     if (success)
         listeners.call (&Listener::appAdded, *iter->second);

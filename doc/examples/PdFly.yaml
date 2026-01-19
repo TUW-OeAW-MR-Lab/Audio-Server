@@ -1,0 +1,18 @@
+id: "configFlyWin"
+name: "Pd Fly Windows"
+description: "Pd with Fly demonstration"
+
+startCommand:
+  - "C:\\PD\\YAMI\\FLY.bat"
+
+stopCommand:
+  - "C:\\Windows\\System32\\taskkill"
+  - "/IM"
+  - "pd.com"
+  - "/T"
+  - "/F"
+
+workingDir: "C:\\PD\\YAMI"
+
+captureStdOut: false
+captureStdErr: false

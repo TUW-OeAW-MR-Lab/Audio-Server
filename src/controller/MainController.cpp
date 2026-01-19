@@ -26,12 +26,8 @@ MainController::MainController()
 
     startWebServer();
 
-    // Simulate dynamic run-time adding after construction time...
     juce::Timer::callAfterDelay (1200, [&] {
-        appController.add (AppConfigController::configFly);
-        appController.add (AppConfigController::configReverb);
-        appController.add (AppConfigController::configJungle);
-        appController.add (AppConfigController::configMusic);
+        appController.populateFromConfigFileLocation();
     });
 }
 

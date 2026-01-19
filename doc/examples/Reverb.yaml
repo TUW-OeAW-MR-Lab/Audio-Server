@@ -1,0 +1,14 @@
+id: "configReverbWin"
+name: "Reaper Reverb Windows"
+description: "Reaper DAW with artificial reverb"
+
+startCommand:
+  - "C:\\Program Files\\REAPER (x64)\\reaper"
+  - "reverb.rpp"
+
+stopCommand: []
+
+workingDir: ""
+
+captureStdOut: false
+captureStdErr: false

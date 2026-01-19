@@ -67,6 +67,8 @@ public:
 
     ~AppController();
 
+    void populateFromConfigFileLocation();
+
     /** Add an app handle for appId to this controller.
 
         This will acquire a matching app configuration for instantiating a handle.
@@ -77,6 +79,13 @@ public:
         @throws AppConfigNotFoundException.
      */
     bool add (const juce::Identifier& appId);
+
+    /** Add an app handle for appId to this controller by file.
+
+        @param file the file on disk.
+        @returns true on success, false if there is already an app with this id.
+     */
+    bool add (const juce::File& file);
 
     /** Remove the app handle for appId from this controller.
 

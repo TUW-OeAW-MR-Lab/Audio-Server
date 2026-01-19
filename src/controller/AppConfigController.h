@@ -10,6 +10,7 @@
 #pragma once
 
 #include <juce_core/juce_core.h>
+#include <yaml-cpp/yaml.h>
 
 namespace mrlab::controller
 {
@@ -28,18 +29,22 @@ struct AppConfig
     juce::StringArray startCommand; ///< Command line to execute for launching (executable and arguments).
     juce::StringArray stopCommand;  ///< Command line to execute for quitting (if empty, kill will be used).
 
-    juce::File workingDir;          ///< Working directory for app launching.
+    juce::File workingDir; ///< Working directory for app launching.
 
-    bool captureStdOut = true;      ///< Flag to indicate whether to capture the app's std output.
-    bool captureStdErr = true;      ///< Flag to indicate whether to capture the app's std error.
+    bool captureStdOut = true; ///< Flag to indicate whether to capture the app's std output.
+    bool captureStdErr = true; ///< Flag to indicate whether to capture the app's std error.
 };
-
 
 //==============================================================================
 /** Manage and provide app configurations from config files. */
 class AppConfigController
 {
 public:
+    struct YamlDocument
+    {
+        YAML::Node node;
+    };
+
     //==============================================================================
     /** Exception that is thrown when there is no app for the given id. */
     class AppConfigNotFoundException : public std::exception
@@ -70,6 +75,15 @@ public:
         @throws AppConfigNotFoundException.
      */
     AppConfig findConfig (const juce::Identifier& appId) const;
+
+    /** Loads and app config from a yaml file while also checking it for validity. */
+    static std::optional<AppConfig> loadConfigFromFile (const juce::File& yamlFile);
+
+    /** */
+    static bool parseYamlFile (const juce::File& yamlFile, YamlDocument& document);
+
+    /** Validates the contents of a yaml AppConfig description to be a valid one. */
+    static bool validateYamlDocument (const YamlDocument& yamlFile);
 
 private:
     //==============================================================================

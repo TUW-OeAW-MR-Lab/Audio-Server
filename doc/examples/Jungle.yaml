@@ -1,0 +1,18 @@
+id: "configJungleWin"
+name: "Pd Jungle Windows"
+description: "Pd with Jungle demonstration"
+
+startCommand:
+  - "C:\\PD\\YAMI\\JUNGLE.bat"
+
+stopCommand:
+  - "C:\\Windows\\System32\\taskkill"
+  - "/IM"
+  - "pd.com"
+  - "/T"
+  - "/F"
+
+workingDir: "C:\\PD\\YAMI"
+
+captureStdOut: false
+captureStdErr: false

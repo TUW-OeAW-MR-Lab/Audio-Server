@@ -1,0 +1,14 @@
+id: "configMusicWin"
+name: "Reaper Music Windows"
+description: "Reaper DAW with music example"
+
+startCommand:
+  - "C:\\Program Files\\REAPER (x64)\\reaper"
+  - "music.rpp"
+
+stopCommand: []
+
+workingDir: ""
+
+captureStdOut: false
+captureStdErr: false

@@ -8,6 +8,7 @@
  */
 
 #include "AppConfigController.h"
+#include <util/Logger.h>
 
 namespace mrlab::controller
 {
@@ -87,6 +88,108 @@ AppConfig AppConfigController::findConfig (const juce::Identifier& appId) const
     }
 
     throw AppConfigNotFoundException (appId);
+}
+
+std::optional<AppConfig> AppConfigController::loadConfigFromFile (const juce::File& yamlFile)
+{
+    Logger::logInfo (juce::String ("Loading config file ") + yamlFile.getFullPathName());
+
+    YamlDocument doc;
+
+    if (! parseYamlFile (yamlFile, doc))
+    {
+        Logger::logError ("Failed to parse YAML file");
+        return std::nullopt;
+    }
+
+    if (! validateYamlDocument (doc))
+    {
+        Logger::logError ("Failed to validate YAML file");
+        return std::nullopt;
+    }
+
+    AppConfig cfg;
+    auto root = doc.node;
+
+    try
+    {
+        // Required strings
+        cfg.id = juce::Identifier (root["id"].as<std::string>());
+        cfg.name = root["name"].as<std::string>();
+        cfg.description = root["description"].as<std::string>();
+        cfg.workingDir = juce::File (root["workingDir"].as<std::string>());
+
+        // Arrays
+        cfg.startCommand.clear();
+        for (const auto& child : root["startCommand"])
+            cfg.startCommand.add (child.as<std::string>());
+
+        cfg.stopCommand.clear();
+        for (const auto& child : root["stopCommand"])
+            cfg.stopCommand.add (child.as<std::string>());
+
+        // Booleans (optional, default true)
+        if (root["captureStdOut"])
+            cfg.captureStdOut = (root["captureStdOut"].as<bool>());
+        if (root["captureStdErr"])
+            cfg.captureStdErr = (root["captureStdErr"].as<bool>());
+    }
+    catch (const std::exception& e)
+    {
+        Logger::logError (juce::String ("Error loading AppConfig: ") + e.what());
+        return std::nullopt;
+    }
+
+    Logger::logInfo ("Config file loaded successfully!");
+    return cfg;
+}
+
+bool AppConfigController::parseYamlFile (const juce::File& yamlFile, YamlDocument& document)
+{
+    if (! yamlFile.existsAsFile())
+    {
+        Logger::logError (juce::String ("AppConfigController::parseYamlFile(): Config file not found."));
+        return false;
+    }
+
+    try
+    {
+        document.node = YAML::LoadFile (yamlFile.getFullPathName().toStdString());
+    }
+    catch (const std::exception& e)
+    {
+        Logger::logError (juce::String ("AppConfigController::parseYamlFile(): Failed to parse YAML file with error: ") + e.what());
+        return false;
+    }
+
+    return true;
+}
+
+bool AppConfigController::validateYamlDocument (const YamlDocument& document)
+{
+    const auto root = document.node;
+
+    // Check required string entries
+    for (const char* key : { "id", "name", "description", "workingDir" })
+    {
+        if (! root[key])
+        {
+            Logger::logError (juce::String ("Missing key '") + key + "'");
+            return false;
+        }
+    }
+
+    // Check startCommand and stopCommand arrays
+    for (const char* key : { "startCommand", "stopCommand" })
+    {
+        if (! root[key] || ! root[key].IsSequence())
+        {
+            Logger::logError (juce::String ("Missing or invalid '") + key + "' (must be a sequence)");
+            return false;
+        }
+    }
+
+    return true;
 }
 
 } // namespace mrlab::controller
