@@ -8,7 +8,7 @@ It communicates with the clients, configures the audio devices, and launches the
 
 ### Prerequisites
 
-*mrlabctrl* needs a standard C++ toolchain to build and should compile with MSVC, clang, or gcc (on Windows, JUCE is reported to not anymore support the minGW gcc compiler).
+*MRLabAudioServer* needs a standard C++ toolchain to build and should compile with MSVC, clang, or gcc (on Windows, JUCE is reported to not anymore support the minGW gcc compiler).
 
 On Windows, one way is to install *Visual Studio 2022 (Community)* with the *Desktop Development with C++* workload.
 
@@ -20,11 +20,11 @@ Use your IDE's built-in *git* facility or the command line to clone the reposito
 git clone https://github.com/sonible/mrlab-audio-server.git
 ```
 
-### Building and runnung from the command line
+### Building and running from the command line
 
 Note that on Windows with Visual Studio, the *Developer Command Prompt* or the *Developer Power Shell* should be used in order set the correct environment for the build toolchain.
 
-*mrlabctrl* uses `cmake` for building and includes *CMake* preset definitions, so either way of standard cmake commands can be used.
+*MRLabAudioServer* uses `cmake` for building and includes *CMake* preset definitions, so either way of standard cmake commands can be used.
 
 #### Using CMake presets
 
@@ -57,7 +57,7 @@ cmake --build build
 The app binary can be then directly run from its build directory, e.g.
 
 ```
-build-release/mrlabctrl_App_artefacts/Release/mrlabctrl.exe
+build-release/mrlabctrl_App_artefacts/Release/MRLabAudioServer.exe
 ```
 
 
@@ -96,17 +96,17 @@ Both options can also be set via environment variables of the same names (i.e., 
 The app binary can be directly run from its build directory, e.g.
 
 ```
-build-release/mrlabctrl_App_artefacts/Release/mrlabctrl
+build-release/mrlabctrl_App_artefacts/Release/MRLabAudioServer
 ```
 
 ## Application configuration data and resources
 
-The default base path for application resources on Windows is in `%APPDATA%/mrlabctrl`, which usually translates to the `AppData/Roaming/mrlabctrl` subdirectory in the user's home directory.
+The default base path for application resources on Windows is `%PROGRAMDATA%/MRLabAudioServer`, which usually translates to the system-wide directory `C:\ProgramData\MRLabAudioServer`.
 
 Below this base path, the following subdirectories are used:
 
-* `webgui`: webserver document root for serving the web-based GUI to the control clients
-* `apps`: configuration files for managed apps
+* `WebGUI`: webserver document root for serving the web-based GUI to the control clients
+* `Config`: configuration files for managed scenes
 
 The server is configured for the following applications:
 
@@ -116,7 +116,7 @@ The server is configured for the following applications:
 * Music: a Reaper-based demo, will be started as `jungle.rpp` and must listen to port 10009
 
 
-### Webgui
+### WebGUI
 
 The repository includes a very simple proof-of-concept webgui project in `resources/webgui_minimal`. Its contents need to be copied to the webserver document root (see above).
 
