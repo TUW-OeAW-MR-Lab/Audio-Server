@@ -1,5 +1,5 @@
       var oscPort = new osc.WebSocketPort({
-          url: "ws://localhost:7080/ws",
+          url: "/ws", // WebSocket resource at current URL context.
           metadata: true
       });
       oscPort.open();
@@ -57,7 +57,7 @@
 				return;
 			};
 
-			if (path[1] == "pd-fly" || path[1] == "pd-jungle") 
+			if (path[1] == "pd-fly" || path[1] == "pd-jungle")
 			{
 				if (path[2] == "osc" && path[3] == "Control") {
 					// Show response infos.
@@ -70,7 +70,7 @@
 				console.log("No OSC message handler: ", oscMsg.address);
 				return;
 			};
-				
 
-			console.log("No OSC message handler: ", oscMsg.address);	
+
+			console.log("No OSC message handler: ", oscMsg.address);
     });
