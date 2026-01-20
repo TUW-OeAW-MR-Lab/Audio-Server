@@ -283,7 +283,13 @@ header a + a {
     display: block;
     padding: 20px;
 }
-
+.scene-main button {
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #9da0a5;
+    cursor: pointer;
+    text-align: left;
+}
 #page-home {
     display: block; /* Default visible section */
 }
