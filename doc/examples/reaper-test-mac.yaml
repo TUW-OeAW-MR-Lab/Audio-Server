@@ -1,0 +1,14 @@
+name: Reaper Test Mac
+description: Reaper DAW generic test for development on Mac
+
+app:
+  startCommand:
+    - /Applications/REAPER.app/Contents/MacOS/REAPER
+    - -new
+
+  stopCommand: []
+
+  workingDir: ""
+
+  captureStdOut: false
+  captureStdErr: false

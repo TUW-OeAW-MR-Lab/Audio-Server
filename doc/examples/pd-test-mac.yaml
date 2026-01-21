@@ -1,0 +1,16 @@
+name: Pd Test Mac
+description: Pd generic test for development on Mac
+
+app:
+  startCommand:
+    - /Applications/Pd-0.56-2.app/Contents/MacOS/Pd
+    - /Users/rm/Documents/Pd/test_stdout.pd
+
+  stopCommand:
+    - killall
+    - Pd
+
+  workingDir: ""
+
+  captureStdOut: true
+  captureStdErr: true
