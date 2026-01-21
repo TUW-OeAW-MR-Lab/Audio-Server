@@ -1,5 +1,6 @@
 
 let secWaited = 0; // Global counter for seconds waited after some action
+let SceneModule = null; // Module for all Scene-related scripts, will be loaded from scripts/%scene-name%.js
 
 // Prevent going back or reload if a scene has been launched
 window.addEventListener('beforeunload', (event) => {
@@ -23,7 +24,7 @@ async function loadScene(scene, clickedButton)
 		// load the activeted scene
 	const activeScene = document.getElementById('scene-port');
 	try 
-	{
+	{		// Load the GUI page
 		const response = await fetch('scenes/' + scene + '.html');
 		if (!response.ok) throw new Error('Page not found');
 		const html = await response.text();
@@ -32,6 +33,19 @@ async function loadScene(scene, clickedButton)
 	catch (error)
 	{
 		activeScene.innerHTML = `<h2>Error</h2><p>The scene ${scene} could not be loaded.</p>`;
+	}
+		// Load Scene-specific scripts, if any
+	try
+	{
+		console.log('Loading script ' + scene + '.js');
+		SceneModule = await import('./' + scene + '.js');
+		SceneModule.init();	// must have an init
+		console.log('Good!');
+	}
+	catch(error)
+	{
+		console.log('Error: ' + error);
+		SceneModule = null;
 	}
 		// Handle the buttons: highlight the active 
 	const allButtons = document.querySelectorAll('.scenes-sidebar button');
@@ -50,13 +64,14 @@ function launchApp(scene, app)
 }
 
 // Quit an app of a scene, consider interface functionality
-function quitApp(scene, app)
+function quitApp(scene, app, quitFun)
 {
 	send('/app/' + app + '/control', 'quit');
 	const launchedButton = document.getElementById('button-' + scene);
 	launchedButton.classList.remove('launched-scene');
 	launchedButton.classList.add('active-scene');
 	secWaited = 0;
+	if (quitFun != null) quitFun();
 }
 
 // Launch an app of a scene (consider interface functionality) and wait until "ready"
@@ -65,7 +80,7 @@ function launchAppAndWait(scene, app, initFun, readyFun)
 	state = document.getElementById(app + "_status");
 	state.innerText = "unclear";
 	state.style.backgroundColor = "red";
-	if (initFun != null) initFun(); 
+	if (initFun != null) initFun();
 	launchApp(scene, app);
 	setTimeout(() => { checkStateLaunched(scene, app, readyFun); }, 100);
 }
@@ -94,40 +109,3 @@ function checkStateLaunched(scene, app, readyFun)
 	}
 }
 
-function initFly()
-{
-	document.getElementById("pd-fly_Version").innerText = "---";
-	document.getElementById("pd-fly_SampleRate").innerText = "---";
-	document.getElementById("pd-fly_CPULoad").innerText = "---";
-}
-
-function doneFly()
-{
-	state = document.getElementById("pd-fly_status");
-	state.innerText = "connecting...";
-	state.style.backgroundColor = "blue";
-	sendResponse('/app/pd-fly/osc/Control/Response');
-	sendResponse('/app/pd-fly/osc/Control/Version');
-	secWaited = 0;
-	setTimeout(() => { checkFlyConnection(); }, 100);
-}
-
-function checkFlyConnection()
-{
-	secWaited += 100;
-	state = document.getElementById("pd-fly_Version");
-	console.log("waiting for " + secWaited/1000 + "s, version=" + state.innerText);
-	switch (state.innerText)
-	{
-		case "---":
-			sendResponse('/app/pd-fly/osc/Control/Response');
-			sendResponse('/app/pd-fly/osc/Control/Version');		
-			setTimeout(() => { checkFlyConnection(); }, 100);
-			break;
-		default: 
-			state = document.getElementById("pd-fly_status");
-			state.innerText = "connected";
-			state.style.backgroundColor = "";
-			break;
-	}
-}		
