@@ -85,9 +85,8 @@
 	<h2>Demo: Fly</h2>
 	<div class="start-container">
 		<div class="button-group">
-			<button onClick="launchAppAndWait('demo-fly', 'pd-fly', SceneModule.init, SceneModule.connect)" class="big-button">Launch App</button>
+			<button onClick="launchAppAndWait('demo-fly', 'pd-fly', 5, SceneModule.init, SceneModule.connect)" class="big-button">Launch App</button>
 			<p>Status: <b id="pd-fly_status">unclear</b></p>
-			<button onClick="sendResponse('/app/pd-fly/osc/Control/Response')" class="small-button" style="width:200px">Connect Response</button>
 	
 			<button onClick="sendNoArgs('/app/pd-fly/osc/Control/Start')" class="big-button">Start</button>
 			<button onClick="sendNoArgs('/app/pd-fly/osc/Control/Stop')"class="big-button">Stop</button>

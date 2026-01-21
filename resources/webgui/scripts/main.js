@@ -29,6 +29,7 @@ async function loadScene(scene, clickedButton)
 		if (!response.ok) throw new Error('Page not found');
 		const html = await response.text();
 		activeScene.innerHTML = html;
+		console.log('Scene ' + scene + '.html loaded.');
 	}
 	catch (error)
 	{
@@ -37,14 +38,13 @@ async function loadScene(scene, clickedButton)
 		// Load Scene-specific scripts, if any
 	try
 	{
-		console.log('Loading script ' + scene + '.js');
 		SceneModule = await import('./' + scene + '.js');
 		SceneModule.init();	// must have an init
-		console.log('Good!');
+		console.log('Script ' + scene + '.js loaded.');
 	}
 	catch(error)
 	{
-		console.log('Error: ' + error);
+		console.log('Error loading ' + scene + '.js: ' + error);
 		SceneModule = null;
 	}
 		// Handle the buttons: highlight the active 
@@ -71,21 +71,25 @@ function quitApp(scene, app, quitFun)
 	launchedButton.classList.remove('launched-scene');
 	launchedButton.classList.add('active-scene');
 	secWaited = 0;
+	state = document.getElementById(app + "_status");
+	state.style.backgroundColor = "";
 	if (quitFun != null) quitFun();
 }
 
 // Launch an app of a scene (consider interface functionality) and wait until "ready"
-function launchAppAndWait(scene, app, initFun, readyFun)
+//   timeout in seconds
+//   initFun and readyFun: optional functions executed before and after successful launch, respectively
+function launchAppAndWait(scene, app, timeout, initFun, readyFun)
 {
 	state = document.getElementById(app + "_status");
 	state.innerText = "unclear";
 	state.style.backgroundColor = "red";
 	if (initFun != null) initFun();
 	launchApp(scene, app);
-	setTimeout(() => { checkStateLaunched(scene, app, readyFun); }, 100);
+	setTimeout(() => { checkStateLaunched(scene, app, timeout, readyFun); }, 100);
 }
 
-function checkStateLaunched(scene, app, readyFun)
+function checkStateLaunched(scene, app, timeout, readyFun)
 {
 	secWaited += 100;
 	state = document.getElementById(app + "_status");
@@ -93,11 +97,13 @@ function checkStateLaunched(scene, app, readyFun)
 	switch (state.innerText)
 	{
 		case "unclear":
-			setTimeout(() => { checkStateLaunched(scene, app, readyFun); }, 100);
+			if (secWaited <= timeout*1000)
+				setTimeout(() => { checkStateLaunched(scene, app, timeout, readyFun); }, 100);
 			break;
 		case "alive":
 			state.style.backgroundColor = "yellow";
-			setTimeout(() => { checkStateLaunched(scene, app, readyFun); }, 100);
+			if (secWaited <= timeout*1000)
+				setTimeout(() => { checkStateLaunched(scene, app, timeout, readyFun); }, 100);
 			break;		
 		case "ready":
 			state.style.backgroundColor = "";
@@ -106,6 +112,12 @@ function checkStateLaunched(scene, app, readyFun)
 		case "error":
 			state.style.backgroundColor = "red";
 			break;
+	}
+	if (secWaited > timeout*1000)
+	{
+		state.style.backgroundColor = "red";
+		state.innerText = "time out!";
+		console.log("Time out!"); 
 	}
 }
 

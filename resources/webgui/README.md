@@ -21,7 +21,9 @@ Buttons on the left side: Scenes
  * `ready`: App launched. Now commands can be sent to the app.
  * `success`: ??? (appears when the App has been closed by the admin).
 
-* To start an app and wait until the app has been launched: ` <button onClick="launchAppAndWait(%SceneName%, %app-name%, SceneModule.init, SceneModule.ready)">Launch App</button>`, which calls the scene-related `init()` function before launching the `%app-name%` and `ready()` after the app has been successfully launched. No time out yet. 
+* To start an app and wait until the app has been launched: ` <button onClick="launchAppAndWait(%SceneName%, %app-name%, %timeout%)">Launch App</button>`, which waits %timeout% seconds before creating an error. 
+
+* To start an app, wait, and do some processing: ` <button onClick="launchAppAndWait(%SceneName%, %app-name%, %timeout%, SceneModule.init, SceneModule.ready)">Launch App</button>`, which calls the scene-related `init()` function before launching the `%app-name%` and `ready()` after the app has been successfully launched. 
 
 * To quit an app: ` <button onClick="quitApp(%SceneName%, %appName%)">Quit App</button>. Server responses with the following states: 
  * `quitting...`: command acknowledged, quitting the app.
