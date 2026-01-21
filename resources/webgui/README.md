@@ -1,10 +1,8 @@
 # WebGUI
 
-Buttons on the left side: Scenes
+Buttons on the left side load a Scene. Technically, each button loads an HTML file `scenes/%SceneName%.html` and optionally a Javascript module `scripts/%SceneName%.js`.
 
-* Each button loads a HTML file from the directory scenes
-
-## Scenes
+## A Scene
 
 * Must start with `<div id="%SceneName%" class="scene-main">` and end with `</div>`.
 
@@ -17,18 +15,18 @@ Buttons on the left side: Scenes
 * The highest level of header must be `<h2>%SceneName%</h2>`.
 
 * To start an app: ` <button onClick="launchApp(%SceneName%, %appName%)">Launch App</button>`. Server responses with the following states: 
- * `alive`: command acknowledged, launching the app.
- * `ready`: App launched. Now commands can be sent to the app.
- * `success`: ??? (appears when the App has been closed by the admin).
+  * `alive`: command acknowledged, launching the app.
+  * `ready`: App launched. Now commands can be sent to the app.
+  * `success`: ??? (appears when the App has been closed by the admin).
 
-* To start an app and wait until the app has been launched: ` <button onClick="launchAppAndWait(%SceneName%, %app-name%, %timeout%)">Launch App</button>`, which waits %timeout% seconds before creating an error. 
+* To start an app and wait until the app has been launched: ` <button onClick="launchAppAndWait(%SceneName%, %appName%, %timeout%)">Launch App</button>`, which waits %timeout% seconds before creating an error. 
 
-* To start an app, wait, and do some processing: ` <button onClick="launchAppAndWait(%SceneName%, %app-name%, %timeout%, SceneModule.init, SceneModule.ready)">Launch App</button>`, which calls the scene-related `init()` function before launching the `%app-name%` and `ready()` after the app has been successfully launched. 
+* To start an app, wait, and do some processing: ` <button onClick="launchAppAndWait(%SceneName%, %appName%, %timeout%, SceneModule.init, SceneModule.ready)">Launch App</button>`, which calls the scene-related `init()` function before launching the `%appName%` and `ready()` after the app has been successfully launched. 
 
 * To quit an app: ` <button onClick="quitApp(%SceneName%, %appName%)">Quit App</button>. Server responses with the following states: 
- * `quitting...`: command acknowledged, quitting the app.
- * `killed`: app killed.
- * `error`: ??? (appears when the App has been killed).
+  * `quitting...`: command acknowledged, quitting the app.
+  * `killed`: app killed.
+  * `error`: ??? (appears when the App has been killed).
  
 * To quit an app and execute a function right after the quit command has been sent to the server: `quitApp(%SceneName%, %appName%, SceneModule.%quitFunction%)`.
 
