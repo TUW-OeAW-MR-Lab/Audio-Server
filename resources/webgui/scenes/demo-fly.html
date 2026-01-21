@@ -1,18 +1,114 @@
 <div id="demo-fly" class="scene-main">
+
+	<style>
+		.big-button {
+			width: 300px;
+			padding: 40px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			text-align: center;
+			font-size: 24px;
+			font-weight: bold;			
+			cursor: pointer;
+		}
+		
+		.small-button {
+			width: 200px;
+			padding: 40px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			text-align: center;
+			font-size: 18px;
+			font-weight: bold;			
+			cursor: pointer;
+		}
+
+		.start-container {
+			display: flex;
+			justify-content: space-between; /* Pushes content to far left and far right */
+			align-items: center;
+			height: 400px;
+			padding: 20px;
+			border: 1px solid #ccc;
+			width: 100%;
+		}
+
+		.quit-container {
+			display: block;
+			justify-content: center; 
+			align-items: center;
+			height: 300px;
+			padding: 20px;
+			border: 1px solid #ccc;
+			width: 100%;
+		}
+		
+		.button-group {
+			box-sizing: border-box;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			gap: 10px;
+			width: 40%;
+		}
+
+		.slider-group { /* Group with the sliders, fills the entire vertical height */
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			width: 40%;
+			height: 100%;
+		}
+		.volume-slider { /* Style to make a vertical volume slider */
+			writing-mode: vertical-lr;
+			direction: rtl;
+			width: 20px;
+			height: 80%;
+		}
+		.volume-box {
+			font-family: monospace;
+			font-size: 1.2rem;
+			background: #007bff;
+			color: white;
+			padding: 5px 10px;
+			border-radius: 4px;
+			width: 100px;
+			text-align: center;
+		}		
+	</style>
+
 	<h2>Demo: Fly</h2>
-	<button onClick="launchApp('demo-fly', 'pd-fly')">Launch App</button>
-	<br>
-	Status: <b id="pd-fly_status">unclear</b>
-	<br><hr><br>
-	<button onClick="sendResponse('/app/pd-fly/osc/Control/Response')">Connect Response</button>
-	<br><hr><br>
-	<button onClick="sendNoArgs('/app/pd-fly/osc/Control/Version')">Get Version</button>
-	<button onClick="sendNoArgs('/app/pd-fly/osc/Control/SampleRate')">Get Samplerate</button>
-	<button onClick="sendNoArgs('/app/pd-fly/osc/Control/CPULoad')">Get CPU</button>
-	<br />
-		Version: <b id="pd-fly_Version">null</b><br>
-		Samplerate: <b id="pd-fly_SampleRate">null</b><br>
-		CPU %: <b id="pd-fly_CPULoad">null</b><br>
-	<hr>
-	<button onClick="quitApp('demo-fly', 'pd-fly')">Quit App</button>
+	<div class="start-container">
+		<div class="button-group">
+			<button onClick="launchApp('demo-fly', 'pd-fly')" class="big-button">Launch App</button>
+			<p>Status: <b id="pd-fly_status">unclear</b></p>
+			<button onClick="sendResponse('/app/pd-fly/osc/Control/Response')" class="small-button" style="width:200px">Connect Response</button>
+	
+			<button onClick="sendNoArgs('/app/pd-fly/osc/Control/Start')" class="big-button">Start</button>
+			<button onClick="sendNoArgs('/app/pd-fly/osc/Control/Stop')"class="big-button">Stop</button>
+		</div>
+
+		<div class="slider-group">
+			<span>Volume</span><br>
+			<input type=range min="1" max="100" value="50" oninput="send('/app/pd-fly/osc/Control/Volume', this.value); document.getElementById('volume-box').innerText = this.value;" class="volume-slider">
+			<div class="volume-box" id="volume-box">50</div>
+		</div>
+	</div>	
+	
+	<div class="quit-container">
+		<button onClick="sendNoArgs('/app/pd-fly/osc/Control/Version')" class="small-button">Get Version</button>
+		Version: <b id="pd-fly_Version">unknown</b><br>
+		
+		<button onClick="sendNoArgs('/app/pd-fly/osc/Control/SampleRate')" class="small-button">Get Samplerate</button>
+		Samplerate: <b id="pd-fly_SampleRate">unknown</b><br>
+		
+		<button onClick="sendNoArgs('/app/pd-fly/osc/Control/CPULoad')" class="small-button">Get CPU</button>
+		CPU %: <b id="pd-fly_CPULoad">unknown</b><br>
+		
+		<button onClick="quitApp('demo-fly', 'pd-fly')" class="big-button">Quit App</button>
+	</div>
 </div>
