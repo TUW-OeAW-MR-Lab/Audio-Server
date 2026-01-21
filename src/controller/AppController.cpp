@@ -29,7 +29,7 @@ void AppController::populateFromSceneConfigDir()
 
     if (! sceneConfigDir.isDirectory())
     {
-        Logger::logError ("AppController: Scene config directory " + sceneConfigDir.getFullPathName() + " does not exist.");
+        Logger::logWarn ("AppController: Scene config directory " + sceneConfigDir.getFullPathName() + " does not exist.");
         return;
     }
 

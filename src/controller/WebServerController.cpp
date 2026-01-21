@@ -38,12 +38,23 @@ WebServerController::~WebServerController()
 bool WebServerController::start()
 {
     if (civetServer != nullptr)
+    {
+        Logger::logWarn ("WebServerController: Ignoring start request,server appears to be running already.");
         return false;
+    }
+
+    const auto documentRootDir = Config::getWebServerDocumentRootDir();
+    const auto documentRoot = documentRootDir.getFullPathName();
+
+    if (documentRootDir.isDirectory())
+        Logger::logInfo (juce::String ("WebServerController: WebGUI document root is: ") + documentRoot);
+    else
+        Logger::logWarn (juce::String ("WebServerController: WebGUI document root does not exist: ") + documentRoot);
 
     std::vector<std::string> civetOptions;
 
     civetOptions.push_back ("document_root");
-    civetOptions.push_back (Config::getWebServerDocumentRootDir().getFullPathName().toStdString());
+    civetOptions.push_back (documentRoot.toStdString());
     civetOptions.push_back ("listening_ports");
     civetOptions.push_back (std::to_string (Config::getWebServerListeningPort()));
     civetOptions.push_back ("websocket_timeout_ms");

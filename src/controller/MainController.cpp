@@ -53,16 +53,8 @@ void MainController::initialise()
 
 void MainController::startWebServer()
 {
-    // TODO: Read Config from central configuration file (IMRV-42)
-    const auto documentRoot = Config::getWebServerDocumentRootDir();
-
-    Logger::logInfo (juce::String ("WebGUI document root is: ") + documentRoot.getFullPathName());
-
-    if (! documentRoot.isDirectory())
-        Logger::logWarn ("WebGUI document root does not exist!");
-
     if (! webServerController.start())
-        Logger::logError ("Starting the webserver failed!");
+        Logger::logError ("MainController: Starting the webserver failed!");
 }
 
 } // namespace mrlab::controller
