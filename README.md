@@ -108,13 +108,14 @@ Below this base path, the following subdirectories are used:
 * `WebGUI`: webserver document root for serving the web-based GUI to the control clients
 * `Config`: configuration files for managed scenes
 
-The server is configured for the following applications:
+### Scene configuration files
 
-* Fly: a pd-based demo, will be started as `C:\\PD\\YAMI\\FLY.bat` and must listen to port 10003
-* Reverb: a Reaper-based demo, will be started as `reverb.rpp` and must listen to port 10005
-* Jungle: a pd-based demo, will be started as `C:\\PD\\YAMI\\JUNGLE.bat` and must listen to port 10007
-* Music: a Reaper-based demo, will be started as `jungle.rpp` and must listen to port 10009
+The repository includes scene configurations in `resources/Config/` that shall match the current development state of the WebGUI.
 
+* Fly (`pd-fly.yaml`): a pd-based demo, will be started as `C:\\PD\\YAMI\\FLY.bat` and must listen to port 10003
+* Reverb (`reaper-reverb.yaml`): a Reaper-based demo, will be started as `reaper.exe reverb.rpp` and must listen to port 10005
+* Jungle (`pd-jungle.yaml`): a pd-based demo, will be started as `C:\\PD\\YAMI\\JUNGLE.bat` and must listen to port 10007
+* Music (`reaper-music.yaml`): a Reaper-based demo, will be started as `reaper.exe jungle.rpp` and must listen to port 10009
 
 ### WebGUI
 
