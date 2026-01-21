@@ -1,0 +1,15 @@
+name: Jungle
+description: Pd with Jungle demonstration
+
+app:
+  startCommand:
+    - C:\PD\YAMI\JUNGLE.bat
+
+  stopCommand:
+    - C:\Windows\System32\taskkill
+    - /IM
+    - pd.com
+    - /T
+    - /F
+
+  workingDir: C:\PD\YAMI

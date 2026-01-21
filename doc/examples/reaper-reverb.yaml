@@ -1,0 +1,11 @@
+name: Reaper Reverb
+description: Reaper DAW with artificial reverb
+
+app:
+  startCommand:
+    - C:\Program Files\REAPER (x64)\reaper
+    - reverb.rpp
+
+  stopCommand: []
+
+  workingDir: ""
