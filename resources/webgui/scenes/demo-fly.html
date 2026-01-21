@@ -81,10 +81,11 @@
 		}		
 	</style>
 
+
 	<h2>Demo: Fly</h2>
 	<div class="start-container">
 		<div class="button-group">
-			<button onClick="launchApp('demo-fly', 'pd-fly')" class="big-button">Launch App</button>
+			<button onClick="launchAppAndWait('demo-fly', 'pd-fly', initFly, doneFly)" class="big-button">Launch App</button>
 			<p>Status: <b id="pd-fly_status">unclear</b></p>
 			<button onClick="sendResponse('/app/pd-fly/osc/Control/Response')" class="small-button" style="width:200px">Connect Response</button>
 	
@@ -112,3 +113,4 @@
 		<button onClick="quitApp('demo-fly', 'pd-fly')" class="big-button">Quit App</button>
 	</div>
 </div>
+
