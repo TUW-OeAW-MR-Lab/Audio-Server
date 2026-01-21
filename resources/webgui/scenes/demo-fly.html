@@ -88,13 +88,13 @@
 			<button onClick="launchAppAndWait('demo-fly', 'pd-fly', 5, SceneModule.init, SceneModule.connect)" class="big-button">Launch App</button>
 			<p>Status: <b id="pd-fly_status">unclear</b></p>
 	
-			<button onClick="sendNoArgs('/app/pd-fly/osc/Control/Start')" class="big-button">Start</button>
-			<button onClick="sendNoArgs('/app/pd-fly/osc/Control/Stop')"class="big-button">Stop</button>
+			<button onClick="sendNoArgs('/app/pd-fly/osc/Play/Start')" class="big-button">Start</button>
+			<button onClick="sendNoArgs('/app/pd-fly/osc/Play/Stop')"class="big-button">Stop</button>
 		</div>
 
 		<div class="slider-group">
 			<span>Volume</span><br>
-			<input type=range min="1" max="100" value="50" oninput="send('/app/pd-fly/osc/Control/Volume', this.value); document.getElementById('volume-box').innerText = this.value;" class="volume-slider">
+			<input type=range min="1" max="100" value="50" oninput="send('/app/pd-fly/osc/SetVol', this.value); document.getElementById('volume-box').innerText = this.value;" class="volume-slider">
 			<div class="volume-box" id="volume-box">50</div>
 		</div>
 	</div>	
