@@ -10,7 +10,7 @@
 #pragma once
 
 #include <juce_core/juce_core.h>
-#include <Config.h>
+#include <Globals.h>
 #include <util/ListenerInterface.h>
 
 namespace mrlab
@@ -45,7 +45,7 @@ public:
     };
 
     //==============================================================================
-    Logger() : juce::FileLogger (Config::getAppSupportDir().getChildFile ("MRLabLog.txt"), "\n\n==== MRLabLog Session Start ====", maxFileSizeBytes) {}
+    Logger() : juce::FileLogger (Globals::getAppSupportDir().getChildFile ("MRLabLog.txt"), "\n\n==== MRLabLog Session Start ====", maxFileSizeBytes) {}
 
     //==============================================================================
     /** Convenience wrapper to write an info log message. */

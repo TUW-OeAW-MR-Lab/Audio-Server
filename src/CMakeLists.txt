@@ -7,7 +7,7 @@
 
 target_sources (mrlabctrl_App
     PRIVATE
-        Config.h
+        Globals.h
         Main.cpp
 )
 
@@ -27,6 +27,7 @@ target_sources (mrlabctrl_Common
         controller/WebServerController.cpp
 
         util/ListenerInterface.h
+        util/Logger.h
 
         view/AppControlComponent.h
         view/AppControlComponent.cpp

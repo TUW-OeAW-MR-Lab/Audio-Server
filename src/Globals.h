@@ -1,5 +1,5 @@
 /*
-    Config.h
+    Globals.h
 
     Part of MR Lab Control Software
 
@@ -15,12 +15,12 @@ namespace mrlab
 {
 
 //==============================================================================
-/** Container for static configuration data.
+/** Container for static global configuration data.
 
     Collects hardcoded configuration data for now, might be extended
     by a configuration file reader.
  */
-struct Config
+struct Globals
 {
     //==============================================================================
     /** @return The general application support base directory. */
@@ -49,8 +49,8 @@ struct Config
         return getAppSupportDir().getChildFile ("WebGUI");
     }
 
-    /** @return The directory containing scene/app configurations. */
-    static juce::File getSceneConfigDir()
+    /** @return The directory containing configuration files (app/routing/...). */
+    static juce::File getConfigDir()
     {
         return getAppSupportDir().getChildFile ("Config");
     }

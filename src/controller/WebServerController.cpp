@@ -14,7 +14,7 @@
 #include <iostream>
 #include <lo/lo_cpp.h>
 #include <util/Logger.h>
-#include <Config.h>
+#include <Globals.h>
 
 namespace mrlab::controller
 {
@@ -43,7 +43,7 @@ bool WebServerController::start()
         return false;
     }
 
-    const auto documentRootDir = Config::getWebServerDocumentRootDir();
+    const auto documentRootDir = Globals::getWebServerDocumentRootDir();
     const auto documentRoot = documentRootDir.getFullPathName();
 
     if (documentRootDir.isDirectory())
@@ -56,7 +56,7 @@ bool WebServerController::start()
     civetOptions.push_back ("document_root");
     civetOptions.push_back (documentRoot.toStdString());
     civetOptions.push_back ("listening_ports");
-    civetOptions.push_back (std::to_string (Config::getWebServerListeningPort()));
+    civetOptions.push_back (std::to_string (Globals::getWebServerListeningPort()));
     civetOptions.push_back ("websocket_timeout_ms");
     civetOptions.push_back (std::to_string (5000));
     civetOptions.push_back ("enable_websocket_ping_pong");

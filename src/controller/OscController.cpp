@@ -11,6 +11,7 @@
 #include "MainController.h"
 #include <lo/lo_cpp.h>
 #include <util/Logger.h>
+#include <Globals.h>
 
 namespace mrlab::controller
 {
@@ -18,7 +19,7 @@ namespace mrlab::controller
 OscController::OscController (MainController& newMainController)
     : mainController (newMainController)
 {
-    addMainServer (7081);
+    addMainServer (Globals::getOscListeningPort());
 
     // Temporary hardcoded app-specific relay server.
     addSubPathServer (AppConfigController::configFly, "/app/pd_fly/osc", 9336, "localhost", 10003);

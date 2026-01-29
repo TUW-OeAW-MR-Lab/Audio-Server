@@ -11,7 +11,7 @@
 #include <juce_core/juce_core.h>
 #include <juce_events/juce_events.h>
 #include <iostream>
-#include <Config.h>
+#include <Globals.h>
 
 namespace mrlab::controller
 {
@@ -28,7 +28,7 @@ MainController::MainController()
     startWebServer();
 
     juce::Timer::callAfterDelay (1200, [&] {
-        appController.populateFromSceneConfigDir();
+        appController.populateFromConfigDir();
     });
 }
 
@@ -38,7 +38,7 @@ void MainController::initialise()
     Logger::setCurrentLogger (&logger);
 
     // check for/create application support directory
-    const auto appSupportDir = Config::getAppSupportDir();
+    const auto appSupportDir = Globals::getAppSupportDir();
 
     if (! appSupportDir.isDirectory())
     {
