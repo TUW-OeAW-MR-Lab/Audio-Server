@@ -9,15 +9,15 @@
 
 #include "AppController.h"
 #include "AppHandle.h"
-#include "AppConfigController.h"
+#include "ConfigController.h"
 #include <Globals.h>
 #include <util/Logger.h>
 
 namespace mrlab::controller
 {
 
-AppController::AppController (AppConfigController& configController)
-    : appConfigController (configController)
+AppController::AppController (ConfigController& newConfigController)
+    : configController (newConfigController)
 {}
 
 AppController::~AppController()
@@ -42,7 +42,7 @@ void AppController::populateFromConfigDir()
 
 bool AppController::add (const juce::Identifier& appId)
 {
-    auto appConfig = appConfigController.findConfig (appId); // may throw
+    auto appConfig = configController.findConfig (appId); // may throw
 
     auto [iter, success] = apps.try_emplace (appId, std::make_unique<AppHandle> (std::move (appConfig)));
 
@@ -54,7 +54,7 @@ bool AppController::add (const juce::Identifier& appId)
 
 bool AppController::add (const juce::File& file)
 {
-    auto appConfig = appConfigController.loadConfigFromFile (file);
+    auto appConfig = configController.loadConfigFromFile (file);
     if (! appConfig.has_value())
         return false;
 

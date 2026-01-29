@@ -13,12 +13,12 @@ target_sources (mrlabctrl_App
 
 target_sources (mrlabctrl_Common
     INTERFACE
-        controller/AppConfigController.h
-        controller/AppConfigController.cpp
         controller/AppController.h
         controller/AppController.cpp
         controller/AppHandle.h
         controller/AppHandle.cpp
+        controller/ConfigController.h
+        controller/ConfigController.cpp
         controller/MainController.h
         controller/MainController.cpp
         controller/OscController.h

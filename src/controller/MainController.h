@@ -9,8 +9,8 @@
 
 #pragma once
 
-#include "AppConfigController.h"
 #include "AppController.h"
+#include "ConfigController.h"
 #include "OscController.h"
 #include "WebServerController.h"
 #include <util/Logger.h>
@@ -43,7 +43,7 @@ private:
     void startWebServer();
 
     //==============================================================================
-    AppConfigController appConfigController;
+    ConfigController configController;
     AppController appController;
     OscController oscController;
     WebServerController webServerController;

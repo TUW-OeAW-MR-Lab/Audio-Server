@@ -1,5 +1,5 @@
 /*
-    AppConfigController.h
+    ConfigController.h
 
     Part of MR Lab Control Software
 
@@ -36,8 +36,8 @@ struct AppConfig
 };
 
 //==============================================================================
-/** Manage and provide app configurations from config files. */
-class AppConfigController
+/** Manage and provide app/scene/... configurations from config files. */
+class ConfigController
 {
 public:
     struct YamlDocument
@@ -47,11 +47,11 @@ public:
 
     //==============================================================================
     /** Exception that is thrown when there is no app for the given id. */
-    class AppConfigNotFoundException : public std::exception
+    class ConfigNotFoundException : public std::exception
     {
     public:
-        AppConfigNotFoundException (const juce::Identifier& appId)
-            : msg ("AppConfigNotFoundException: no app config found for id " + appId.toString())
+        ConfigNotFoundException (const juce::Identifier& appId)
+            : msg ("ConfigNotFoundException: no app config found for id " + appId.toString())
         {}
 
         const char* what() const noexcept override { return msg.toUTF8(); }
@@ -61,7 +61,7 @@ public:
     };
 
     //==============================================================================
-    AppConfigController();
+    ConfigController();
 
     // Temporary test config ids
     inline static const auto configFly = juce::Identifier ("pd-fly");
@@ -72,7 +72,7 @@ public:
     /** Get the app configuration for appId.
 
         @returns AppConfig for appId.
-        @throws AppConfigNotFoundException.
+        @throws ConfigNotFoundException.
      */
     AppConfig findConfig (const juce::Identifier& appId) const;
 
@@ -88,7 +88,7 @@ public:
 private:
     //==============================================================================
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AppConfigController)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ConfigController)
 };
 
 } // namespace mrlab::controller

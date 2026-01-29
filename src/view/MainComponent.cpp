@@ -11,7 +11,6 @@
 #include "AppControlComponent.h"
 #include <controller/MainController.h>
 #include <controller/AppHandle.h>
-#include <controller/AppConfigController.h>
 
 
 namespace mrlab::view

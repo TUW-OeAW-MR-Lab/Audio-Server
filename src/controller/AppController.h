@@ -18,7 +18,7 @@ namespace mrlab::controller
 {
 
 class AppHandle;
-class AppConfigController;
+class ConfigController;
 
 //==============================================================================
 class AppController
@@ -63,7 +63,7 @@ public:
     };
 
     //==============================================================================
-    AppController (AppConfigController& configController);
+    AppController (ConfigController& configController);
 
     ~AppController();
 
@@ -77,7 +77,7 @@ public:
 
         @param appId Unique app identifier.
         @returns true on success, false if there is already an app with this id.
-        @throws AppConfigNotFoundException.
+        @throws ConfigNotFoundException.
      */
     bool add (const juce::Identifier& appId);
 
@@ -161,7 +161,7 @@ private:
     };
 
     //==============================================================================
-    AppConfigController& appConfigController;
+    ConfigController& configController;
 
     std::map<juce::Identifier, std::unique_ptr<AppHandle>> apps; ///< Managed apps.
     std::unique_ptr<AppStopTimer> appStopTimer;                  ///< Helper used in stopAllApps().

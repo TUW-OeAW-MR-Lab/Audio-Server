@@ -13,7 +13,7 @@
 #include <juce_events/juce_events.h>
 #include <util/ListenerInterface.h>
 #include <thread>
-#include "AppConfigController.h"
+#include "ConfigController.h"
 
 namespace mrlab::controller
 {

@@ -1,5 +1,5 @@
 /*
-    AppConfigController.cpp
+    ConfigController.cpp
 
     Part of MR Lab Control Software
 
@@ -7,16 +7,16 @@
     SPDX-FileCopyrightText: Copyright (c) 2025 Martin Rumori/sonible GmbH
  */
 
-#include "AppConfigController.h"
+#include "ConfigController.h"
 #include <util/Logger.h>
 
 namespace mrlab::controller
 {
 
-AppConfigController::AppConfigController()
+ConfigController::ConfigController()
 {}
 
-AppConfig AppConfigController::findConfig (const juce::Identifier& appId) const
+AppConfig ConfigController::findConfig (const juce::Identifier& appId) const
 {
     if (appId == configFly)
     {
@@ -87,10 +87,10 @@ AppConfig AppConfigController::findConfig (const juce::Identifier& appId) const
         };
     }
 
-    throw AppConfigNotFoundException (appId);
+    throw ConfigNotFoundException (appId);
 }
 
-std::optional<AppConfig> AppConfigController::loadConfigFromFile (const juce::File& yamlFile)
+std::optional<AppConfig> ConfigController::loadConfigFromFile (const juce::File& yamlFile)
 {
     Logger::logInfo (juce::String ("Loading config file ") + yamlFile.getFullPathName());
 
@@ -146,11 +146,11 @@ std::optional<AppConfig> AppConfigController::loadConfigFromFile (const juce::Fi
     return cfg;
 }
 
-bool AppConfigController::parseYamlFile (const juce::File& yamlFile, YamlDocument& document)
+bool ConfigController::parseYamlFile (const juce::File& yamlFile, YamlDocument& document)
 {
     if (! yamlFile.existsAsFile())
     {
-        Logger::logError (juce::String ("AppConfigController::parseYamlFile(): Config file not found."));
+        Logger::logError (juce::String ("ConfigController::parseYamlFile(): Config file not found."));
         return false;
     }
 
@@ -160,14 +160,14 @@ bool AppConfigController::parseYamlFile (const juce::File& yamlFile, YamlDocumen
     }
     catch (const std::exception& e)
     {
-        Logger::logError (juce::String ("AppConfigController::parseYamlFile(): Failed to parse YAML file with error: ") + e.what());
+        Logger::logError (juce::String ("ConfigController::parseYamlFile(): Failed to parse YAML file with error: ") + e.what());
         return false;
     }
 
     return true;
 }
 
-bool AppConfigController::validateYamlDocument (const YamlDocument& document)
+bool ConfigController::validateYamlDocument (const YamlDocument& document)
 {
     // check top level contents
     const auto root = document.node;
