@@ -13,13 +13,13 @@
 #include <juce_events/juce_events.h>
 #include <util/ListenerInterface.h>
 #include <thread>
-#include "ConfigController.h"
 
 namespace mrlab::controller
 {
+class YamlConfig;
 
 //==============================================================================
-class AppHandle : private juce::Timer
+class AppHandle : private juce::MultiTimer
 {
 public:
     //==============================================================================
@@ -103,9 +103,12 @@ public:
     //==============================================================================
     /** Create an AppHandle according to an app config.
 
-        @param config App config to use.
+        @param config Configuration containing an app section.
+        @throws UnusableConfigException in case the app section is missing.
      */
-    AppHandle (AppConfig newConfig);
+    AppHandle (const YamlConfig& newConfig);
+
+    ~AppHandle() override;
 
     /** Attempt to start this app according to the configuration.
 
@@ -137,16 +140,21 @@ public:
         If the app process is not running, this will do nothing but
         returning its current state.
 
-        @returns AppState::killed on success, AppState::killFailed on failure,
-                 or the previous AppState if process was not running.
+        @note It still depends on the system whether and how quickly
+              the app process gets actually killed after this has
+              returned.
+
+        @returns AppState::killRequested on success,
+                 AppState::killRequestFailed on failure, or the
+                 previous AppState if process was not running.
      */
     AppState kill();
 
-    /** Get the configuration of this app.
+    /** Get the configuration id of this app.
 
-        @returns The app configuration.
+        @returns The id of the app configuration.
     */
-    const AppConfig& getConfig() const { return config; }
+    const juce::Identifier& getId() const;
 
     /** Get the current state of this app.
 
@@ -186,11 +194,21 @@ public:
 
 private:
     //==============================================================================
-    /** Rate at which to update the process state and to read the process output. */
-    static constexpr auto stateUpdateHz = 10;
+    /** Ids for the timers used in this class. */
+    enum TimerId
+    {
+        stateUpdate = 0,        ///< Period timer checking for process state updates.
+        appReadyTimeout = 1     ///< Delay for timeout-based setting an app ready.
+    };
+
+    /** Interval at which to update the process state and to read the process output. */
+    static constexpr auto stateUpdateMs = 100;
+
+    /** Default timeout for setting a started up to 'ready' state. */
+    static constexpr auto appReadyTimeoutMs = 3000;
 
     //==============================================================================
-    void timerCallback() override;
+    void timerCallback (int timerId) override;
 
     /** Sets the app state and notifies listeners. */
     void setStateAndNotify (AppState newState);
@@ -202,7 +220,7 @@ private:
     void updateOutput();
 
     //==============================================================================
-    AppConfig config;                            ///< App configuration.
+    const YamlConfig& config;                    ///< Reference to the app configuration.
     juce::ChildProcess process;                  ///< Actual app process.
     AppState state = AppState::init;             ///< Current app state.
     juce::String lastOutput;                     ///< Last available output captured from the app.

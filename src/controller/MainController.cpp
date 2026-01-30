@@ -12,12 +12,13 @@
 #include <juce_events/juce_events.h>
 #include <iostream>
 #include <Globals.h>
+#include "YamlConfig.h"
 
 namespace mrlab::controller
 {
 
 MainController::MainController()
-    : appController (configController),
+    : appController (*this),
       oscController (*this),
       webServerController (*this)
 {
@@ -26,10 +27,11 @@ MainController::MainController()
 
     // Start web server.
     startWebServer();
+}
 
-    juce::Timer::callAfterDelay (1200, [&] {
-        appController.populateFromConfigDir();
-    });
+MainController::~MainController()
+{
+    Logger::setCurrentLogger (nullptr);
 }
 
 void MainController::initialise()

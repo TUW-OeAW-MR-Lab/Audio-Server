@@ -162,7 +162,7 @@ void WebServerController::appStateChanged (AppHandle& app, AppHandle::AppState n
     message.add (int (newState));
     message.add_string (AppHandle::appStateNames.at (newState).toStdString());
 
-    auto oscPath = std::string ("/app/") + app.getConfig().id.toString().toStdString() + "/state";
+    auto oscPath = std::string ("/app/") + app.getId().toString().toStdString() + "/state";
     auto size = message.length (oscPath);
 
     std::vector<std::byte> serialised;

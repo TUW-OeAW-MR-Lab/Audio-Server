@@ -15,7 +15,7 @@ namespace mrlab::view
 
 AppControlComponent::AppControlComponent (controller::AppHandle& appHandle)
     : app (appHandle),
-      appIdLabel ("AppControlComponent::appIdLabel", app.getConfig().id.toString()),
+      appIdLabel ("AppControlComponent::appIdLabel", app.getId().toString()),
       statusLabel ("AppControlComponent::statusLabel"),
       launchQuitButton ("AppControlComponent::launchQuitButton"),
       killButton ("AppControlComponent::killButton"),

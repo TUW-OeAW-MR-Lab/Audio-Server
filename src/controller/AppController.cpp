@@ -8,81 +8,61 @@
  */
 
 #include "AppController.h"
+#include "MainController.h"
 #include "AppHandle.h"
-#include "ConfigController.h"
-#include <Globals.h>
+#include "YamlConfig.h"
 #include <util/Logger.h>
 
 namespace mrlab::controller
 {
 
-AppController::AppController (ConfigController& newConfigController)
-    : configController (newConfigController)
-{}
+AppController::AppController (MainController& mainControllerIn)
+    : mainController (mainControllerIn)
+{
+    mainController.getConfigController().addListener (this);
+}
 
 AppController::~AppController()
-{}
-
-void AppController::populateFromConfigDir()
 {
-    const auto configDir = Globals::getConfigDir();
+    mainController.getConfigController().removeListener (this);
+}
 
-    if (! configDir.isDirectory())
+bool AppController::add (const YamlConfig& config)
+{
+    const auto& id = config.getId();
+
+    try
     {
-        Logger::logWarn ("AppController: Config directory " + configDir.getFullPathName() + " does not exist.");
-        return;
+        auto [iter, success] = apps.try_emplace (id, std::make_unique<AppHandle> (config));
+
+        if (success)
+            listeners.call (&Listener::appAdded, *iter->second);
+        else
+            Logger::logWarn ("AppController: App has already been added for id: " + id.toString());
+
+        return success;
+    }
+    catch (const std::runtime_error& e)
+    {
+        Logger::logError ("AppController: Error adding app for id: " + id.toString() + "(" + e.what() + ").");
     }
 
-    Logger::logInfo ("AppController: Scanning config directory " + configDir.getFullPathName() + " for YAML configuration files.");
-    const auto yamlConfigs = configDir.findChildFiles (juce::File::TypesOfFileToFind::findFiles, true, "*.yaml");
-
-    for (const auto& config : yamlConfigs)
-        add (config);
-}
-
-bool AppController::add (const juce::Identifier& appId)
-{
-    auto appConfig = configController.findConfig (appId); // may throw
-
-    auto [iter, success] = apps.try_emplace (appId, std::make_unique<AppHandle> (std::move (appConfig)));
-
-    if (success)
-        listeners.call (&Listener::appAdded, *iter->second);
-
-    return success;
-}
-
-bool AppController::add (const juce::File& file)
-{
-    auto appConfig = configController.loadConfigFromFile (file);
-    if (! appConfig.has_value())
-        return false;
-
-    const auto id = appConfig->id;
-
-    auto [iter, success] = apps.try_emplace (id, std::make_unique<AppHandle> (std::move (*appConfig)));
-
-    if (success)
-        listeners.call (&Listener::appAdded, *iter->second);
-
-    return success;
+    return false;
 }
 
 bool AppController::remove (const juce::Identifier& appId)
 {
     checkForAppAndThrowIfNotFound (appId);
 
-    auto& app = apps.at (appId);
-
-    if (app->isRunning())
+    if (apps.at (appId)->isRunning())
     {
-        jassertfalse; // App should be checked for a non-running state before attempting to remove it.
+        Logger::logWarn ("AppController: Ignoring removal attempt of still running app with id: " + appId.toString());
+        jassertfalse;
+
         return false;
     }
 
-    listeners.call (&Listener::appWillBeRemoved, *app);
-
-    apps.erase (appId);
+    removeForced (appId);
 
     return true;
 }
@@ -122,6 +102,52 @@ const AppHandle& AppController::getApp (const juce::Identifier& appId) const
     checkForAppAndThrowIfNotFound (appId);
 
     return *apps.at (appId);
+}
+
+void AppController::configAdded (const YamlConfig& config)
+{
+    // Ignore configurations that do not affect us.
+    if (! config.hasSection (YamlConfig::Section::app))
+        return;
+
+    if (! add (config))
+        Logger::logWarn ("AppController: Error adding app for newly appeared config with id: " + config.getId().toString());
+}
+
+void AppController::configWillBeRemoved (const YamlConfig& config)
+{
+    const auto id = config.getId();
+
+    // Ignore configurations that do not affect us.
+    if (! config.hasSection (YamlConfig::Section::app))
+    {
+        // Somehow we ended up managing an app without an app config section?
+        jassert (! hasApp (id));
+        return;
+    }
+
+    if (! hasApp (id))
+        return;
+
+    /* Try to be gentle and issue the app's stop command in case it is
+       running, but we are actually going to kill it right after.
+     */
+    auto& app = getApp (id);
+
+    if (app.isRunning())
+    {
+        Logger::logWarn ("AppController: Config for running app with id '" + id.toString() + "' is going to be removed. Stopping/killing app.");
+
+        app.stop();
+    }
+
+    removeForced (id);
+}
+
+void AppController::removeForced (const juce::Identifier& appId)
+{
+    listeners.call (&Listener::appWillBeRemoved, *apps.at (appId));
+    apps.erase (appId);
 }
 
 void AppController::checkForAppAndThrowIfNotFound (const juce::Identifier& appId) const

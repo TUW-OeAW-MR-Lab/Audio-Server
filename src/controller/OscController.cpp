@@ -22,10 +22,10 @@ OscController::OscController (MainController& newMainController)
     addMainServer (Globals::getOscListeningPort());
 
     // Temporary hardcoded app-specific relay server.
-    addSubPathServer (ConfigController::configFly, "/app/pd_fly/osc", 9336, "localhost", 10003);
-    addSubPathServer (ConfigController::configReverb, "/app/reaper_reverb/osc", 9338, "localhost", 10005);
-    addSubPathServer (ConfigController::configJungle, "/app/pd_jungle/osc", 9340, "localhost", 10007);
-    addSubPathServer (ConfigController::configMusic, "/app/reaper_music/osc", 9342, "localhost", 10009);
+    addSubPathServer (juce::Identifier ("pd_fly"), "/app/pd_fly/osc", 9336, "localhost", 10003);
+    addSubPathServer (juce::Identifier ("reaper_reverb"), "/app/reaper_reverb/osc", 9338, "localhost", 10005);
+    addSubPathServer (juce::Identifier ("pd_jungle"), "/app/pd_jungle/osc", 9340, "localhost", 10007);
+    addSubPathServer (juce::Identifier ("reaper_music"), "/app/reaper_music/osc", 9342, "localhost", 10009);
 }
 
 OscController::~OscController()

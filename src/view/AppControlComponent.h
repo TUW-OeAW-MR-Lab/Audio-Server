@@ -32,7 +32,7 @@ public:
     void resized() override;
 
     /** @returns the id of the app represented by this. */
-    juce::Identifier getId() const { return app.getConfig().id; }
+    juce::Identifier getId() const { return app.getId(); }
 
 private:
     //==============================================================================

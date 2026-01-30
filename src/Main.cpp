@@ -29,6 +29,9 @@ public:
     {
         mainController = std::make_unique<controller::MainController>();
         mainWindow = std::make_unique<view::MainWindow> (getApplicationName(), *mainController);
+
+        // Load configuration files from app support directory.
+        mainController->getConfigController().populateFromConfigDir();
     }
 
     //==============================================================================

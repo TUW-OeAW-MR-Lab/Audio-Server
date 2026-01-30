@@ -8,35 +8,55 @@
  */
 
 #include "AppHandle.h"
+#include "YamlConfig.h"
+#include <util/Logger.h>
 
 namespace mrlab::controller
 {
 
-AppHandle::AppHandle (AppConfig newConfig)
-    : config (std::move (newConfig))
-{}
+AppHandle::AppHandle (const YamlConfig& newConfig)
+    : config (newConfig)
+{
+    if (! config.hasSection (YamlConfig::Section::app))
+        throw YamlConfig::UnusableConfigException ("Missing config section 'app'.");
+}
+
+AppHandle::~AppHandle()
+{
+    kill();
+    captureThread.reset(); // Might block until app process is gone.
+}
 
 AppHandle::AppState AppHandle::start()
 {
     if (isRunning() || process.isRunning())
         return state;
 
-    int streamFlags = (config.captureStdOut ? juce::ChildProcess::wantStdOut : 0) |
-                      (config.captureStdErr ? juce::ChildProcess::wantStdErr : 0);
+    const auto appConfig = config.getSection (YamlConfig::Section::app);
 
-    // Save current working directory later restore after app launch.
+    int streamFlags = (appConfig["captureStdOut"].as<bool>() ? juce::ChildProcess::wantStdOut : 0) |
+                      (appConfig["captureStdErr"].as<bool>() ? juce::ChildProcess::wantStdErr : 0);
+
+    // Save current working directory in order to restore it after app launch.
     const auto currentWorkingDir = juce::File::getCurrentWorkingDirectory();
 
-    // Change to configured app working directory if specified (non-empty).
-    if (config.workingDir != juce::String() && ! config.workingDir.setAsCurrentWorkingDirectory())
+    // Change to configured app working directory (fallback: app support dir).
+    const auto workingDir = Globals::getAppSupportDir().getChildFile (appConfig["workingDir"].as<std::string>());
+
+    if (! workingDir.setAsCurrentWorkingDirectory())
     {
-        std::cerr << "AppHandle::start(): Could not set working directory " << config.workingDir.getFullPathName() << std::endl;
+        Logger::logError ("AppHandle: Could not set working directory " + workingDir.getFullPathName() + " for app with id: " + config.getId().toString());
         setStateAndNotify (AppState::startFailed);
         return state;
     }
 
     // Try to launch app.
-    const auto success = process.start (config.startCommand, streamFlags);
+    juce::StringArray startCommand;
+
+    for (const auto& child : appConfig["startCommand"])
+        startCommand.add (child.as<std::string>());
+
+    const auto success = process.start (startCommand, streamFlags);
 
     // Restore previously saved working directory.
     currentWorkingDir.setAsCurrentWorkingDirectory();
@@ -46,7 +66,7 @@ AppHandle::AppState AppHandle::start()
     if (! success)
         return state;
 
-    startTimerHz (stateUpdateHz);
+    startTimer (TimerId::stateUpdate, stateUpdateMs);
 
     // Start reading the output asynchronously as juce::ChildProcess::readProcessOutput() is blocking.
     if (streamFlags)
@@ -69,14 +89,9 @@ AppHandle::AppState AppHandle::start()
         captureThread = std::make_unique<std::jthread> (std::move (readOutput));
     }
 
-    // TODO: implement waiting for app to become ready (IMRV-33)
-    // for now, we just become ready 3 seconds after launching.
-    juce::Timer::callAfterDelay (3000, [&] {
-        if (state != AppState::alive)
-            return;
-
-        setStateAndNotify (AppState::ready);
-    });
+    // TODO: implement waiting for app to become ready (IMRV-33).
+    // For now, we just become ready after a delay.
+    startTimer (TimerId::appReadyTimeout, appReadyTimeoutMs);
 
     return state;
 }
@@ -86,24 +101,30 @@ AppHandle::AppState AppHandle::stop()
     if (! isRunning())
         return state;
 
-    if (config.stopCommand.isEmpty())
+    juce::StringArray stopCommand;
+
+    for (const auto& child : config.getSection (YamlConfig::Section::app)["stopCommand"])
+        stopCommand.add (child.as<std::string>());
+
+    if (stopCommand.isEmpty())
         return kill();
 
     juce::ChildProcess stopProcess;
 
-    if (! (stopProcess.start (config.stopCommand) &&
+    if (! (stopProcess.start (stopCommand) &&
            stopProcess.waitForProcessToFinish (1000) &&
            stopProcess.getExitCode() == 0))
     {
         if (stopProcess.isRunning())
         {
-            std::cerr << "AppHandle::stop(): stopCommand is taking too long, killing it..." << std::endl;
+            Logger::logWarn ("AppHandle: stopCommand for app with id " + config.getId().toString() + " is taking too long, killing it.");
             stopProcess.kill();
         }
         else
         {
-            std::cerr << "AppHandle::stop(): stopCommand returned " << stopProcess.getExitCode() << ": "
-                      << stopProcess.readAllProcessOutput() << std::endl;
+            Logger::logWarn ("AppHandle: stopCommand for app with id " + config.getId().toString() +
+                             " returned with exit code " + juce::String (stopProcess.getExitCode()) +
+                             " (" + stopProcess.readAllProcessOutput() + ").");
         }
 
         setStateAndNotify (AppState::stopRequestFailed);
@@ -123,6 +144,11 @@ AppHandle::AppState AppHandle::kill()
     return state;
 }
 
+const juce::Identifier& AppHandle::getId() const
+{
+    return config.getId();
+}
+
 uint32_t AppHandle::getExitCode() const
 {
     jassert (isFinished());
@@ -130,14 +156,30 @@ uint32_t AppHandle::getExitCode() const
     return process.getExitCode();
 }
 
-void AppHandle::timerCallback()
+void AppHandle::timerCallback (int timerId)
 {
-    updateState();
+    switch (timerId)
+    {
+        case TimerId::stateUpdate:
+            updateState();
 
-    if (! isRunning())
-        stopTimer();
+            if (! isRunning())
+                stopTimer (TimerId::stateUpdate);
 
-    updateOutput();
+            updateOutput();
+            break;
+
+        case TimerId::appReadyTimeout:
+            stopTimer (TimerId::appReadyTimeout); // Single-shot timer.
+
+            if (state == AppState::alive)
+                setStateAndNotify (AppState::ready);
+
+            break;
+
+        default:
+            ;
+    }
 }
 
 void AppHandle::setStateAndNotify (AppState newState)

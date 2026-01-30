@@ -8,206 +8,104 @@
  */
 
 #include "ConfigController.h"
+#include "YamlConfig.h"
+#include <Globals.h>
 #include <util/Logger.h>
 
 namespace mrlab::controller
 {
 
-ConfigController::ConfigController()
-{}
+ConfigController::ConfigController() {}
 
-AppConfig ConfigController::findConfig (const juce::Identifier& appId) const
+ConfigController::~ConfigController() {}
+
+const YamlConfig& ConfigController::getConfig (const juce::Identifier& id) const
 {
-    if (appId == configFly)
-    {
-        return {
-            .id = configFly,
-            .name = "Pd Fly",
-            .description = "Pd with Fly demonstration",
-#if JUCE_WINDOWS
-            .startCommand = juce::StringArray ("C:\\PD\\YAMI\\FLY.bat"),
-            .stopCommand = juce::StringArray ("C:\\Windows\\System32\\taskkill", "/IM", "pd.com", "/T", "/F"),
-            .workingDir = juce::File ("C:\\PD\\YAMI")
-#elif JUCE_MAC
-            .startCommand = juce::StringArray ("/Applications/Pd-0.56-2.app/Contents/MacOS/Pd",
-                                               "/Users/rm/Documents/Pd/test_stdout.pd"),
-            .stopCommand = juce::StringArray ("killall", "Pd"),
-            .workingDir = juce::File ("/Users/rm/Documents/Pd")
-#endif
-        };
-    }
+    checkForConfigAndThrowIfNotFound (id);
 
-    if (appId == configReverb)
-    {
-        return {
-            .id = configReverb,
-            .name = "Reaper Reverb",
-            .description = "Reaper DAW with artificial reverb",
-#if JUCE_WINDOWS
-            .startCommand = juce::StringArray ("C:\\Program Files\\REAPER (x64)\\reaper",
-                                               "reverb.rpp")
-#elif JUCE_MAC
-            .startCommand = juce::StringArray ("/Applications/REAPER.app/Contents/MacOS/REAPER",
-                                               "-new")
-#endif
-        };
-    }
-
-    if (appId == configJungle)
-    {
-        return {
-            .id = configJungle,
-            .name = "Pd Jungle",
-            .description = "Pd with Jungle demonstration",
-#if JUCE_WINDOWS
-            .startCommand = juce::StringArray ("C:\\PD\\YAMI\\JUNGLE.bat"),
-            .stopCommand = juce::StringArray ("C:\\Windows\\System32\\taskkill", "/IM", "pd.com", "/T", "/F"),
-            .workingDir = juce::File ("C:\\PD\\YAMI")
-#elif JUCE_MAC
-            .startCommand = juce::StringArray ("/Applications/Pd-0.56-2.app/Contents/MacOS/Pd",
-                                               "/Users/rm/Documents/Pd/test_stdout.pd"),
-            .stopCommand = juce::StringArray ("killall", "Pd")
-#endif
-        };
-    }
-
-    if (appId == configMusic)
-    {
-        return {
-            .id = configMusic,
-            .name = "Reaper Music",
-            .description = "Reaper DAW with music example",
-#if JUCE_WINDOWS
-            .startCommand = juce::StringArray ("C:\\Program Files\\REAPER (x64)\\reaper",
-                                               "music.rpp")
-#elif JUCE_MAC
-            .startCommand = juce::StringArray ("/Applications/REAPER.app/Contents/MacOS/REAPER",
-                                               "-new")
-#endif
-        };
-    }
-
-    throw ConfigNotFoundException (appId);
+    return *configs.at (id);
 }
 
-std::optional<AppConfig> ConfigController::loadConfigFromFile (const juce::File& yamlFile)
+bool ConfigController::loadConfig (const juce::File& yamlFile)
 {
-    Logger::logInfo (juce::String ("Loading config file ") + yamlFile.getFullPathName());
+    return loadConfig (yamlFile.getFileNameWithoutExtension(), yamlFile);
+}
 
-    YamlDocument doc;
+bool ConfigController::loadConfig (const juce::Identifier& id)
+{
+    const auto file = Globals::getConfigDir().getChildFile (id.toString()).withFileExtension (Globals::getConfigFileExtension());
 
-    if (! parseYamlFile (yamlFile, doc))
+    return loadConfig (id, file);
+}
+
+void ConfigController::unloadConfig (const juce::Identifier& id)
+{
+    checkForConfigAndThrowIfNotFound (id);
+
+    Logger::logInfo ("ConfigController: Unloading config with id: " + id.toString());
+
+    listeners.call (&Listener::configWillBeRemoved, *configs.at (id));
+    configs.erase (id);
+}
+
+void ConfigController::populateFromConfigDir()
+{
+    const auto configDir = Globals::getConfigDir();
+
+    if (! configDir.isDirectory())
     {
-        Logger::logError ("Failed to parse YAML file");
-        return std::nullopt;
+        Logger::logWarn ("ConfigController: Config directory does not exist: " + configDir.getFullPathName());
+        return;
     }
 
-    if (! validateYamlDocument (doc))
-    {
-        Logger::logError ("Failed to validate YAML file");
-        return std::nullopt;
-    }
+    Logger::logInfo ("ConfigController: Scanning config directory for YAML files: " + configDir.getFullPathName());
 
-    AppConfig cfg;
-    auto appRoot = doc.node["app"];
-    auto root = doc.node;
+    const auto yamlFiles = configDir.findChildFiles (juce::File::TypesOfFileToFind::findFiles, true, "*." + Globals::getConfigFileExtension());
+    auto result = true;
+
+    for (const auto& yamlFile : yamlFiles)
+        result &= loadConfig (yamlFile);
+
+    if (! result)
+        Logger::logWarn ("ConfigController: At least one config file could not be loaded successfully.");
+}
+
+bool ConfigController::loadConfig (const juce::Identifier& id, const juce::File& yamlFile)
+{
+    // id and file name have to match.
+    jassert (id.toString() == yamlFile.getFileNameWithoutExtension());
+
+    if (configs.contains (id))
+        unloadConfig (id);
 
     try
     {
-        // Required strings
-        cfg.id = juce::Identifier (yamlFile.getFileNameWithoutExtension());
-        cfg.name = root["name"].as<std::string>();
-        cfg.description = root["description"].as<std::string>();
+        auto [iter, success] = configs.try_emplace (id, std::make_unique<YamlConfig> (yamlFile));
 
-        cfg.workingDir = juce::File (appRoot["workingDir"].as<std::string>());
+        if (success)
+        {
+            listeners.call (&Listener::configAdded, *iter->second);
+            Logger::logInfo ("ConfigController: Loaded config with id: " + id.toString());
+        }
+        else
+        {
+            Logger::logError ("ConfigController: Error adding config with id: " + id.toString());
+        }
 
-        // Arrays
-        cfg.startCommand.clear();
-        for (const auto& child : appRoot["startCommand"])
-            cfg.startCommand.add (child.as<std::string>());
-
-        cfg.stopCommand.clear();
-        for (const auto& child : appRoot["stopCommand"])
-            cfg.stopCommand.add (child.as<std::string>());
-
-        // Booleans (optional, default true)
-        if (appRoot["captureStdOut"])
-            cfg.captureStdOut = (appRoot["captureStdOut"].as<bool>());
-        if (appRoot["captureStdErr"])
-            cfg.captureStdErr = (appRoot["captureStdErr"].as<bool>());
+        return success;
     }
-    catch (const std::exception& e)
+    catch (const std::runtime_error& e)
     {
-        Logger::logError (juce::String ("Error loading AppConfig: ") + e.what());
-        return std::nullopt;
+        Logger::logError ("ConfigController: Error loading config with id: " + id.toString() + " (" + e.what() + ").");
     }
 
-    Logger::logInfo ("Config file loaded successfully!");
-    return cfg;
+    return false;
 }
 
-bool ConfigController::parseYamlFile (const juce::File& yamlFile, YamlDocument& document)
+void ConfigController::checkForConfigAndThrowIfNotFound (const juce::Identifier& id) const
 {
-    if (! yamlFile.existsAsFile())
-    {
-        Logger::logError (juce::String ("ConfigController::parseYamlFile(): Config file not found."));
-        return false;
-    }
-
-    try
-    {
-        document.node = YAML::LoadFile (yamlFile.getFullPathName().toStdString());
-    }
-    catch (const std::exception& e)
-    {
-        Logger::logError (juce::String ("ConfigController::parseYamlFile(): Failed to parse YAML file with error: ") + e.what());
-        return false;
-    }
-
-    return true;
-}
-
-bool ConfigController::validateYamlDocument (const YamlDocument& document)
-{
-    // check top level contents
-    const auto root = document.node;
-
-    for (const char* key : { "name", "description" })
-    {
-        if (! root[key])
-        {
-            Logger::logError (juce::String ("Missing key '") + key + "'");
-            return false;
-        }
-    }
-
-    // check "app" if it exists
-    if (document.node["app"])
-    {
-        const auto appRoot = document.node["app"];
-
-        // Check required string entries
-        for (const char* key : { "workingDir" })
-        {
-            if (! appRoot[key])
-            {
-                Logger::logError (juce::String ("Missing key '") + key + "'");
-                return false;
-            }
-        }
-
-        // Check startCommand and stopCommand arrays
-        for (const char* key : { "startCommand", "stopCommand" })
-        {
-            if (! appRoot[key] || ! appRoot[key].IsSequence())
-            {
-                Logger::logError (juce::String ("Missing or invalid '") + key + "' (must be a sequence)");
-                return false;
-            }
-        }
-    }
-
-    return true;
+    if (! configs.contains (id))
+        throw ConfigNotFoundException (id);
 }
 
 } // namespace mrlab::controller

@@ -51,7 +51,7 @@ void MainComponent::appAdded (controller::AppHandle& app)
 
 void MainComponent::appWillBeRemoved (controller::AppHandle& app)
 {
-    const auto it = std::find_if (appControls.begin(), appControls.end(), [id = app.getConfig().id] (auto& c) { return c->getId() == id; });
+    const auto it = std::find_if (appControls.begin(), appControls.end(), [id = app.getId()] (auto& c) { return c->getId() == id; });
 
     if (it == appControls.end())
         return;

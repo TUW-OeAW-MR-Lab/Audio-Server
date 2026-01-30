@@ -13,30 +13,25 @@
 #include <juce_core/juce_core.h>
 #include <juce_events/juce_events.h>
 #include <util/ListenerInterface.h>
+#include "ConfigController.h"
 
 namespace mrlab::controller
 {
-
+class MainController;
 class AppHandle;
-class ConfigController;
 
 //==============================================================================
-class AppController
+class AppController : public ConfigController::Listener
 {
 public:
     //==============================================================================
     /** Exception that is thrown when there is no app for the given id. */
-    class AppUnknownException : public std::exception
+    class AppUnknownException : public std::runtime_error
     {
     public:
-        AppUnknownException (const juce::Identifier& appId)
-            : msg ("AppUnknownException: no app found with id " + appId.toString())
+        AppUnknownException (const juce::Identifier& id)
+            : std::runtime_error ("AppUnknownException: No app found with id " + id.toString().toStdString())
         {}
-
-        const char* what() const noexcept override { return msg.toUTF8(); }
-
-    protected:
-        juce::String msg;
     };
 
     //==============================================================================
@@ -63,32 +58,24 @@ public:
     };
 
     //==============================================================================
-    AppController (ConfigController& configController);
+    AppController (MainController& mainControllerIn);
 
-    ~AppController();
+    ~AppController() override;
 
-    /** Read all configurations from the scene config dir. */
-    void populateFromConfigDir();
+    /** Add an app handle for a given config to this controller.
 
-    /** Add an app handle for appId to this controller.
+        The provided config needs to contain an app configuration
+        section for this to work.
 
-        This will acquire a matching app configuration for instantiating a handle.
-        If there is already a handle for appId, it should be removed before calling this.
+        @param config configuration to use.
 
-        @param appId Unique app identifier.
-        @returns true on success, false if there is already an app with this id.
-        @throws ConfigNotFoundException.
+        @returns true on success, false if there is already an app
+                 with this id or if the provided configuration does
+                 not contain an app section.
      */
-    bool add (const juce::Identifier& appId);
+    bool add (const YamlConfig& config);
 
-    /** Add an app handle for appId to this controller by file.
-
-        @param file the file on disk.
-        @returns true on success, false if there is already an app with this id.
-     */
-    bool add (const juce::File& file);
-
-    /** Remove the app handle for appId from this controller.
+    /** Remove the app handle for id from this controller.
 
         This is only supported for apps that are not running.
 
@@ -123,6 +110,9 @@ public:
      */
     bool isAnyAppRunning() const;
 
+    /** Check whether this manages an app with the given id. */
+    bool hasApp (const juce::Identifier& appId) const { return apps.contains (appId); }
+
     /** Get the app handle for appId.
 
         @returns The matching handle for appId.
@@ -142,6 +132,13 @@ public:
 
 private:
     //==============================================================================
+    // ConfigController::Listener interface.
+    void configAdded (const YamlConfig& config) override;
+    void configWillBeRemoved (const YamlConfig& config) override;
+
+    /** Remove an app handle independent of its running state, possibly killing it. */
+    void removeForced (const juce::Identifier& appId);
+
     /** Check whether we know about an appId and throw an exception otherwise. */
     void checkForAppAndThrowIfNotFound (const juce::Identifier& appId) const;
 
@@ -161,7 +158,7 @@ private:
     };
 
     //==============================================================================
-    ConfigController& configController;
+    MainController& mainController;
 
     std::map<juce::Identifier, std::unique_ptr<AppHandle>> apps; ///< Managed apps.
     std::unique_ptr<AppStopTimer> appStopTimer;                  ///< Helper used in stopAllApps().

@@ -24,6 +24,10 @@ class MainController
 public:
     //==============================================================================
     MainController();
+    ~MainController();
+
+    /** @returns a reference to the ConfigController. */
+    ConfigController& getConfigController() { return configController; }
 
     /** @returns a reference to the AppController. */
     AppController& getAppController() { return appController; }
