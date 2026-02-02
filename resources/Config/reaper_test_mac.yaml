@@ -1,14 +1,26 @@
 name: Reaper Test Mac
 description: Reaper DAW generic test for development on Mac
+author: rumori
+date: 2026-01-31
+revision: 1
 
 app:
   startCommand:
     - /Applications/REAPER.app/Contents/MacOS/REAPER
-    - -new
+    - music.rpp
 
-  stopCommand: []
+  stopCommand:
+    - /Applications/REAPER.app/Contents/MacOS/REAPER
+    - -closeall:nosave:exit
 
-  workingDir: ""
+  workingDir: /Users/rm/Documents/1_projects/2025_mrlab/Audio-Apps/Demo-Music
+
+  oscClients:
+    - id: reaper
+      subPath: osc
+      prefix: ""
+      listenPort: 9342
+      destination: [ localhost, 10005 ]
 
   captureStdOut: false
   captureStdErr: false

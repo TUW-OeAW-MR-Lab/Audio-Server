@@ -13,3 +13,9 @@ app:
     - /F
 
   workingDir: C:\MRLab\Audio-Apps\Demo-Fly
+
+  oscClients:
+    - id: yami
+      subPath: osc
+      listenPort: 9336
+      destination: [ localhost, 10003 ]

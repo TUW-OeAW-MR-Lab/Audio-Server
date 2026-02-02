@@ -13,3 +13,9 @@ app:
     - /F
 
   workingDir: C:\MRLab\Audio-Apps\Demo-Jungle
+
+  oscClients:
+    - id: yami
+      subPath: osc
+      listenPort: 9340
+      destination: [ localhost, 10007 ]

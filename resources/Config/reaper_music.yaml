@@ -9,3 +9,9 @@ app:
   stopCommand: []
 
   workingDir: ""
+
+  oscClients:
+    - id: reaper
+      subPath: osc
+      listenPort: 9342
+      destination: [ localhost, 10009 ]
