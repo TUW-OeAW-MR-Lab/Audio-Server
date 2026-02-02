@@ -25,6 +25,8 @@ target_sources (mrlabctrl_Common
         controller/OscController.cpp
         controller/WebServerController.h
         controller/WebServerController.cpp
+        controller/YamlConfig.h
+        controller/YamlConfig.cpp
 
         util/ListenerInterface.h
         util/Logger.h
