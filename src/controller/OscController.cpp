@@ -16,36 +16,43 @@
 namespace mrlab::controller
 {
 
-OscController::OscController (MainController& newMainController)
-    : mainController (newMainController)
+OscController::OscController (MainController& mainControllerIn)
+    : mainController (mainControllerIn)
 {
     addMainServer (Globals::getOscListeningPort());
-
-    // Temporary hardcoded app-specific relay server.
-    addSubPathServer (juce::Identifier ("pd_fly"), "/app/pd_fly/osc", 9336, "localhost", 10003);
-    addSubPathServer (juce::Identifier ("reaper_reverb"), "/app/reaper_reverb/osc", 9338, "localhost", 10005);
-    addSubPathServer (juce::Identifier ("pd_jungle"), "/app/pd_jungle/osc", 9340, "localhost", 10007);
-    addSubPathServer (juce::Identifier ("reaper_music"), "/app/reaper_music/osc", 9342, "localhost", 10009);
 }
 
 OscController::~OscController()
-{}
+{
+    removeServer (mainServerId);
+}
 
 bool OscController::addSubPathServer (const juce::Identifier& id, std::string subPath, int listenPort, const juce::String& destination, int destinationPort)
 {
-    jassert (servers.contains (mainServerId)); // Main server should be initialised first!
+    // Main server should be initialised first!
+    if (! servers.contains (mainServerId))
+    {
+        Logger::logError ("OscController::addSubPathServer: Main server is not initialised, cannot add subserver.");
+        return false;
+    }
+
+    if (! subPath.starts_with ('/') || subPath.ends_with ('/'))
+    {
+        Logger::logError ("OscController::addSubPathServer: Malformed OSC subpath '" + subPath + "' (must have a leading and no trailing '/').");
+        return false;
+    }
 
     if (! addToServers (id, listenPort))
+    {
+        Logger::logError ("OscController::addSubPathServer: Error adding subserver for id: " + id.toString());
         return false;
+    }
 
     auto& subServer = servers.at (id);
     auto& mainServer = servers.at (mainServerId);
 
-    jassert (subPath.starts_with ('/')); // OSC subpath needs a leading '/'!
-    jassert (! subPath.ends_with ('/')); // OSC subpath must not have a trailing '/'!
-
     // Pattern-matching handler for transparent app-specific communication.
-    mainServer->add_method (subPath + "/*", nullptr, [&subServer, subPathLength = subPath.length(), dest = destination.toStdString(), destinationPort] (std::string_view path, const lo::Message& message) {
+    auto subPathHandler = [&subServer, subPathLength = subPath.length(), dest = destination.toStdString(), destinationPort] (std::string_view path, const lo::Message& message) {
         auto addr = lo::Address (dest, destinationPort);
 
         // Forward to subserver with subPath stripped from the path.
@@ -60,13 +67,22 @@ bool OscController::addSubPathServer (const juce::Identifier& id, std::string su
         lo_send_message_from (addr, lo_server (*subServer), strippedPath.data(), message);
 
         return 1; // Continue searching for other handlers.
-    });
+    };
+
+    auto [iter, success] = mainServerMethods.try_emplace (id, mainServer->add_method (subPath + "/*", nullptr, std::move (subPathHandler)));
+
+    if (! success)
+    {
+        Logger::logError (juce::String ("OscController::addSubPathServer: Error adding message handler for OSC subpath ") + subPath + ", id: " + id.toString());
+        removeServer (id);
+        return false;
+    }
 
     // Catch-all handler for return messages from app.
-    subServer->add_method (nullptr, nullptr, [this, sub = std::move (subPath)] (std::string_view path, const lo::Message& message) {
+    subServer->add_method (nullptr, nullptr, [this, subPath] (std::string_view path, const lo::Message& message) {
         // Should be forwarded to main server with subPath added to app-local path.
         // For now, just send to WebSocket clients (webgui).
-        auto fullPath = sub + std::string (path);
+        auto fullPath = subPath + std::string (path);
         auto size = message.length (fullPath);
 
         std::vector<std::byte> serialised;
@@ -77,6 +93,8 @@ bool OscController::addSubPathServer (const juce::Identifier& id, std::string su
     });
 
     subServer->start();
+
+    Logger::logInfo (juce::String ("OscController::addSubPathServer: Added OSC subpath server for '") + subPath + "', listenPort: " + juce::String (listenPort) + ", destination: [" + destination + ", " + juce::String (destinationPort) + "].");
 
     return true;
 }
@@ -89,7 +107,19 @@ bool OscController::removeServer (const juce::Identifier& id)
         return false;
     }
 
-    // TODO implement
+    if (mainServerMethods.contains (id))
+    {
+        // Remove app-specific subpath message handler.
+        servers.at (mainServerId)->del_method (mainServerMethods.at (id));
+        mainServerMethods.erase (id);
+    }
+
+    servers.at (id)->stop();
+    servers.erase (id);
+
+    if (id != mainServerId)
+        Logger::logInfo ("OscController::removeServer: Removed OSC subpath server for id: " + id.toString());
+
     return true;
 }
 

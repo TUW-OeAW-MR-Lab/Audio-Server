@@ -19,6 +19,7 @@ namespace lo
 {
 class ServerThread;
 class Message;
+class Method;
 }
 
 namespace mrlab::controller
@@ -49,7 +50,7 @@ public:
     /**
 
      */
-    OscController (MainController& newMainController);
+    OscController (MainController& mainControllerIn);
 
     /**
 
@@ -96,6 +97,7 @@ private:
     //==============================================================================
     MainController& mainController;
     std::map<juce::Identifier, std::unique_ptr<lo::ServerThread>> servers; ///< Managed server instances.
+    std::map<juce::Identifier, lo::Method> mainServerMethods; ///< OSC methods added to main server per id.
 
     MRLAB_IMPLEMENT_LISTENER_INTERFACE
 

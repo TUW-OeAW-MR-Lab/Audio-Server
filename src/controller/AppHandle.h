@@ -16,6 +16,7 @@
 
 namespace mrlab::controller
 {
+class MainController;
 class YamlConfig;
 
 //==============================================================================
@@ -50,7 +51,7 @@ public:
         alive           = running,      ///< App process is alive but app logic not yet considered ready.
         ready,                          ///< App is ready to be used/controlled.
         busy,                           ///< App indicates that it is not ready to be controlled.
-        lost,                           ///< Connection to the app was lost.
+        lost,                           ///< Connection to the app was lost (e.g., osc client channel could not be established).
 
         stopRequested,                  ///< App has been requested to stop gracefully.
         stopRequestFailed,              ///< Failure while requesting to stop gracefully.
@@ -106,7 +107,7 @@ public:
         @param config Configuration containing an app section.
         @throws UnusableConfigException in case the app section is missing.
      */
-    AppHandle (const YamlConfig& newConfig);
+    AppHandle (MainController& mainControllerIn, const YamlConfig& newConfig);
 
     ~AppHandle() override;
 
@@ -220,6 +221,7 @@ private:
     void updateOutput();
 
     //==============================================================================
+    MainController& mainController;              ///< Reference to the main controller.
     const YamlConfig& config;                    ///< Reference to the app configuration.
     juce::ChildProcess process;                  ///< Actual app process.
     AppState state = AppState::init;             ///< Current app state.

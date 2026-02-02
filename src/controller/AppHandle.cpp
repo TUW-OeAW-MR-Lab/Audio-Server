@@ -9,13 +9,15 @@
 
 #include "AppHandle.h"
 #include "YamlConfig.h"
+#include "MainController.h"
 #include <util/Logger.h>
 
 namespace mrlab::controller
 {
 
-AppHandle::AppHandle (const YamlConfig& newConfig)
-    : config (newConfig)
+AppHandle::AppHandle (MainController& mainControllerIn, const YamlConfig& newConfig)
+    : mainController (mainControllerIn),
+      config (newConfig)
 {
     if (! config.hasSection (YamlConfig::Section::app))
         throw YamlConfig::UnusableConfigException ("Missing config section 'app'.");
@@ -66,6 +68,30 @@ AppHandle::AppState AppHandle::start()
     if (! success)
         return state;
 
+    // Add subpath OSC server if config calls or it.
+    if (const auto oscClients = appConfig["oscClients"]; oscClients)
+    {
+        // We only support one client entry for now.
+        if (oscClients.size() > 1)
+            Logger::logWarn ("AppHandle: Ignoring additional oscClient entries in app config with id " + config.getId().toString());
+
+        const auto osc = oscClients[0];
+
+        if (! osc["prefix"].as<std::string>().empty())
+            Logger::logWarn ("AppHandle: Ignoring oscClient 'prefix' entry (not yet implemented) in app config with id " + config.getId().toString());
+
+        if (! mainController.getOscController().addSubPathServer (config.getId(),
+                                                                  "/app/" + config.getId().toString().toStdString() + "/" + osc["subPath"].as<std::string>(),
+                                                                  osc["listenPort"].as<uint16_t>(),
+                                                                  osc["destination"][0].as<std::string>(),
+                                                                  osc["destination"][1].as<uint16_t>()))
+        {
+            Logger::logError ("AppHandle: Establishing osc client channel failed for app with id " + config.getId().toString());
+
+            setStateAndNotify (AppState::lost);
+        }
+    }
+
     startTimer (TimerId::stateUpdate, stateUpdateMs);
 
     // Start reading the output asynchronously as juce::ChildProcess::readProcessOutput() is blocking.
@@ -91,7 +117,8 @@ AppHandle::AppState AppHandle::start()
 
     // TODO: implement waiting for app to become ready (IMRV-33).
     // For now, we just become ready after a delay.
-    startTimer (TimerId::appReadyTimeout, appReadyTimeoutMs);
+    if (state == AppState::alive)
+        startTimer (TimerId::appReadyTimeout, appReadyTimeoutMs);
 
     return state;
 }
@@ -100,6 +127,9 @@ AppHandle::AppState AppHandle::stop()
 {
     if (! isRunning())
         return state;
+
+    // Remove potentially added subpath OSC server.
+    mainController.getOscController().removeServer (config.getId());
 
     juce::StringArray stopCommand;
 
@@ -139,7 +169,12 @@ AppHandle::AppState AppHandle::stop()
 AppHandle::AppState AppHandle::kill()
 {
     if (process.isRunning())
+    {
+        // Remove potentially added subpath OSC server.
+        mainController.getOscController().removeServer (config.getId());
+
         setStateAndNotify (process.kill() ? AppState::killRequested : AppState::killRequestFailed);
+    }
 
     return state;
 }
@@ -178,7 +213,7 @@ void AppHandle::timerCallback (int timerId)
             break;
 
         default:
-            ;
+            jassertfalse; // Unhandled timer id.
     }
 }
 
@@ -210,6 +245,9 @@ void AppHandle::updateState()
 
     captureThread.reset();
     // TODO: Implement crash detection of app (IMRV-35).
+
+    // Remove potentially added subpath OSC server.
+    mainController.getOscController().removeServer (config.getId());
 }
 
 void AppHandle::updateOutput()

@@ -33,7 +33,7 @@ bool AppController::add (const YamlConfig& config)
 
     try
     {
-        auto [iter, success] = apps.try_emplace (id, std::make_unique<AppHandle> (config));
+        auto [iter, success] = apps.try_emplace (id, std::make_unique<AppHandle> (mainController, config));
 
         if (success)
             listeners.call (&Listener::appAdded, *iter->second);
