@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <JuceHeader.h>
+#include <juce_core/juce_core.h>
 
 namespace mrlab
 {
@@ -24,24 +24,13 @@ struct Globals
 {
     //==============================================================================
     /** @return The general application support base directory. */
-    static juce::File getAppSupportBaseDir()
-    {
-#if JUCE_WINDOWS
-        return { juce::SystemStats::getEnvironmentVariable ("PROGRAMDATA", juce::File::getSpecialLocation (juce::File::commonApplicationDataDirectory).getFullPathName()) };
-#elif JUCE_MAC
-        return juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory).getChildFile ("Application Support");
-#elif JUCE_LINUX
-        return juce::File::getSpecialLocation (juce::File::userHomeDirectory).getChildFile (".local/share");
-#else
-        return juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory);
-#endif
-    }
+    static juce::File getAppSupportBaseDir();
 
     /** @return The base directory of this application's data and associated resources. */
-    static juce::File getAppSupportDir()
-    {
-        return getAppSupportBaseDir().getChildFile (ProjectInfo::projectName);
-    }
+    static juce::File getAppSupportDir();
+
+    /** @return The location and name of the log file to be written. */
+    static juce::File getLogFile();
 
     /** @return The web server's document root (holds web gui data). */
     static juce::File getWebServerDocumentRootDir()
@@ -53,6 +42,12 @@ struct Globals
     static juce::File getConfigDir()
     {
         return getAppSupportDir().getChildFile ("Config");
+    }
+
+    /** @return The file extension of configuration files (app/routing/...). */
+    static juce::String getConfigFileExtension()
+    {
+      return "yaml";
     }
 
     //==============================================================================

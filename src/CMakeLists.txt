@@ -8,6 +8,7 @@
 target_sources (mrlabctrl_App
     PRIVATE
         Globals.h
+        Globals.cpp
         Main.cpp
 )
 

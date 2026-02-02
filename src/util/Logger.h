@@ -45,7 +45,7 @@ public:
     };
 
     //==============================================================================
-    Logger() : juce::FileLogger (Globals::getAppSupportDir().getChildFile ("MRLabLog.txt"), "\n\n==== MRLabLog Session Start ====", maxFileSizeBytes) {}
+    Logger() : juce::FileLogger (Globals::getLogFile(), "\n\n==== MRLabLog Session Start ====", maxFileSizeBytes) {}
 
     //==============================================================================
     /** Convenience wrapper to write an info log message. */
