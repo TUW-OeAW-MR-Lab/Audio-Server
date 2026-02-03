@@ -1,0 +1,44 @@
+/*
+    TestGlobals.cpp
+
+    Part of MR Lab Control Software
+
+    SPDX-License-Identifier: EUPL-1.2
+    SPDX-FileCopyrightText: Copyright (c) 2026 Martin Rumori/sonible GmbH
+ */
+
+#include "Globals.h"
+
+/* Globals.cpp implementation for test cases.
+
+   This points the app support directory to the source repository's
+   resources directory such that locally run test cases can refer to
+   the project resources.
+ */
+
+namespace mrlab
+{
+
+juce::File Globals::getAppSupportBaseDir()
+{
+    auto resourceDir = juce::File ("@CMAKE_SOURCE_DIR@").getChildFile ("resources");
+
+    /* Resource directory not present?
+       Test builds require the source tree from which they were built.
+     */
+    jassert (resourceDir.isDirectory());
+
+    return resourceDir;
+}
+
+juce::File Globals::getAppSupportDir()
+{
+    return getAppSupportBaseDir();
+}
+
+juce::File Globals::getLogFile()
+{
+    return juce::File ("@CMAKE_CURRENT_BINARY_DIR@").getChildFile ("MRLabLog_UnitTest.txt");
+}
+
+} // namespace mrlab

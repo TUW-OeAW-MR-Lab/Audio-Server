@@ -9,36 +9,31 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <controller/AppController.h>
-#include <controller/AppConfigController.h>
+#include <controller/MainController.h>
 #include <controller/AppHandle.h>
 
 namespace mrlab
 {
 
-TEST_CASE ("App configurations and handles", "[AppControllerTest]")
+TEST_CASE ("App handle controller", "[AppControllerTest]")
 {
-    controller::AppConfigController appConfigController;
+    controller::MainController mainController;
+    controller::ConfigController& configController = mainController.getConfigController();
+    controller::AppController& appController = mainController.getAppController();
 
-    SECTION ("Access hardcoded example configurations")
+    SECTION ("Load and acess example configurations")
     {
-        REQUIRE_NOTHROW (appConfigController.findConfig (controller::AppConfigController::configFly));
-        REQUIRE_NOTHROW (appConfigController.findConfig (controller::AppConfigController::configReverb));
-        REQUIRE_THROWS (appConfigController.findConfig (juce::Identifier ("non-existent")));
-    }
+        juce::Identifier reaperTest = "reaper_test_mac";
+        juce::Identifier pdTest = "pd_test_mac";
 
-    controller::AppController appController (appConfigController);
-
-    SECTION ("Add and access example configurations")
-    {
-        appController.add (controller::AppConfigController::configFly);
-        appController.add (controller::AppConfigController::configReverb);
+        REQUIRE (configController.loadConfig (reaperTest));
+        REQUIRE (configController.loadConfig (pdTest));
 
         REQUIRE (appController.getApps().size() == 2);
 
-        auto& app = appController.getApp (controller::AppConfigController::configFly);
+        const auto& app = appController.getApp (reaperTest);
 
-        REQUIRE (app.getConfig().id == controller::AppConfigController::configFly);
+        REQUIRE (app.getId() == reaperTest);
         REQUIRE (app.getState() == controller::AppHandle::AppState::initial);
     }
 }

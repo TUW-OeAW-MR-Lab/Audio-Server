@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: EUPL-1.2
 # SPDX-FileCopyrightText: Copyright (c) 2025 Martin Rumori/sonible GmbH
 
-CPMAddPackage ("gh:catchorg/Catch2@3.11.0")
+CPMAddPackage ("gh:catchorg/Catch2@3.12.0")
 
 #====================================================================================
 juce_add_console_app (mrlabctrl_UnitTest
@@ -14,16 +14,16 @@ juce_add_console_app (mrlabctrl_UnitTest
     BUNDLE_ID     com.sonible.mrlabctrl_unittest
 )
 
-# We do not intend to use JuceHeader.h generally,
-# this is just for exploiting its ProjectInfo:: facility.
-juce_generate_juce_header (mrlabctrl_UnitTest)
-
 add_dependencies (run_tests mrlabctrl_UnitTest)
 
 set_target_properties (mrlabctrl_UnitTest
     PROPERTIES
         EXCLUDE_FROM_ALL TRUE
 )
+
+configure_file (TestGlobals.cpp.in TestGlobals.cpp ESCAPE_QUOTES)
+
+target_include_directories (mrlabctrl_UnitTest PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
 
 target_link_libraries (mrlabctrl_UnitTest
     PRIVATE
@@ -33,6 +33,8 @@ target_link_libraries (mrlabctrl_UnitTest
 
 target_sources (mrlabctrl_UnitTest
     PRIVATE
+        TestGlobals.cpp
+        ConfigControllerTest.cpp
         AppControllerTest.cpp
 )
 
