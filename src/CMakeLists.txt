@@ -19,6 +19,8 @@ target_sources (mrlabctrl_Common
         controller/AppController.cpp
         controller/AppHandle.h
         controller/AppHandle.cpp
+        controller/AppHandleOscAgent.h
+        controller/AppHandleOscAgent.cpp
         controller/ConfigController.h
         controller/ConfigController.cpp
         controller/ConfigOscAgent.h
@@ -29,6 +31,8 @@ target_sources (mrlabctrl_Common
         controller/OscController.h
         controller/OscController.cpp
         controller/OscEndpoint.h
+        controller/SubPathOscAgentWithEndpoint.h
+        controller/SubPathOscAgentWithEndpoint.cpp
         controller/UdpEndpoint.h
         controller/UdpEndpoint.cpp
         controller/WebServerController.h

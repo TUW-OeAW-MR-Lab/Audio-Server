@@ -63,7 +63,7 @@ void AppControlComponent::appStateChanged (controller::AppHandle&, controller::A
 
     killButton.setEnabled (app.isRunning());
 
-    auto statusText = controller::AppHandle::appStateNames.at (newState);
+    auto statusText = juce::String (controller::AppHandle::AppStateDescription::get (newState).data());
 
     if (app.isFinished())
         statusText += " (" + juce::String (app.getExitCode()) + ")";

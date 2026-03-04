@@ -16,8 +16,9 @@
 
 namespace mrlab::controller
 {
-class MainController;
+class OscController;
 class YamlConfig;
+class AppHandleOscAgent;
 
 //==============================================================================
 class AppHandle : private juce::MultiTimer
@@ -59,23 +60,31 @@ public:
         killRequestFailed               ///< Attempt to kill the app failed.
     };
 
-    /** AppState values as display strings. */
-    inline static const auto appStateNames = std::map<AppState, juce::String> (
-        { { AppState::init, "" },
-          { AppState::startFailed, "start failed" },
-          { AppState::stoppedSuccess, "success" },
-          { AppState::stoppedError, "error" },
-          { AppState::crashed, "crashed" },
-          { AppState::killed, "killed" },
-          { AppState::alive, "alive" },
-          { AppState::ready, "ready" },
-          { AppState::busy, "busy" },
-          { AppState::lost, "lost" },
-          { AppState::stopRequested, "quitting..." },
-          { AppState::stopRequestFailed, "quitting failed" },
-          { AppState::killRequested, "killing..." },
-          { AppState::killRequestFailed, "kill failed" } }
-    );
+    struct AppStateDescription
+    {
+        static std::string_view get (AppState code)
+        {
+            return description.at (code);
+        }
+
+        /** AppState values to display strings. */
+        inline static const auto description = std::map<AppState, std::string_view> (
+            { { AppState::init, "" },
+              { AppState::startFailed, "start failed" },
+              { AppState::stoppedSuccess, "success" },
+              { AppState::stoppedError, "error" },
+              { AppState::crashed, "crashed" },
+              { AppState::killed, "killed" },
+              { AppState::alive, "alive" },
+              { AppState::ready, "ready" },
+              { AppState::busy, "busy" },
+              { AppState::lost, "lost" },
+              { AppState::stopRequested, "quitting..." },
+              { AppState::stopRequestFailed, "quitting failed" },
+              { AppState::killRequested, "killing..." },
+              { AppState::killRequestFailed, "kill failed" } }
+        );
+    };
 
     //==============================================================================
     /** Listener interface to get informed of AppHandle updates. */
@@ -89,6 +98,13 @@ public:
             @param newState New state of the app.
          */
         virtual void appStateChanged (AppHandle& app, AppState newState) = 0;
+
+        /** Indicates that an exit code of the app has been set.
+
+            @param app App whose exit code has been set.
+            @param exitCode Newly assigned exit code.
+         */
+        virtual void exitCodeAvailable (AppHandle& /*app*/, uint32_t /*exitCode*/) {}
 
         /** Indicates that new output was captured from the app's standard and/or error output.
 
@@ -104,10 +120,12 @@ public:
     //==============================================================================
     /** Create an AppHandle according to an app config.
 
-        @param config Configuration containing an app section.
-        @throws UnusableConfigException in case the app section is missing.
+        @param oscController Reference to the OscController.
+        @param configIn Configuration containing an app section.
+
+        @throws ConfigUnusableException in case the app section is missing.
      */
-    AppHandle (MainController& mainControllerIn, const YamlConfig& newConfig);
+    AppHandle (OscController& oscController, const YamlConfig& configIn);
 
     ~AppHandle() override;
 
@@ -169,7 +187,7 @@ public:
 
         @note Calling this does only make sense if the app is not running anymore.
      */
-    uint32_t getExitCode() const;
+    uint32_t getExitCode() const { return exitCode; }
 
     /** Get the output that was last captured from the app.
 
@@ -221,10 +239,11 @@ private:
     void updateOutput();
 
     //==============================================================================
-    MainController& mainController;              ///< Reference to the main controller.
     const YamlConfig& config;                    ///< Reference to the app configuration.
+    std::unique_ptr<AppHandleOscAgent> oscAgent; ///< OSC agent for this.
     juce::ChildProcess process;                  ///< Actual app process.
-    AppState state = AppState::init;             ///< Current app state.
+    AppState state { AppState::init };           ///< Current app state.
+    uint32_t exitCode { 0 };                     ///< Last available exit code.
     juce::String lastOutput;                     ///< Last available output captured from the app.
     juce::MemoryOutputStream output;             ///< Output currently being captured.
     juce::CriticalSection outputLock;            ///< Lock for concurrent access to output.

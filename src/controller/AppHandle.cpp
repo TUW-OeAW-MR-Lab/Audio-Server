@@ -9,18 +9,20 @@
 
 #include "AppHandle.h"
 #include "YamlConfig.h"
-#include "MainController.h"
+#include "AppHandleOscAgent.h"
 #include <util/Logger.h>
+#include <Exceptions.h>
 
 namespace mrlab::controller
 {
 
-AppHandle::AppHandle (MainController& mainControllerIn, const YamlConfig& newConfig)
-    : mainController (mainControllerIn),
-      config (newConfig)
+AppHandle::AppHandle (OscController& oscController, const YamlConfig& newConfig)
+    : config (newConfig)
 {
     if (! config.hasSection (YamlConfig::Section::app))
-        throw YamlConfig::UnusableConfigException ("Missing config section 'app'.");
+        throw ConfigUnusableException ("Missing config section 'app'.");
+
+    oscAgent = std::make_unique<AppHandleOscAgent> (oscController, *this);
 }
 
 AppHandle::~AppHandle()
@@ -68,33 +70,15 @@ AppHandle::AppState AppHandle::start()
     if (! success)
         return state;
 
-    // Add subpath OSC server if config calls or it.
-    if (const auto oscClients = appConfig["oscClients"]; oscClients)
-    {
-        // We only support one client entry for now.
-        if (oscClients.size() > 1)
-            Logger::logWarn ("AppHandle: Ignoring additional oscClient entries in app config with id " + config.getId().toString());
-
-        const auto osc = oscClients[0];
-
-        if (! osc["prefix"].as<std::string>().empty())
-            Logger::logWarn ("AppHandle: Ignoring oscClient 'prefix' entry (not yet implemented) in app config with id " + config.getId().toString());
-
-        if (! mainController.getOscController().addSubPathServer (config.getId(),
-                                                                  "/app/" + config.getId().toString().toStdString() + "/" + osc["subPath"].as<std::string>(),
-                                                                  osc["listenPort"].as<uint16_t>(),
-                                                                  osc["destination"][0].as<std::string>(),
-                                                                  osc["destination"][1].as<uint16_t>()))
-        {
-            Logger::logError ("AppHandle: Establishing osc client channel failed for app with id " + config.getId().toString());
-
-            setStateAndNotify (AppState::lost);
-        }
-    }
+    // Ask oscAgent to add sub-path OSC client channel agents if config calls or it.
+    if (! oscAgent->addOscClientsAgents (appConfig["oscClients"]))
+        setStateAndNotify (AppState::lost);
 
     startTimer (TimerId::stateUpdate, stateUpdateMs);
 
-    // Start reading the output asynchronously as juce::ChildProcess::readProcessOutput() is blocking.
+    /* Start reading the output asynchronously as
+       juce::ChildProcess::readProcessOutput() is blocking.
+     */
     if (streamFlags)
     {
         auto readOutput = [&] (std::stop_token stopToken) {
@@ -127,9 +111,6 @@ AppHandle::AppState AppHandle::stop()
 {
     if (! isRunning())
         return state;
-
-    // Remove potentially added subpath OSC server.
-    mainController.getOscController().removeServer (config.getId());
 
     juce::StringArray stopCommand;
 
@@ -169,12 +150,7 @@ AppHandle::AppState AppHandle::stop()
 AppHandle::AppState AppHandle::kill()
 {
     if (process.isRunning())
-    {
-        // Remove potentially added subpath OSC server.
-        mainController.getOscController().removeServer (config.getId());
-
         setStateAndNotify (process.kill() ? AppState::killRequested : AppState::killRequestFailed);
-    }
 
     return state;
 }
@@ -182,13 +158,6 @@ AppHandle::AppState AppHandle::kill()
 const juce::Identifier& AppHandle::getId() const
 {
     return config.getId();
-}
-
-uint32_t AppHandle::getExitCode() const
-{
-    jassert (isFinished());
-
-    return process.getExitCode();
 }
 
 void AppHandle::timerCallback (int timerId)
@@ -224,6 +193,10 @@ void AppHandle::setStateAndNotify (AppState newState)
 
     state = newState;
     listeners.call (&Listener::appStateChanged, *this, state);
+
+    Logger::logInfo (juce::String ("AppHandle: AppState changed for app ") + getId() +
+                     ": " + juce::String (int32_t (state)) +
+                     " (" + AppStateDescription::get (state).data() + ").");
 }
 
 void AppHandle::updateState()
@@ -237,17 +210,22 @@ void AppHandle::updateState()
         return;
     }
 
-    // Process stopped: check previous state and determine what to do.
+    // Process stopped: Clean up, check previous state and determine new state.
+    exitCode = process.getExitCode();
+
+    // Remove potentially added OSC client channel agents.
+    oscAgent->removeOscClientsAgents();
+
     if (state == AppState::killRequested)
         setStateAndNotify (AppState::killed);
     else if (isRunning())
-        setStateAndNotify (process.getExitCode() == 0 ? AppState::stoppedSuccess : AppState::stoppedError);
+        setStateAndNotify (exitCode == 0 ? AppState::stoppedSuccess : AppState::stoppedError);
+
+    // Notify exit code.
+    listeners.call (&Listener::exitCodeAvailable, *this, exitCode);
 
     captureThread.reset();
     // TODO: Implement crash detection of app (IMRV-35).
-
-    // Remove potentially added subpath OSC server.
-    mainController.getOscController().removeServer (config.getId());
 }
 
 void AppHandle::updateOutput()
