@@ -56,6 +56,10 @@ struct Globals
 
     /** @return The listening port for 3rd party OSC control. */
     static uint16_t getOscListeningPort() { return 7081; }
+
+    /** @return The resource URI for the WebSocket connection handler. */
+    static std::string getWebSocketUri() { return "/ws"; }
+
 };
 
 } // namespace mrlab
