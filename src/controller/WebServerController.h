@@ -9,15 +9,14 @@
 
 #pragma once
 
-#include <memory>
 #include <juce_core/juce_core.h>
-#include <CivetServer.h>
-#include "AppController.h"
-#include "AppHandle.h"
+
+class CivetServer;
 
 namespace mrlab::controller
 {
-class MainController;
+class OscController;
+class WebSocketController;
 
 //==============================================================================
 /** Controller that wraps a single webserver with websocket functionality.
@@ -27,17 +26,18 @@ class MainController;
     switch to the WebSocket protocol by means of an http protocol
     upgrade request.
 
+    The websocket facility is managed by a sub-controller
+    (WebSocketController).
+
     For the implementation, civetweb (https://github.com/civetweb/civetweb)
     is used.
  */
-class WebServerController : public CivetWebSocketHandler,
-                            public AppController::Listener,
-                            public AppHandle::Listener
+class WebServerController
 {
 public:
     //==============================================================================
-    WebServerController (MainController& mainControllerIn);
-    ~WebServerController() override;
+    WebServerController (OscController& oscController);
+    ~WebServerController();
 
     /** Start the webserver.
 
@@ -47,37 +47,15 @@ public:
 
     /** Stop the webserver.
 
-        @return true on success, false if server was not running.
+        @return true on success, false if there was an error to
+                gracefully stop.
     */
     bool stop();
 
-    /** Send a message to all connected clients.
-
-        @param message Serialised binary message to send.
-
-        @return true on success, false on error.
-     */
-    bool sendToAll (const std::vector<std::byte>& message);
-
-    // CivetWebSocketHandler interface.
-    bool handleConnection (CivetServer* server, const mg_connection* conn) override;
-    void handleReadyState (CivetServer* server, mg_connection* conn) override;
-    bool handleData (CivetServer* server, mg_connection* conn, int bits, char* data, size_t data_len) override;
-    void handleClose (CivetServer* server, const mg_connection* conn) override;
-
-    // AppController::Listener interface.
-    void appAdded (AppHandle& app) override { app.addListener (this); }
-    void appWillBeRemoved (AppHandle& app) override { app.removeListener (this); }
-
-    // AppHandle::Listener interface.
-    void appStateChanged (AppHandle& app, AppHandle::AppState newState) override;
-
 private:
     //==============================================================================
-    MainController& mainController;
-
-    std::unique_ptr<CivetServer> civetServer; ///< Wrapped civetweb server instance.
-    std::vector<mg_connection*> clients;  ///< Currently established client connections.
+    std::unique_ptr<WebSocketController> webSocketController; ///< WebSocket endpoints controller.
+    std::unique_ptr<CivetServer> civetServer;                 ///< Wrapped civetweb server instance.
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WebServerController)
 };

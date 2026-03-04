@@ -31,6 +31,8 @@ target_sources (mrlabctrl_Common
         controller/UdpEndpoint.cpp
         controller/WebServerController.h
         controller/WebServerController.cpp
+        controller/WebSocketController.h
+        controller/WebSocketController.cpp
         controller/YamlConfig.h
         controller/YamlConfig.cpp
 
