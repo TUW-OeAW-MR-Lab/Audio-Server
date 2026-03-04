@@ -8,240 +8,175 @@
  */
 
 #include "OscController.h"
-#include "MainController.h"
-#include <lo/lo_cpp.h>
-#include <util/Logger.h>
+#include "UdpEndpoint.h"
 #include <Globals.h>
+#include <util/Logger.h>
+#include <osc/Address.h>
+#include <osc/Util.h>
+#include <Exceptions.h>
+#include <lo/lo_cpp.h>
 
 namespace mrlab::controller
 {
 
-OscController::OscController (MainController& mainControllerIn)
-    : mainController (mainControllerIn)
-{
-    addMainServer (Globals::getOscListeningPort());
-}
+OscController::OscController()
+{}
 
 OscController::~OscController()
 {
-    removeServer (mainServerId);
+    stop();
 }
 
-bool OscController::addSubPathServer (const juce::Identifier& id, std::string subPath, int listenPort, const juce::String& destination, int destinationPort)
+bool OscController::start()
 {
-    // Main server should be initialised first!
-    if (! servers.contains (mainServerId))
+    const auto port = Globals::getOscListeningPort();
+
+    // Main server nominally listening on TCP, but just for message dispatching.
+    server = std::make_unique<lo::Server> (port, LO_TCP, [this] (int num, const char* msg, const char* where) { errorHandler (num, msg, where); });
+
+    if (! server->is_valid())
     {
-        Logger::logError ("OscController::addSubPathServer: Main server is not initialised, cannot add subserver.");
+        Logger::logFatal ("OscController: Cannot initialize OSC message handling, port " + juce::String (Globals::getOscListeningPort()) + " (TCP) occupied?");
         return false;
     }
 
-    if (! subPath.starts_with ('/') || subPath.ends_with ('/'))
-    {
-        Logger::logError ("OscController::addSubPathServer: Malformed OSC subpath '" + subPath + "' (must have a leading and no trailing '/').");
-        return false;
-    }
+    // Catch-all handler for listeners and logging OSC traffic (debug).
+    server->add_method (nullptr, nullptr, [this] (std::string_view path, const lo::Message& msg) {
+#if JUCE_DEBUG
+        const auto src = currentSource ? currentSource->getPeer() : " <nn>";
 
-    if (! addToServers (id, listenPort))
-    {
-        Logger::logError ("OscController::addSubPathServer: Error adding subserver for id: " + id.toString());
-        return false;
-    }
+        std::cout << "[OSC recv " << src << "]: " << path << " ";
+        msg.print();
+#endif
 
-    auto& subServer = servers.at (id);
-    auto& mainServer = servers.at (mainServerId);
-
-    // Pattern-matching handler for transparent app-specific communication.
-    auto subPathHandler = [&subServer, subPathLength = subPath.length(), dest = destination.toStdString(), destinationPort] (std::string_view path, const lo::Message& message) {
-        auto addr = lo::Address (dest, destinationPort);
-
-        // Forward to subserver with subPath stripped from the path.
-        auto strippedPath = path.substr (subPathLength);
-
-        /* We would like to use the C++ interface here but it does not provide
-           a working overload for the statement below, so we fall back to the C
-           interface.
-
-           addr.send_from (*subServer, strippedPath, message);
-        */
-        lo_send_message_from (addr, lo_server (*subServer), strippedPath.data(), message);
-
-        return 1; // Continue searching for other handlers.
-    };
-
-    auto [iter, success] = mainServerMethods.try_emplace (id, mainServer->add_method (subPath + "/*", nullptr, std::move (subPathHandler)));
-
-    if (! success)
-    {
-        Logger::logError (juce::String ("OscController::addSubPathServer: Error adding message handler for OSC subpath ") + subPath + ", id: " + id.toString());
-        removeServer (id);
-        return false;
-    }
-
-    // Catch-all handler for return messages from app.
-    subServer->add_method (nullptr, nullptr, [this, subPath] (std::string_view path, const lo::Message& message) {
-        // Should be forwarded to main server with subPath added to app-local path.
-        // For now, just send to WebSocket clients (webgui).
-        auto fullPath = subPath + std::string (path);
-        auto size = message.length (fullPath);
-
-        std::vector<std::byte> serialised;
-        serialised.resize (size);
-        message.serialise (fullPath, serialised.data(), nullptr);
-        const auto result = mainController.getWebServerController().sendToAll (serialised);
-        jassertquiet (result);
-    });
-
-    subServer->start();
-
-    Logger::logInfo (juce::String ("OscController::addSubPathServer: Added OSC subpath server for '") + subPath + "', listenPort: " + juce::String (listenPort) + ", destination: [" + destination + ", " + juce::String (destinationPort) + "].");
-
-    return true;
-}
-
-bool OscController::removeServer (const juce::Identifier& id)
-{
-    if (! servers.contains (id))
-    {
-        jassertfalse; // Unknown key.
-        return false;
-    }
-
-    if (mainServerMethods.contains (id))
-    {
-        // Remove app-specific subpath message handler.
-        servers.at (mainServerId)->del_method (mainServerMethods.at (id));
-        mainServerMethods.erase (id);
-    }
-
-    servers.at (id)->stop();
-    servers.erase (id);
-
-    if (id != mainServerId)
-        Logger::logInfo ("OscController::removeServer: Removed OSC subpath server for id: " + id.toString());
-
-    return true;
-}
-
-bool OscController::dispatchRaw (std::span<std::byte> data)
-{
-    if (! servers.contains (mainServerId))
-    {
-        jassertfalse; // No main server present.
-        return false;
-    }
-
-    return servers.at (mainServerId)->dispatch_data (data.data(), data.size()) >= 0;
-}
-
-bool OscController::addMainServer (int port)
-{
-    if (! addToServers (mainServerId, port))
-        return false;
-
-    auto& server = servers.at (mainServerId);
-
-    // Pattern-matching handler for app-control messages.
-    server->add_method ("/app/*/control", "s", [this] (std::string_view path, const lo::Message& message) {
-        handleIncomingAppControlMessage (path, message);
+        listeners.call (&Listener::messageReceived, path, msg);
 
         return 1; // Continue searching for other handlers.
     });
 
-    server->add_method ("/config/*/reload", nullptr, [this] (std::string_view path, const lo::Message& message) {
-        handleIncomingReloadConfigMessage (path, message);
-
-        return 0; // Don't continue searching for other handlers.
+    // Global handler for /ping response.
+    server->add_method (osc::Address::ping, nullptr, [this] (const lo::Message& msg) {
+        if (currentSource)
+            send (*currentSource, osc::Address::pong, msg);
     });
 
-    server->add_method ("/configinfo/list", nullptr, [this] (std::string_view /*path*/, const lo::Message& message) {
-        sendAvailableConfigs (message);
+    // Main endpoint actually listening on UDP.
+    try
+    {
+        mainEndpoint = std::make_unique<UdpEndpoint> (*this, port, UdpEndpoint::DestinationMode::lastReceived);
+    }
+    catch (const ServerInvalidException& e)
+    {
+        Logger::logError (juce::String ("OscController: ") + e.what());
+        return false;
+    }
 
-        return 0; // Don't continue to search for other handlers.
-    });
-
-    // Catch-all handler for log.
-    server->add_method (nullptr, nullptr, [this] (std::string_view path, const lo::Message& message) {
-        handleIncomingMessage (path, message);
-
-        return 1; // Continue searching for other handlers.
-    });
-
-    server->start();
+    mainEndpoint->start();
 
     return true;
 }
 
-bool OscController::addToServers (const juce::Identifier& id, int port)
+bool OscController::stop()
 {
-    auto [iter, success] = servers.try_emplace (id, std::make_unique<lo::ServerThread> (port));
+    for (const auto& [agent, methods] : agents)
+        removeAgent (*agent);
 
-    jassert (success); // A server with this key already exists!
+    mainEndpoint.reset();
+    server.reset();
 
-    return success;
+    return true;
 }
 
-void OscController::sendAvailableConfigs (const lo::Message& /*message*/)
+bool OscController::addAgent (const OscAgent& agent)
 {
-    Logger::logInfo ("OscController: send all available app configs");
+    const auto& [iter, result] = agents.try_emplace (&agent);
 
-    auto msg = lo_message_new();
-    const auto& appsMap = mainController.getConfigController().getConfigurations();
-    for (const auto& [id, yaml] : appsMap)
-        lo_message_add_string (msg, id.getCharPointer());
-
-    const auto path = std::string ("/configinfo/list");
-    auto size = lo_message_length (msg, path.c_str());
-
-    std::vector<std::byte> serialised;
-    serialised.resize (size);
-    lo_message_serialise (msg, path.c_str(), (void*) serialised.data(), &size);
-    const auto result = mainController.getWebServerController().sendToAll (serialised);
-    jassertquiet (result);
+    return result;
 }
 
-void OscController::handleIncomingMessage (std::string_view path, const lo::Message& message)
+bool OscController::removeAgent (const OscAgent& agent)
 {
-    Logger::logInfo (juce::String ("OscController [catch-all]: received ") + std::string (path) + " with " + juce::String (message.argc()) + " args.");
+    if (! agents.contains (&agent))
+        return false;
 
-    listeners.call (&Listener::messageReceived, path, message);
+    // Remove all osc methods that were registered by agent.
+    for (const auto& method : agents.at (&agent))
+        server->del_method (method);
+
+    return agents.erase (&agent) == 1;
 }
 
-void OscController::handleIncomingAppControlMessage (std::string_view path, const lo::Message& message)
+bool OscController::addEndpoint (OscEndpoint* endpoint)
 {
-    Logger::logInfo (juce::String ("OscController [app-ctrl]: received ") + std::string (path) + " with " + juce::String (message.argc()) + " args.");
+    const auto& [iter, result] = endpoints.insert (endpoint);
 
-    jassert (message.argc() == 1); // Unexpected number of message arguments!
+    return result;
+}
 
-    path.remove_prefix (1);                                                      // strip initial '/'
-    const auto pathElems = juce::StringArray::fromTokens (path.data(), "/", ""); // strip initial '/'
-    const auto appId = juce::Identifier (pathElems[1]);
-    const auto command = std::string_view (&message.argv()[0]->s);
+bool OscController::removeEndpoint (OscEndpoint* endpoint)
+{
+    return endpoints.erase (endpoint) == 1;
+}
 
-    auto& appController = mainController.getAppController();
+void OscController::broadcast (std::string_view path, const lo::Message& msg, const OscEndpoint* origin)
+{
+    for (auto* endpoint : endpoints)
+        send (*endpoint, path, msg, origin);
+}
 
-    if (appController.getApps().contains (appId))
+void OscController::send (OscEndpoint& destination, std::string_view path, const lo::Message& msg, const OscEndpoint* origin)
+{
+    try
     {
-        auto& handle = appController.getApp (appId);
-
-        if (command == "launch")
-            juce::MessageManager::callAsync ([&] { handle.start(); });
-        else if (command == "quit")
-            juce::MessageManager::callAsync ([&] { handle.stop(); });
+        destination.send (path, msg, origin);
+    }
+    catch (const SendingOscFailedException& e)
+    {
+        Logger::logError (e.what());
     }
 }
 
-void OscController::handleIncomingReloadConfigMessage (std::string_view path, const lo::Message& /*message*/)
+void OscController::dispatch (std::vector<std::byte>&& data, OscEndpoint* source)
 {
-    Logger::logInfo (juce::String ("OscController [config/*/reload]: received ") + std::string (path));
+    // Dispatch all data synchronously on the message thread.
+    /* Dispatching each message using callAsync() might be expensive
+       (allocation-wise) with high congestion, we might be better off
+       with a separate OSC data queue and, e.g., a timer on the
+       message thread.
+     */
+    juce::MessageManager::callAsync ([this, d = std::move (data), source] () mutable {
+        currentSource = source;
+        const auto result = server->dispatch_data (d.data(), d.size());
+        currentSource = nullptr;
 
-    path.remove_prefix (1);                                                      // strip initial '/'
-    const auto pathElems = juce::StringArray::fromTokens (path.data(), "/", ""); // strip initial '/'
-    const auto id = juce::Identifier (pathElems[1]);
+        jassertquiet (result >= 0);
+    });
 
-    const auto result = mainController.getConfigController().loadConfig (id);
+}
 
-    jassertquiet (result);
+void OscController::dispatch (std::span<const std::byte> data, OscEndpoint* source)
+{
+    dispatch (std::vector (data.begin(), data.end()), source);
+}
+
+void OscController::dispatch (std::string_view path, const lo::Message& msg, OscEndpoint* source)
+{
+    /* Unless we have an updated (or patched) version of liblo that
+       allows for directly dispatching OSC messages, we have to
+       serialise the message to be dispatched.
+     */
+    const auto size = msg.length (path);
+
+    std::vector<std::byte> data;
+    data.resize (size);
+    msg.serialise (path, data.data(), nullptr);
+
+    dispatch (std::move (data), source);
+}
+
+void OscController::errorHandler (int num, const char* msg, const char* where) const
+{
+    Logger::logError (osc::Util::formatServerError (*server, "OscController: ", num, msg, where));
 }
 
 } // namespace mrlab::controller
