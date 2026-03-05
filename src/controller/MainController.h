@@ -26,17 +26,17 @@ public:
     MainController();
     ~MainController();
 
-    /** @returns a reference to the ConfigController. */
-    ConfigController& getConfigController() { return configController; }
-
-    /** @returns a reference to the AppController. */
-    AppController& getAppController() { return appController; }
-
     /** @returns a reference to the OscController. */
     OscController& getOscController() { return oscController; }
 
     /** @returns a reference to the WebServerController. */
     WebServerController& getWebServerController() { return webServerController; }
+
+    /** @returns a reference to the ConfigController. */
+    ConfigController& getConfigController() { return configController; }
+
+    /** @returns a reference to the AppController. */
+    AppController& getAppController() { return appController; }
 
     /** @returns a reference to the Logger. */
     Logger& getLogger() { return logger; }
@@ -46,16 +46,16 @@ private:
     /** Perform a few initialisation tasks/checks. */
     void initialise();
 
-    /** Start the webserver with a default configuration. */
-    void startWebServer();
+    /** Start managed servers. */
+    bool start();
 
     //==============================================================================
-    ConfigController configController;
-    AppController appController;
+    Logger logger;
+
     OscController oscController;
     WebServerController webServerController;
-
-    Logger logger;
+    ConfigController configController;
+    AppController appController;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainController)
 };

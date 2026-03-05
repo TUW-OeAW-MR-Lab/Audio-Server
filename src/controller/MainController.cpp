@@ -18,15 +18,14 @@ namespace mrlab::controller
 {
 
 MainController::MainController()
-    : appController (*this),
-      oscController (*this),
-      webServerController (*this)
+    : webServerController (oscController),
+      appController (*this)
 {
     // Initialisation tasks of this controller.
     initialise();
 
-    // Start web server.
-    startWebServer();
+    // Start servers and subcontrollers.
+    start();
 }
 
 MainController::~MainController()
@@ -53,10 +52,19 @@ void MainController::initialise()
     }
 }
 
-void MainController::startWebServer()
+bool MainController::start()
 {
+    if (! oscController.start())
+        return false;
+
+    // Not crucial, may best to do this after OscController was started.
     if (! webServerController.start())
-        Logger::logError ("MainController: Starting the webserver failed!");
+        return false;
+
+    // This must not happen before the OscController was started.
+    configController.initOscAgent (oscController);
+
+    return true;
 }
 
 } // namespace mrlab::controller
