@@ -8,9 +8,11 @@
  */
 
 #include "ConfigController.h"
+#include "ConfigOscAgent.h"
 #include "YamlConfig.h"
 #include <Globals.h>
 #include <util/Logger.h>
+#include <Exceptions.h>
 
 namespace mrlab::controller
 {
@@ -24,6 +26,11 @@ const YamlConfig& ConfigController::getConfig (const juce::Identifier& id) const
     checkForConfigAndThrowIfNotFound (id);
 
     return *configs.at (id);
+}
+
+void ConfigController::initOscAgent (OscController& oscController)
+{
+    oscAgent = std::make_unique<ConfigOscAgent> (oscController, *this);
 }
 
 bool ConfigController::loadConfig (const juce::File& yamlFile)
@@ -46,6 +53,7 @@ void ConfigController::unloadConfig (const juce::Identifier& id)
 
     listeners.call (&Listener::configWillBeRemoved, *configs.at (id));
     configs.erase (id);
+    listeners.call (&Listener::configHasBeenRemoved, id);
 }
 
 void ConfigController::populateFromConfigDir()

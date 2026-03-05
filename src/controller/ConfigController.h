@@ -16,22 +16,14 @@
 namespace mrlab::controller
 {
 class YamlConfig;
+class ConfigOscAgent;
+class OscController;
 
 //==============================================================================
 /** Manage and provide configurations from YAML config files. */
 class ConfigController
 {
 public:
-    //==============================================================================
-    /** Exception that is thrown when there is no config for the given id. */
-    class ConfigNotFoundException : public std::runtime_error
-    {
-    public:
-        ConfigNotFoundException (const juce::Identifier& id)
-            : std::runtime_error ("ConfigNotFoundException: No config found for id " + id.toString().toStdString())
-        {}
-    };
-
     //==============================================================================
     /** Listener interface to get informed about currently managed configs. */
     struct Listener
@@ -40,7 +32,7 @@ public:
 
         /** Called when a configuration was added (i.e., loaded).
 
-            @param id Id of the added config.
+            @param config Reference to the added config.
          */
         virtual void configAdded (const YamlConfig& config) = 0;
 
@@ -48,14 +40,23 @@ public:
 
             This will also be called prior to reloading a configuration.
 
-            @param id Id of the config to be removed.
+            @param config Reference to the config being removed.
          */
         virtual void configWillBeRemoved (const YamlConfig& config) = 0;
+
+        /** Called when a configuration has been removed.
+
+            @param id Id of the config that has been removed.
+         */
+        virtual void configHasBeenRemoved (const juce::Identifier& /*id*/) {}
     };
 
     //==============================================================================
     ConfigController();
     ~ConfigController();
+
+    /** Initialise corresponding OSC message handlers. */
+    void initOscAgent (OscController& oscController);
 
     /** Get the configuration for id.
 
@@ -64,6 +65,13 @@ public:
         @throws ConfigNotFoundException.
      */
     const YamlConfig& getConfig (const juce::Identifier& id) const;
+
+    /** Check whether a configuration for id exists.
+
+        @param id Id of the config to check.
+        @returns true of config exists, false otherwise.
+     */
+    bool hasConfig (const juce::Identifier& id) const { return configs.contains (id); }
 
     /** Load a config from a YAML file.
 
@@ -111,7 +119,7 @@ public:
     size_t getNumConfigurations() { return configs.size(); }
 
     /** @returns a const reference to the map of managed configurations. */
-    const std::map<juce::Identifier, std::unique_ptr<YamlConfig>>& getConfigurations() { return configs; }
+    const std::map<juce::Identifier, std::unique_ptr<YamlConfig>>& getConfigurations() const { return configs; }
 
 private:
     //==============================================================================
@@ -133,6 +141,7 @@ private:
 
     //==============================================================================
     std::map<juce::Identifier, std::unique_ptr<YamlConfig>> configs; ///< Managed configs.
+    std::unique_ptr<ConfigOscAgent> oscAgent;
 
     MRLAB_IMPLEMENT_LISTENER_INTERFACE
 

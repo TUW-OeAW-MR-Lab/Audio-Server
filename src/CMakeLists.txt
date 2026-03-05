@@ -21,6 +21,8 @@ target_sources (mrlabctrl_Common
         controller/AppHandle.cpp
         controller/ConfigController.h
         controller/ConfigController.cpp
+        controller/ConfigOscAgent.h
+        controller/ConfigOscAgent.cpp
         controller/MainController.h
         controller/MainController.cpp
         controller/OscAgent.h
