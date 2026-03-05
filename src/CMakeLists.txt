@@ -23,12 +23,21 @@ target_sources (mrlabctrl_Common
         controller/ConfigController.cpp
         controller/MainController.h
         controller/MainController.cpp
+        controller/OscAgent.h
         controller/OscController.h
         controller/OscController.cpp
+        controller/OscEndpoint.h
+        controller/UdpEndpoint.h
+        controller/UdpEndpoint.cpp
         controller/WebServerController.h
         controller/WebServerController.cpp
         controller/YamlConfig.h
         controller/YamlConfig.cpp
+
+        osc/Address.h
+        osc/Error.h
+        osc/Message.h
+        osc/Util.h
 
         util/ListenerInterface.h
         util/Logger.h
