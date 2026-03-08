@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: EUPL-1.2
 # SPDX-FileCopyrightText: Copyright (c) 2025 Martin Rumori/sonible GmbH
 
-CPMAddPackage ("gh:catchorg/Catch2@3.12.0")
+CPMAddPackage ("gh:catchorg/Catch2@3.13.0")
 
 #====================================================================================
 juce_add_console_app (mrlabctrl_UnitTest

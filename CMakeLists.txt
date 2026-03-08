@@ -34,7 +34,7 @@ CPMAddPackage ("gh:juce-framework/JUCE#8.0.12")
 # yaml-cpp
 set (CMAKE_POLICY_VERSION_MINIMUM "3.5")
 CPMAddPackage (
-    URI "gh:jbeder/yaml-cpp#0.8.0"
+    URI "gh:jbeder/yaml-cpp#yaml-cpp-0.9.0@0.9.0"
     OPTIONS
         "YAML_BUILD_SHARED_LIBS OFF"
         "YAML_CPP_BUILD_TESTS OFF"
@@ -44,7 +44,7 @@ unset (CMAKE_POLICY_VERSION_MINIMUM)
 
 # CivetWeb for webserver and websocket
 CPMAddPackage (
-    URI "gh:civetweb/civetweb#dfdfdb6926765541751cab055472f70daa9aa2dd"
+    URI "gh:civetweb/civetweb#4a4f0c95cd3bd7572cd23fd89ca6eef380d41b99"
     OPTIONS
     "CIVETWEB_ENABLE_SERVER_EXECUTABLE OFF"
     "CIVETWEB_BUILD_TESTING OFF"
@@ -57,6 +57,8 @@ CPMAddPackage (
 CPMAddPackage (
     URI "gh:radarsat1/liblo#0.34"
     SOURCE_SUBDIR "cmake"
+    PATCHES
+    "patches/liblo_stringview.patch" # "Fix" MSVC debug assertion.
     OPTIONS
     "WITH_TOOLS OFF"
     "WITH_TESTS OFF"
@@ -92,8 +94,16 @@ target_compile_definitions (mrlabctrl_Common
         DONT_SET_USING_JUCE_NAMESPACE=1
         JUCE_WEB_BROWSER=0
         JUCE_USE_CURL=0
-        LO_USE_EXCEPTIONS=1
 )
+
+# Fix wrong __cplusplus version macro on Windows.
+# liblo does not support std::string_view otherwise.
+if (MSVC)
+target_compile_options (mrlabctrl_Common
+    INTERFACE
+        /Zc:__cplusplus
+)
+endif()
 
 target_compile_features (mrlabctrl_Common
     INTERFACE
