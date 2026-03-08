@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <juce_core/juce_core.h>
+#include <juce_events/juce_events.h>
 #include <Globals.h>
 #include <util/ListenerInterface.h>
 
@@ -94,22 +94,34 @@ public:
      */
     void logMessage (const juce::String& message) override
     {
-        // log to std::cout
-        std::cout << message << std::endl;
+        /* Even if juce::FileLogger takes care of locking concurrent
+           access, listener notification etc. should happen from the
+           message thread, so we simply pass all we have to do to it.
+         */
+        juce::MessageManager::callAsync ([this, message] {
+            // log to std::cout
+            std::cout << message << std::endl;
 
-        // log to file
-        juce::FileLogger::logMessage (message);
+            // log to file
+            juce::FileLogger::logMessage (message);
 
-        // notify listeners
-        listeners.call (&Listener::messageLogged, message);
+            // notify listeners
+            listeners.call (&Listener::messageLogged, message);
 
-        // trim file size if needed
-        trimFileSize (getLogFile(), maxFileSizeBytes);
+            // trim file size if needed
+            if (++trimFileSizeCount >= trimFileSizeEveryNumMessages)
+            {
+                trimFileSize (getLogFile(), maxFileSizeBytes);
+                trimFileSizeCount = 0;
+            }
+        });
     }
 
 private:
     //==============================================================================
     static constexpr auto maxFileSizeBytes = 10 * 1024 * 1024; // 10 MB
+    static constexpr auto trimFileSizeEveryNumMessages = 1024;
+    int trimFileSizeCount { 0 };
 
     //==============================================================================
     /** Prohibit using the standard logger on this class by hiding it as private. */
