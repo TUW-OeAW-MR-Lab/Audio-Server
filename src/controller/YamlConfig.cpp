@@ -8,6 +8,7 @@
  */
 
 #include "YamlConfig.h"
+#include <Exceptions.h>
 
 namespace mrlab::controller
 {
@@ -51,7 +52,7 @@ void YamlConfig::validate()
             const auto& n = appRoot[key];
 
             if (! (n && n.IsSequence()))
-                throw InvalidConfigException (std::string ("Missing or invalid key 'app:") + key + "', must be a sequence of <string>");
+                throw ConfigInvalidException (std::string ("Missing or invalid key 'app:") + key + "', must be a sequence of <string>");
 
             for (const auto& nn : n)
             {
@@ -61,7 +62,7 @@ void YamlConfig::validate()
                 }
                 catch (const YAML::BadConversion& e)
                 {
-                    throw InvalidConfigException (std::string ("Invalid key 'app:") + key + "', all sequence members must be of type <string> [" + e.what() + "]");
+                    throw ConfigInvalidException (std::string ("Invalid key 'app:") + key + "', all sequence members must be of type <string> [" + e.what() + "]");
                 }
             }
         }
@@ -76,7 +77,7 @@ void YamlConfig::validate()
         if (oscClients)
         {
             if (! oscClients.IsSequence())
-                throw InvalidConfigException (std::string ("Invalid key 'app:oscClients', must be a sequence of mappings"));
+                throw ConfigInvalidException (std::string ("Invalid key 'app:oscClients', must be a sequence of mappings"));
 
             // Check oscClients sequence members.
             for (auto i = 0; auto osc : oscClients)
@@ -84,7 +85,7 @@ void YamlConfig::validate()
                 std::string msgKey = std::string ("app:oscClients[") + std::to_string (i++) + "]";
 
                 if (! osc.IsMap())
-                    throw InvalidConfigException (std::string ("Invalid key '" + msgKey + "', all sequence members must be of type <mapping>"));
+                    throw ConfigInvalidException (std::string ("Invalid key '" + msgKey + "', all sequence members must be of type <mapping>"));
 
                 // mandatory id, subPath, listenPort
                 validateMandatoryWithType<std::string> (osc["id"], msgKey + ":id", "string");
@@ -98,7 +99,7 @@ void YamlConfig::validate()
                 auto destination = osc["destination"];
 
                 if (! (destination && destination.IsSequence() && destination.size() == 2))
-                    throw InvalidConfigException (std::string ("Missing or invalid key '" + msgKey + ":destination', must be a sequence of <string, int>"));
+                    throw ConfigInvalidException (std::string ("Missing or invalid key '" + msgKey + ":destination', must be a sequence of <string, int>"));
 
                 validateMandatoryWithType<std::string> (destination[0], msgKey + ":destination[0]", "string");
                 validateMandatoryWithType<uint16_t> (destination[1], msgKey + ":destination[1]", "int");
@@ -121,10 +122,10 @@ template <typename T>
 void YamlConfig::validateMandatoryWithType (const YAML::Node& n, std::string msgKey, std::string msgType)
 {
     if (! n)
-        throw InvalidConfigException (std::string ("Missing key '") + msgKey + "' <" + msgType + ">");
+        throw ConfigInvalidException (std::string ("Missing key '") + msgKey + "' <" + msgType + ">");
 
     if (! n.IsScalar())
-        throw InvalidConfigException (std::string ("Invalid key '") + msgKey + "', must be a scalar <" + msgType + ">");
+        throw ConfigInvalidException (std::string ("Invalid key '") + msgKey + "', must be a scalar <" + msgType + ">");
 
     try
     {
@@ -132,7 +133,7 @@ void YamlConfig::validateMandatoryWithType (const YAML::Node& n, std::string msg
     }
     catch (const YAML::BadConversion& e)
     {
-        throw InvalidConfigException (std::string ("Invalid key '") + msgKey + "', must be of type <" + msgType + "> [" + e.what() + "]");
+        throw ConfigInvalidException (std::string ("Invalid key '") + msgKey + "', must be of type <" + msgType + "> [" + e.what() + "]");
     }
 }
 

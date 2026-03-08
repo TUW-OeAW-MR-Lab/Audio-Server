@@ -12,6 +12,7 @@
 #include "AppHandle.h"
 #include "YamlConfig.h"
 #include <util/Logger.h>
+#include <Exceptions.h>
 
 namespace mrlab::controller
 {
@@ -33,7 +34,7 @@ bool AppController::add (const YamlConfig& config)
 
     try
     {
-        auto [iter, success] = apps.try_emplace (id, std::make_unique<AppHandle> (mainController, config));
+        auto [iter, success] = apps.try_emplace (id, std::make_unique<AppHandle> (mainController.getOscController(), config));
 
         if (success)
             listeners.call (&Listener::appAdded, *iter->second);
@@ -153,7 +154,7 @@ void AppController::removeForced (const juce::Identifier& appId)
 void AppController::checkForAppAndThrowIfNotFound (const juce::Identifier& appId) const
 {
     if (! apps.contains (appId))
-        throw AppUnknownException (appId);
+        throw AppNotFoundException (appId);
 }
 
 AppController::AppStopTimer::AppStopTimer (AppController& appController, uint32_t timeoutMs)

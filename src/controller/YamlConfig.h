@@ -47,28 +47,6 @@ public:
     );
 
     //==============================================================================
-    /** Exception that is thrown when the validation of the YAML config failed. */
-    class InvalidConfigException : public std::runtime_error
-    {
-    public:
-        InvalidConfigException (const std::string& what)
-            : std::runtime_error ("InvalidConfigException: " + what)
-        {}
-    };
-
-    /** Exception that is thrown when a config cannot be used in a certain context.
-
-        This may indicate that a config section is missing but required.
-     */
-    class UnusableConfigException : public std::runtime_error
-    {
-    public:
-        UnusableConfigException (const std::string& what)
-            : std::runtime_error ("UnusableConfigException: " + what)
-        {}
-    };
-
-    //==============================================================================
     /** Create a YamlConfig by reading from a YAML configuration file.
 
         This will attempt to parse the file into a YAML node and
@@ -79,7 +57,7 @@ public:
 
         @param yamlFile File to load the configuration from.
 
-        @throws InvalidConfigException on a validation error and any
+        @throws ConfigInvalidException on a validation error and any
                 of the exceptions thrown by YAML::LoadFile and yaml-cpp
                 conversion operations.
      */
@@ -130,7 +108,7 @@ private:
         @param n Node to check.
         @param msgKey Key identifier to be used in exception message.
         @param msgType Type identifier to be used in exception message.
-        @throws InvalidConfigException
+        @throws ConfigInvalidException
 
         @note This expects the very YAML node to be validated as
               parameter n. The msgKey parameter is not used for
@@ -152,7 +130,7 @@ private:
         @param n Node to check.
         @param msgKey Key identifier to be used in exception message.
         @param msgType Type identifier to be used in exception message.
-        @throws InvalidConfigException
+        @throws ConfigInvalidException
 
         @note This expects the very YAML node to be validated as
               parameter n. The msgKey parameter is not used for

@@ -25,16 +25,6 @@ class AppController : public ConfigController::Listener
 {
 public:
     //==============================================================================
-    /** Exception that is thrown when there is no app for the given id. */
-    class AppUnknownException : public std::runtime_error
-    {
-    public:
-        AppUnknownException (const juce::Identifier& id)
-            : std::runtime_error ("AppUnknownException: No app found with id " + id.toString().toStdString())
-        {}
-    };
-
-    //==============================================================================
     /** Listener interface to get informed about currently managed apps. */
     struct Listener
     {

@@ -7,6 +7,7 @@
 
 target_sources (mrlabctrl_App
     PRIVATE
+        Exceptions.h
         Globals.h
         Globals.cpp
         Main.cpp

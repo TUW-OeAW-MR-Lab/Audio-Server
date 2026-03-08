@@ -12,6 +12,7 @@
 #include <controller/ConfigController.h>
 #include <controller/YamlConfig.h>
 #include <Globals.h>
+#include <Exceptions.h>
 #include <util/Logger.h>
 
 namespace mrlab
@@ -31,7 +32,7 @@ TEST_CASE ("YAML configuration file controller", "[ConfigControllerTest]")
         REQUIRE_NOTHROW (configController.getConfig (juce::Identifier ("reaper_test_mac")));
         REQUIRE_NOTHROW (configController.getConfig (juce::Identifier ("pd_test_mac")));
 
-        REQUIRE_THROWS_AS (configController.getConfig (juce::Identifier ("non_existent")), controller::ConfigController::ConfigNotFoundException);
+        REQUIRE_THROWS_AS (configController.getConfig (juce::Identifier ("non_existent")), ConfigNotFoundException);
     }
 
 
