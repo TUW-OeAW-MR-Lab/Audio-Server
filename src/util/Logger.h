@@ -30,11 +30,11 @@ public:
     //==============================================================================
     enum class LogLevel
     {
-        Info,
-        Debug,
-        Warn,
-        Error,
-        Fatal
+        info,
+        debug,
+        warn,
+        error,
+        fatal
     };
 
     //==============================================================================
@@ -49,40 +49,40 @@ public:
 
     //==============================================================================
     /** Convenience wrapper to write an info log message. */
-    static void logInfo (const juce::String& message) { log (LogLevel::Info, message); }
+    static void logInfo (const juce::String& message) { log (LogLevel::info, message); }
 
     /** Convenience wrapper to write a debug log message.
 
         @note Debug messages are ignored in non-debug builds.
      */
-    static void logDebug (const juce::String& message) { log (LogLevel::Debug, message); }
+    static void logDebug (const juce::String& message) { log (LogLevel::debug, message); }
 
     /** Convenience wrapper to write a warn log message. */
-    static void logWarn (const juce::String& message) { log (LogLevel::Warn, message); }
+    static void logWarn (const juce::String& message) { log (LogLevel::warn, message); }
 
     /** Convenience wrapper to write an error log message. */
-    static void logError (const juce::String& message) { log (LogLevel::Error, message); }
+    static void logError (const juce::String& message) { log (LogLevel::error, message); }
 
     /** Convenience wrapper to write a fatal log message. */
-    static void logFatal (const juce::String& message) { log (LogLevel::Fatal, message); }
+    static void logFatal (const juce::String& message) { log (LogLevel::fatal, message); }
 
     //==============================================================================
     /** Write a log message of a desired LogLevel. */
     static void log (LogLevel level, const juce::String& message)
     {
 #if ! JUCE_DEBUG
-        if (level == LogLevel::Debug)
+        if (level == LogLevel::debug)
             return;
 #endif
 
         // clang-format off
         switch (level)
         {
-            case LogLevel::Info:  return writeToLog (juce::String ("Info:  ") + message);
-            case LogLevel::Debug: return writeToLog (juce::String ("Debug: ") + message);
-            case LogLevel::Warn:  return writeToLog (juce::String ("Warn:  ") + message);
-            case LogLevel::Error: return writeToLog (juce::String ("Error: ") + message);
-            case LogLevel::Fatal: return writeToLog (juce::String ("Fatal: ") + message);
+            case LogLevel::info:  return writeToLog (juce::String ("Info:  ") + message);
+            case LogLevel::debug: return writeToLog (juce::String ("Debug: ") + message);
+            case LogLevel::warn:  return writeToLog (juce::String ("Warn:  ") + message);
+            case LogLevel::error: return writeToLog (juce::String ("Error: ") + message);
+            case LogLevel::fatal: return writeToLog (juce::String ("Fatal: ") + message);
         }
         // clang-format on
     }
