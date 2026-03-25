@@ -154,11 +154,12 @@ protected:
 
         If destination is nullptr, the error will be only logged.
 
+        @tparam logLevel Log level for log message.
         @param destination Endpoint for the error response or nullptr.
         @param error OSC error that occurred.
         @param args Additional arguments to include in the error message/report.
      */
-    template <class... Args>
+    template <Logger::LogLevel logLevel = Logger::LogLevel::warn, class... Args>
     void sendError (OscEndpoint* destination, osc::Error error, Args... args)
     {
         const auto errorMsg = osc::ErrorDescription::get (error);
@@ -168,7 +169,7 @@ protected:
         logMsg << int32_t (error) << " (" << errorMsg;
         ((logMsg << ", " << args), ...) << ").";
 
-        Logger::logWarn (logMsg.str());
+        Logger::log (logLevel, logMsg.str());
 
         if (! destination)
             return;

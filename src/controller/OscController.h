@@ -165,7 +165,7 @@ public:
     /** Add an OSC method (message handler) receiving the source OscEndpoint.
 
         The handler's first parameter of type OscEndpoint* will be
-        assigned the source of the mssage or nullptr if not available
+        assigned the source of the message or nullptr if not available
         (e.g., for messages that were dispatched internally).
 
         @param agent OscAgent registering the handler.
@@ -178,13 +178,45 @@ public:
         @return true if successfully added, false on error.
 
         @note The current implementation requires this handler to be
-              explicitly wrapped in a std::function object.
+              explicitly wrapped in a std::function object. This
+              overload accepts handler functions that do not return
+              any value.
 
         @note The recommended way of adding OSC methods is to use the
               OscAgent::addOscMethod() delegate functions.
      */
     template <class Types, class... Args>
     bool addMethod (const OscAgent& agent, std::string_view path, Types types, std::function<void (OscEndpoint*, Args...)>&& handler)
+    {
+        return addMethod (agent, path, types, [this, h = std::move (handler)] (Args... args) { h (currentSource, args...); });
+    }
+
+    /** Add an OSC method (message handler) receiving the source OscEndpoint.
+
+        The handler's first parameter of type OscEndpoint* will be
+        assigned the source of the message or nullptr if not available
+        (e.g., for messages that were dispatched internally).
+
+        @param agent OscAgent registering the handler.
+        @param path OSC path to listen on, wildcards are supported.
+        @param types Message signature for argument type coercion. Use
+               an empty string for no arguments or nullptr for no type
+               signature, i.e., respond to all type signatures.
+        @param handler Handler function.
+
+        @return true if successfully added, false on error.
+
+        @note The current implementation requires this handler to be
+              explicitly wrapped in a std::function object. This
+              overload accepts handler functions returning an int for
+              indicating whether the message has been successfully
+              consumed.
+
+        @note The recommended way of adding OSC methods is to use the
+              OscAgent::addOscMethod() delegate functions.
+     */
+    template <class Types, class... Args>
+    bool addMethod (const OscAgent& agent, std::string_view path, Types types, std::function<int (OscEndpoint*, Args...)>&& handler)
     {
         return addMethod (agent, path, types, [this, h = std::move (handler)] (Args... args) { h (currentSource, args...); });
     }
