@@ -94,21 +94,48 @@ public:
 };
 
 //==============================================================================
-/** Wrong or unsupported JSON value type (e.g., while converting to OSC). */
-class ProdigyJsonTypeException : public std::runtime_error
+/** Exception while processing the Prodigy JSON state tree. */
+class ProdigyJsonException : public std::runtime_error
 {
 public:
-    ProdigyJsonTypeException (const std::string& what)
-        : std::runtime_error ("ProdigyJsonTypeException: " + what)
+    ProdigyJsonException (const std::string& what)
+        : std::runtime_error ("ProdigyJsonException: " + what)
     {}
 };
 
-/** Exception while processing the Prodigy JSON state tree. */
-class ProdigyJsonStateException : public std::runtime_error
+/** Discovered a corrupt state while processing the Prodigy JSON state tree. */
+class ProdigyJsonCorruptStateException : public ProdigyJsonException
 {
 public:
-    ProdigyJsonStateException (const std::string& what)
-        : std::runtime_error ("ProdigyJsonStateException: " + what)
+    ProdigyJsonCorruptStateException (const std::string& what)
+        : ProdigyJsonException ("ProdigyJsonCorruptStateException: " + what)
+    {}
+};
+
+/** Exception concerning communication with the matrix via the Prodigy JSON control protocol. */
+class ProdigyJsonProtocolException : public ProdigyJsonException
+{
+public:
+    ProdigyJsonProtocolException (const std::string& what)
+        : ProdigyJsonException ("ProdigyJsonProtocolException: " + what)
+    {}
+};
+
+/** A referenced object could not be found in the Prodigy JSON state tree. */
+class ProdigyJsonStateNotFoundException : public ProdigyJsonException
+{
+public:
+    ProdigyJsonStateNotFoundException (const std::string& what)
+        : ProdigyJsonException ("ProdigyJsonStateNotFoundException: " + what)
+    {}
+};
+
+/** Expected an array index while processing the Prodigy JSON state tree. */
+class ProdigyJsonNoArrayIndexException : public ProdigyJsonException
+{
+public:
+    ProdigyJsonNoArrayIndexException (const std::string& what)
+        : ProdigyJsonException ("ProdigyJsonNoArrayIndexException: " + what)
     {}
 };
 

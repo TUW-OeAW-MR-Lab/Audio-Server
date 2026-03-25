@@ -47,7 +47,7 @@ struct Util
      */
     static std::string_view getPathSegment (std::string_view path, size_t n)
     {
-        using std::operator""sv;
+        using namespace std::string_view_literals;
 
         // Remove leading '/' before splitting.
         path.remove_prefix (1);
@@ -62,6 +62,23 @@ struct Util
 
         // std::string_view constructor from std::subrange only coming in C++-23.
         return std::string_view ((*segment).data(), (*segment).size());
+    }
+
+    /** Helper to append a segment to an OSC path.
+
+        @param path Input OSC path.
+        @param segment Path segment to append (without a leading '/').
+
+        @return The resulting OSC path.
+
+        @note This function does not perform OSC path validation, so
+              ill-formed paths will likely produce unexpected results.
+     */
+    static std::string appendPathSegment (std::string_view path, std::string_view segment)
+    {
+        std::string newPath { path };
+        (newPath += '/') += segment;
+        return newPath;
     }
 
     /** Helper to format a liblo server error callback message.

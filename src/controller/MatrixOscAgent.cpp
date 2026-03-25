@@ -14,6 +14,7 @@
 
 #include "MatrixOscAgent.h"
 #include <util/Logger.h>
+#include <osc/Util.h>
 #include <lo/lo_cpp.h>
 #include <Exceptions.h>
 #include <charconv>
@@ -95,74 +96,11 @@ void MatrixOscAgent::handleGetRespMessage (nlohmann::json&& msg)
     // Store full Prodigy state.
     matrix = msg.at (Field::payload);
 
-    // Add state getter OSC methods for entire tree.
-    auto addGetter = [this] (const nlohmann::json& /*payload*/, nlohmann::json& state, std::string_view oscPath) {
+    // Register catch-all OSC method handler for state getting.
+    addStateGetterOscMethod (nlohmann::json::json_pointer());
 
-        addMethod (oscPath, {}, [this, &state] (OscEndpoint* source, std::string_view path, const lo::Message&) {
-            if (! source)
-                return Logger::logWarn (std::string ("MatrixOscAgent: Discarding state query message without sender for OSC path: ") += path);
-
-            try
-            {
-                send (*source, path, json2osc (state));
-            }
-            catch (const ProdigyJsonTypeException& e)
-            {
-                Logger::logError (juce::String ("MatrixOscAgent: Cannot respond to state query (") + e.what() + ").");
-            }
-        });
-    };
-
-    try
-    {
-        forEachPrimitiveInPayload (std::move (addGetter), matrix);
-    }
-    catch (const ProdigyJsonStateException& e)
-    {
-        Logger::logError (juce::String ("MatrixOscAgent: Error initialising the Prodigy state (") + e.what() + ").");
-        return;
-    }
-
-    // Add state setter OSC methods for /settings subtree.
-    auto addSetter = [this] (const nlohmann::json& /*payload*/, nlohmann::json& state, std::string_view oscPath) {
-        // Add OSC method corresponding to the type of the JSON state value.
-        if (state.is_number_integer())
-            return addStateSetterOscMethod (oscPath, "i", state, [] (lo_arg** argv, int) { return argv[0]->i; });
-
-        if (state.is_number_float())
-            return addStateSetterOscMethod (oscPath, "f", state, [] (lo_arg** argv, int) { return argv[0]->f; });
-
-        if (state.is_string())
-            return addStateSetterOscMethod (oscPath, "s", state, [] (lo_arg** argv, int) { return &argv[0]->s; });
-
-        // Support multiple ways of setting boolean state values.
-        if (state.is_boolean())
-        {
-            addStateSetterOscMethod (oscPath, "T", state, [] (lo_arg**, int) { return true; });
-            addStateSetterOscMethod (oscPath, "F", state, [] (lo_arg**, int) { return false; });
-
-            // Note: int message will be coerced to float by liblo.
-            addStateSetterOscMethod (oscPath, "f", state, [] (lo_arg** argv, int) { return std::abs (argv[0]->f) > std::numeric_limits<float>::min(); });
-
-            addStateSetterOscMethod (oscPath, "s", state, [] (lo_arg** argv, int) {
-                std::string_view val (&argv[0]->s);
-                return val == "true";
-            });
-
-            return;
-        }
-
-        throw ProdigyJsonStateException (std::string ("Unknown primitive type of JSON state value at ") += oscPath);
-    };
-
-    try
-    {
-        forEachPrimitiveInPayload (std::move (addSetter), matrix.at ("settings"), nlohmann::json::json_pointer ("/settings"));
-    }
-    catch (const ProdigyJsonStateException& e)
-    {
-        Logger::logError (juce::String ("MatrixOscAgent: Error initialising the Prodigy state (") + e.what() + ").");
-    }
+    // Register OSC method handler for /settings subtree for state setting.
+    addStateSetterOscMethod (nlohmann::json::json_pointer ("/settings"));
 }
 
 void MatrixOscAgent::handleUpdateMessage (nlohmann::json&& msg)
@@ -174,21 +112,14 @@ void MatrixOscAgent::handleUpdateMessage (nlohmann::json&& msg)
         state = payload;
 
         // Broadcast update to OSC clients.
-        try
-        {
-            broadcast (oscPath, json2osc (state));
-        }
-        catch (const std::runtime_error& e)
-        {
-            Logger::logError ("MatrixOscAgent: Error sending OSC for path " + std::string (oscPath) + " (" + e.what() + ").");
-        }
+        broadcastStateChange (oscPath, state);
     };
 
     try
     {
         forEachPrimitiveInPayload (std::move (update), msg.at (Field::payload));
     }
-    catch (const ProdigyJsonStateException& e)
+    catch (const ProdigyJsonException& e)
     {
         Logger::logError (juce::String ("MatrixOscAgent: Error processing Prodigy JSON 'update' message (") + e.what() + ").");
     }
@@ -210,10 +141,8 @@ void MatrixOscAgent::handleAckMessage (nlohmann::json&& msg)
 
     removeMessageFromPending (msg);
 
-#if JUCE_DEBUG
-    return Logger::logInfo (juce::String ("MatrixOscAgent: Received Prodigy JSON ack for message seq: ") +
-        (msg.contains (Field::seq) ? nlohmann::to_string (msg.at (Field::seq)) : "<?>"));
-#endif
+    Logger::logDebug (juce::String ("MatrixOscAgent: Received Prodigy JSON ack for message seq: ") +
+                      (msg.contains (Field::seq) ? nlohmann::to_string (msg.at (Field::seq)) : "<?>"));
 }
 
 nlohmann::json MatrixOscAgent::makeMessage (std::string_view type, const nlohmann::json& payload, const nlohmann::json& obj)
@@ -234,6 +163,21 @@ nlohmann::json MatrixOscAgent::makeMessage (std::string_view type, const nlohman
     return msg;
 }
 
+bool MatrixOscAgent::broadcastStateChange (std::string_view path, const nlohmann::json& state, const OscEndpoint* origin) const
+{
+    osc::Message msg;
+
+    if (! addJson2osc (msg, state))
+    {
+        Logger::logError ("MatrixOscAgent::broadcastStateChange: Error converting state value to OSC for path " + std::string (path));
+        return false;
+    }
+
+    broadcast (path, msg, origin);
+
+    return true;
+}
+
 bool MatrixOscAgent::removeMessageFromPending (const nlohmann::json& msg)
 {
     if (! msg.contains (Field::seq))
@@ -245,23 +189,119 @@ bool MatrixOscAgent::removeMessageFromPending (const nlohmann::json& msg)
     return false;
 }
 
-lo::Message MatrixOscAgent::json2osc (const nlohmann::json& json)
+bool MatrixOscAgent::addJson2osc (osc::Message& osc, const nlohmann::json& json)
 {
-    if (json.is_number_integer())
-        return osc::Message (json.get<int32_t>());
-    if (json.is_number_float())
-        return osc::Message (json.get<float>());
-    if (json.is_string())
-        return osc::Message (json.get<std::string_view>());
-    if (json.is_boolean())
-        return osc::Message (int32_t (json.get<bool>()));
+    switch (json.type())
+    {
+        case nlohmann::json::value_t::number_integer:
+        case nlohmann::json::value_t::number_unsigned:
+            osc.add (json.get<int32_t>());
+            return true;
 
-    throw ProdigyJsonTypeException (std::string ("json2osc: cannot create OSC message from value with type ") += json.type_name());
+        case nlohmann::json::value_t::number_float:
+            osc.add (json.get<float>());
+            return true;
+
+        case nlohmann::json::value_t::string:
+            osc.add (json.get<std::string_view>());
+            return true;
+
+        case nlohmann::json::value_t::boolean:
+            osc.add (int32_t (json.get<bool>()));
+            return true;
+
+        case nlohmann::json::value_t::null:
+        case nlohmann::json::value_t::object:
+        case nlohmann::json::value_t::array:
+        case nlohmann::json::value_t::binary:
+        case nlohmann::json::value_t::discarded:
+        default:
+            return false;
+    }
+}
+
+bool MatrixOscAgent::osc2json (nlohmann::json& json, char type, lo_arg* osc)
+{
+    // Helper to assign to JSON value from a numerical type.
+    auto assignNumber = [&json]<typename T> (T val) -> bool {
+        switch (json.type())
+        {
+            case nlohmann::json::value_t::number_integer:
+                json = int32_t (val);
+                return true;
+
+            case nlohmann::json::value_t::number_unsigned:
+                if (val < T (0))
+                    return false;
+
+                json = uint32_t (val);
+                return true;
+
+            case nlohmann::json::value_t::number_float:
+                json = float (val);
+                return true;
+
+            case nlohmann::json::value_t::boolean:
+                json = bool (val);
+                return true;
+
+            case nlohmann::json::value_t::null:
+            case nlohmann::json::value_t::string:
+            case nlohmann::json::value_t::object:
+            case nlohmann::json::value_t::array:
+            case nlohmann::json::value_t::binary:
+            case nlohmann::json::value_t::discarded:
+            default:
+                return false;
+        }
+    };
+
+    switch (type)
+    {
+        case 'i':
+            return assignNumber (osc->i);
+
+        case 'f':
+            return assignNumber (osc->f);
+
+        case 's':
+            if (json.is_string())
+            {
+                json = &osc->s;
+                return true;
+            }
+            if (json.is_boolean())
+            {
+                std::string_view val (&osc->s);
+                json = val == "true";
+                return true;
+            }
+            return false;
+
+        case 'T':
+            if (json.is_boolean())
+            {
+                json = true;
+                return true;
+            }
+            return false;
+
+        case 'F':
+            if (json.is_boolean())
+            {
+                json = false;
+                return true;
+            }
+            return false;
+
+        default:
+            return false;
+    }
 }
 
 nlohmann::json MatrixOscAgent::oscPath2objPointer (std::string_view oscPath)
 {
-    using std::operator""sv;
+    using namespace std::string_view_literals;
 
     // Strip "/matrix/".
     jassert (oscPath.starts_with (osc::Address::matrix));
@@ -270,40 +310,149 @@ nlohmann::json MatrixOscAgent::oscPath2objPointer (std::string_view oscPath)
     // Split OSC path and build 'obj' JSON array.
     nlohmann::json obj;
 
-    for (const auto seg : std::views::split (oscPath, "/"sv))
+    for (const auto& seg : std::views::split (oscPath, "/"sv))
     {
         const auto segment = std::string_view (seg.data(), seg.size());
 
         // Try to parse the segment as a number for array indexing, otherwise use as object key.
-        uint32_t index;
-        auto* last = segment.data() + segment.size();
-        auto result = std::from_chars (segment.data(), last, index);
-
-        if (result.ptr == last)
-            obj.emplace_back (index);
-        else
+        try
+        {
+            obj.emplace_back (string2index (segment));
+        }
+        catch (const std::runtime_error&)
+        {
             obj.emplace_back (segment);
+        }
     }
 
     return obj;
 }
 
-template <std::invocable<lo_arg**, int> ValueGetter>
-void MatrixOscAgent::addStateSetterOscMethod (std::string_view oscPath, std::string_view oscTypes, nlohmann::json& state, ValueGetter&& valueGetter)
+std::string MatrixOscAgent::matrixOscPathFromJsonPointer (const nlohmann::json::json_pointer& pointer)
 {
-    addMethod (oscPath, oscTypes, [this, &state, obj = oscPath2objPointer (oscPath), getter = std::forward<ValueGetter> (valueGetter)] (OscEndpoint* source, std::string_view path, std::string_view /*types*/, lo_arg** argv, int argc, const lo::Message& msg) {
-        state = getter (argv, argc); // Assign new value to state.
-        auto setMsg = makeMessage (Type::set, state, obj); // Prodigy JSON set message.
+    auto oscPath = pointer.to_string();
+    oscPath.insert (0, osc::Address::matrix);
+    return oscPath;
+}
 
+uint32_t MatrixOscAgent::string2index (std::string_view string)
+{
+    uint32_t index;
+    auto* last = string.data() + string.size();
+    auto result = std::from_chars (string.data(), last, index);
+
+    if (result.ptr == last)
+        return index;
+
+    throw ProdigyJsonNoArrayIndexException ("MatrixOscAgent: Cannot parse string to numerical index value.");
+}
+
+nlohmann::json::iterator MatrixOscAgent::findSubArrayForIndex (nlohmann::json& array, uint32_t index)
+{
+    jassert (array.is_array());
+
+    // Search for inner array with matching index in state.
+    auto subArrayMatches = [index] (const auto& sub) {
+        if (! sub.is_array() || sub.empty() || ! sub[0].is_number_unsigned())
+            throw ProdigyJsonCorruptStateException ("MatrixOscAgent: State array does not contain indexed sub-arrays.");
+
+        return sub[0].template get<uint32_t>() == index;
+    };
+
+    return std::find_if (array.begin(), array.end(), std::move (subArrayMatches));
+}
+
+void MatrixOscAgent::addStateGetterOscMethod (nlohmann::json::json_pointer top)
+{
+    auto oscPattern = matrixOscPathFromJsonPointer (top);
+    oscPattern += "/*";
+
+    addMethod (oscPattern, {}, [this, ptrTop = std::move (top)] (OscEndpoint* source, std::string_view path, const lo::Message&) {
+        if (! source)
+            return Logger::logWarn (std::string ("MatrixOscAgent: Discarding state query message without sender for OSC path: ") += path);
+
+        auto sendStateReply = [this, source] (nlohmann::json& state, std::string_view oscPath) {
+            osc::Message msg;
+
+            if (! addJson2osc (msg, state))
+                return Logger::logError ("MatrixOscAgent: Error converting state value to OSC for path " + std::string (oscPath) + ").");
+
+            send (*source, oscPath, msg);
+        };
+
+        try
+        {
+            forEachPrimitiveMatchingOscPattern (std::move (sendStateReply), path, ptrTop);
+        }
+        catch (const ProdigyJsonStateNotFoundException& e)
+        {
+            sendError (source, osc::Error::matrixStateNotFound, path, e.what());
+        }
+        catch (const ProdigyJsonNoArrayIndexException& e)
+        {
+            sendError (source, osc::Error::matrixStateArrayIndexExpected, path, e.what());
+        }
+        catch (const ProdigyJsonException& e)
+        {
+            sendError<Logger::LogLevel::error> (source, osc::Error::matrixGeneric, path, e.what());
+        }
+    });
+}
+
+void MatrixOscAgent::addStateSetterOscMethod (nlohmann::json::json_pointer top)
+{
+    auto oscPattern = matrixOscPathFromJsonPointer (top);
+    oscPattern += "/*";
+
+    addMethod (oscPattern, [this, ptrTop = std::move (top)] (OscEndpoint* source, std::string_view path, std::string_view types, lo_arg** argv, int argc) {
+        // OSC message with no arguments should be handled by state getter method.
+        if (types.empty()) // argc == 0
+            return 1;
+
+        if (argc > 1)
+        {
+            sendError (source, osc::Error::matrixStateUnsupportedNumArguments, path, argc);
+            return 0;
+        }
+
+        auto setStateAndBroadcast = [&, this] (nlohmann::json& state, std::string_view oscPath) {
+            // Assign OSC argument to state value.
+            if (! osc2json (state, types.front(), argv[0]))
+            {
+                sendError (source, osc::Error::matrixStateIncompatibleArgumentType, path, types.front());
+                return;
+            }
+
+            // Apply state change to matrix.
+            auto setMsg = makeMessage (Type::set, state, oscPath2objPointer (oscPath));
 #if JUCE_DEBUG
-        std::cout << "[JSON Prodigy send]" << std::endl;
-        std::cout << std::setw (2) << setMsg << std::endl;
+            std::cout << "[JSON Prodigy send]" << std::endl;
+            std::cout << std::setw (2) << setMsg << std::endl;
 #endif
+            matrixController.sendMatrixMessage (std::move (setMsg));
 
-        matrixController.sendMatrixMessage (std::move (setMsg));
+            // Broadcast state change to OSC clients.
+            broadcastStateChange (oscPath, state, source);
+        };
 
-        // Propagate state change to other endpoints.
-        broadcast (path, msg, source);
+        try
+        {
+            forEachPrimitiveMatchingOscPattern (std::move (setStateAndBroadcast), path, ptrTop);
+        }
+        catch (const ProdigyJsonStateNotFoundException& e)
+        {
+            sendError (source, osc::Error::matrixStateNotFound, path, e.what());
+        }
+        catch (const ProdigyJsonNoArrayIndexException& e)
+        {
+            sendError (source, osc::Error::matrixStateArrayIndexExpected, path, e.what());
+        }
+        catch (const ProdigyJsonException& e)
+        {
+            sendError<Logger::LogLevel::error> (source, osc::Error::matrixGeneric, path, e.what());
+        }
+
+        return 0;
     });
 }
 
@@ -312,78 +461,188 @@ void MatrixOscAgent::forEachPrimitiveInPayload (Func&& func, const nlohmann::jso
 {
     /* Helper for recursive state traversal.
 
-       @param p Current reference into input payload.
-       @param s Current reference into state, corresponding to p.
-       @param o Recursively built OSC path matching the current payload/state references.
+       @param curPayload Current reference into input payload.
+       @param curState Current reference into state, corresponding to p.
+       @param curOscPath Recursively built OSC path matching the current payload/state references.
        @param r Recurse function (passed on).
      */
-    auto recurse = [f = std::forward<Func> (func)] (const nlohmann::json& p, nlohmann::json& s, std::string_view o, auto&& r) -> void {
+    auto recurse = [f = std::forward<Func> (func)] (const nlohmann::json& curPayload, nlohmann::json& curState, std::string_view curOscPath, auto&& r) -> void {
 
-        if (p.is_primitive() && s.is_primitive())
+        if (curPayload.is_primitive() && curState.is_primitive())
         {
-            f (p, s, o);
+            f (curPayload, curState, curOscPath);
             return;
         }
 
-        if (p.is_object() && s.is_object())
+        if (curPayload.is_object() && curState.is_object())
         {
-            for (const auto& [key, value] : p.items())
+            for (const auto& [key, value] : curPayload.items())
             {
-                if (! s.contains (key))
-                    throw ProdigyJsonStateException (std::string ("MatrixOscAgent::forEachPrimitiveInPayload: Payload references unknown key in matrix state at ") += o);
+                if (! curState.contains (key))
+                    throw ProdigyJsonProtocolException (std::string ("MatrixOscAgent::forEachPrimitiveInPayload: Payload references unknown key in matrix state at ") += curOscPath);
 
-                std::string path { o };
-                (path += '/') += key;
-                r (value, s.at (key), path, r);
+                r (value, curState.at (key), osc::Util::appendPathSegment (curOscPath, key), r);
             }
             return;
         }
 
-        if (p.is_array() && s.is_array())
+        if (curPayload.is_array() && curState.is_array())
         {
-            for (const auto& elem : p)
+            for (const auto& elem : curPayload)
             {
                 /* According to the Prodigy array semantics (Prodigy
                    JSON specification 2.2.8.1), we expect inner arrays
                    with [index, value] here.
                  */
                 if (! elem.is_array() || elem.empty() || ! elem[0].is_number_unsigned())
-                    throw ProdigyJsonStateException (std::string ("MatrixOscAgent::forEachPrimitiveInPayload: Payload array does not contain indexed sub-arrays at ") += o);
+                    throw ProdigyJsonProtocolException (std::string ("MatrixOscAgent::forEachPrimitiveInPayload: Payload array does not contain indexed sub-arrays at ") += curOscPath);
 
                 const auto index = elem[0].get<uint32_t>();
 
-                // Search for inner array with matching index in state.
-                auto subArrayMatches = [index, o] (const auto& sub) {
-                    if (! sub.is_array() || sub.empty() || ! sub[0].is_number_unsigned())
-                        throw ProdigyJsonStateException (std::string ("MatrixOscAgent::forEachPrimitiveInPayload: State array does not contain indexed sub-arrays at ") += o);
-
-                    return sub[0].template get<uint32_t>() == index;
-                };
-
-                if (const auto sub = std::find_if (s.begin(), s.end(), std::move (subArrayMatches)); sub != s.end())
+                if (const auto sub = findSubArrayForIndex (curState, index); sub != curState.end())
                 {
-                    std::string path { o };
-                    (path += '/') += std::to_string (index);
-                    r (elem[1], (*sub)[1], path, r);
+                    r (elem[1], (*sub)[1], osc::Util::appendPathSegment (curOscPath, std::to_string (index)), r);
                     continue;
                 }
 
-                throw ProdigyJsonStateException (std::string ("MatrixOscAgent::forEachPrimitiveInPayload: No matching state array for payload array index ") + std::to_string (index) + " at " += o);
+                throw ProdigyJsonCorruptStateException (std::string ("MatrixOscAgent::forEachPrimitiveInPayload: No matching state array for payload array index ") + std::to_string (index) + " at " += curOscPath);
             }
             return;
         }
 
-        throw ProdigyJsonStateException (std::string ("MatrixOscAgent::forEachPrimitiveInPayload: Unsupported JSON value type in payload at ") += o);
+        throw ProdigyJsonCorruptStateException (std::string ("MatrixOscAgent::forEachPrimitiveInPayload: Unsupported JSON value type in payload at ") += curOscPath);
     };
 
+    if (! matrix.contains (top))
+        throw ProdigyJsonCorruptStateException (std::string ("MatrixOscAgent::forEachPrimitiveInPayload: Cannot access sub-state pointed to by top at ") += top.to_string());
+
+    recurse (payload, matrix.at (top), matrixOscPathFromJsonPointer (top), recurse);
+}
+
+template <std::invocable<nlohmann::json&, std::string_view> Func>
+void MatrixOscAgent::forEachPrimitiveMatchingOscPattern (Func&& func, std::string_view oscPattern, nlohmann::json::json_pointer top)
+{
+    using namespace std::string_view_literals;
+
     // Prepare initial OSC path.
-    auto path = top.to_string();
-    path.insert (0, osc::Address::matrix);
+    auto initialOscPath = matrixOscPathFromJsonPointer (top);
+
+    // Strip "/matrix/<top>" from oscPath.
+    jassert (oscPattern.starts_with (initialOscPath));
+    oscPattern.remove_prefix (initialOscPath.size() + 1); // +1 for trailing /
+
+    auto oscSplit = std::views::split (oscPattern, "/"sv);
+
+    /* Helper for recursive state traversal.
+
+       @param curSegmentIt Iterator referencing the OSC path segment to process.
+       @param curState Current reference into state.
+       @param curOscPath Recursively built OSC path matching the current state reference.
+       @param r Recurse function (passed on).
+     */
+    auto recurse = [f = std::forward<Func> (func), oscEndIt = oscSplit.end()] (auto curSegmentIt, nlohmann::json& curState, std::string_view curOscPath, auto&& r) -> void {
+
+        if (curSegmentIt == oscEndIt)
+        {
+            // When reaching the end of the OSC path, we must have arrived at a state primitive.
+            if (curState.is_primitive())
+            {
+                f (curState, curOscPath);
+                return;
+            }
+
+            throw ProdigyJsonStateNotFoundException (std::string ("MatrixOscAgent::forEachPrimitiveMatchingOscPattern: No primitive state value for OSC path at ") += curOscPath);
+        }
+
+        // Need a std::string here to obtain a c_str() for liblo matching functions.
+        const auto curSegment = std::string ((*curSegmentIt).data(), (*curSegmentIt).size());
+        ++curSegmentIt;
+
+        if (curSegment.empty())
+            throw ProdigyJsonStateNotFoundException (std::string ("MatrixOscAgent::forEachPrimitiveMatchingOscPattern: Empty OSC path segment following ") += curOscPath);
+
+        // JSON primitive value while not at end of OSC path.
+        if (curState.is_primitive())
+            throw ProdigyJsonStateNotFoundException (std::string ("MatrixOscAgent::forEachPrimitiveMatchingOscPattern: No further state hierarchy for '") + curSegment + "' below OSC path " += curOscPath);
+
+        // JSON object: match OSC segment against member keys.
+        if (curState.is_object())
+        {
+            // No wildcard pattern: direct match?
+            if (! lo_string_contains_pattern (curSegment.c_str()))
+            {
+                if (curState.contains (curSegment))
+                {
+                    r (curSegmentIt, curState.at (curSegment), osc::Util::appendPathSegment (curOscPath, curSegment), r);
+                    return;
+                }
+
+                throw ProdigyJsonStateNotFoundException (std::string ("MatrixOscAgent::forEachPrimitiveMatchingOscPattern: No matching state object for OSC path at ") += osc::Util::appendPathSegment (curOscPath, curSegment));
+            }
+
+            // Wildcard match against member keys.
+            auto didMatch = false;
+
+            for (const auto& [key, value] : curState.items())
+            {
+                if (lo_pattern_match (key.c_str(), curSegment.c_str()))
+                {
+                    r (curSegmentIt, value, osc::Util::appendPathSegment (curOscPath, key), r);
+                    didMatch = true;
+                }
+            }
+
+            if (! didMatch)
+                throw ProdigyJsonStateNotFoundException (std::string ("MatrixOscAgent::forEachPrimitiveMatchingOscPattern: No matching state object for OSC path wildcard at ") += osc::Util::appendPathSegment (curOscPath, curSegment));
+
+            return;
+        }
+
+        // JSON array: match OSC segment against nested arrays' indices.
+        if (curState.is_array())
+        {
+            // No wildcard pattern: direct index match?
+            if (! lo_string_contains_pattern (curSegment.c_str()))
+            {
+                if (const auto sub = findSubArrayForIndex (curState, string2index (curSegment)); sub != curState.end())
+                {
+                    r (curSegmentIt, (*sub)[1], osc::Util::appendPathSegment (curOscPath, curSegment), r);
+                    return;
+                }
+
+                throw ProdigyJsonStateNotFoundException (std::string ("MatrixOscAgent::forEachPrimitiveMatchingOscPattern: No matching state array member for index in OSC path at ") += osc::Util::appendPathSegment (curOscPath, curSegment));
+            }
+
+            // Wildcard match against index strings of inner arrays.
+            auto subArrayMatchesWildcard = [&pattern = curSegment] (const auto& sub) {
+                if (! sub.is_array() || sub.empty() || ! sub[0].is_number_unsigned())
+                    throw ProdigyJsonCorruptStateException ("MatrixOscAgent::forEachPrimitiveMatchingOscPattern: State array does not contain indexed sub-arrays.");
+
+                const auto index = nlohmann::to_string (sub[0]);
+                return lo_pattern_match (index.c_str(), pattern.c_str());
+            };
+
+            auto didMatch = false;
+
+            std::ranges::for_each (curState | std::views::filter (std::move (subArrayMatchesWildcard)), [&] (auto& sub) {
+                r (curSegmentIt, sub[1], osc::Util::appendPathSegment (curOscPath, nlohmann::to_string (sub[0])), r);
+                didMatch = true;
+            });
+
+            if (! didMatch)
+                throw ProdigyJsonStateNotFoundException (std::string ("MatrixOscAgent::forEachPrimitiveMatchingOscPattern: No matching state array member for OSC path wildcard at ") += osc::Util::appendPathSegment (curOscPath, curSegment));
+
+            return;
+        }
+
+        // Unknown JSON value type in state tree.
+        throw ProdigyJsonCorruptStateException (std::string ("MatrixOscAgent::forEachPrimitiveMatchingOscPattern: Unsupported JSON value type in state at ") += curOscPath);
+    };
 
     if (! matrix.contains (top))
-        throw ProdigyJsonStateException (std::string ("MatrixOscAgent::forEachPrimitiveInPayload: Cannot access sub-state pointed to by top at ") += top.to_string());
+        throw ProdigyJsonCorruptStateException (std::string ("MatrixOscAgent::forEachPrimitiveMatchingOscPattern: Cannot access sub-state pointed to by top at ") += top.to_string());
 
-    recurse (payload, matrix.at (top), path, recurse);
+    recurse (oscSplit.begin(), matrix.at (top), initialOscPath, recurse);
 }
 
 } // namespace mrlab::controller

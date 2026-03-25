@@ -30,6 +30,12 @@ enum class Error
     // app
     appCommandUnknown = 0x20,
 
+    // matrix
+    matrixGeneric = 0x30,
+    matrixStateNotFound,
+    matrixStateArrayIndexExpected,
+    matrixStateUnsupportedNumArguments,
+    matrixStateIncompatibleArgumentType,
 };
 
 /** Descriptive texts for OSC error codes. */
@@ -53,6 +59,12 @@ struct ErrorDescription
           // app
           { Error::appCommandUnknown, "App control command unknown" },
 
+          // matrix
+          { Error::matrixGeneric, "Error communicating with Prodigy matrix controller" },
+          { Error::matrixStateNotFound, "Requested Prodigy matrix state not found" },
+          { Error::matrixStateArrayIndexExpected, "Referencing a Prodigy matrix state expects an array index" },
+          { Error::matrixStateUnsupportedNumArguments, "Unsupported number of arguments in Prodigy matrix state set request" },
+          { Error::matrixStateIncompatibleArgumentType, "Could not assign argument value to Prodigy matrix state" },
 
         });
 };

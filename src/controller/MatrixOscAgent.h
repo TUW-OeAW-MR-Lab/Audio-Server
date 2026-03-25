@@ -80,7 +80,7 @@ private:
               response (i.e., 'get_resp', 'ack' or 'error') using
               removeMessageFromPending().
 
-        @see Type.
+        @see Type
      */
     nlohmann::json makeMessage (std::string_view type, const nlohmann::json& payload = {}, const nlohmann::json& obj = {});
 
@@ -97,13 +97,37 @@ private:
      */
     bool removeMessageFromPending (const nlohmann::json& msg);
 
-    /** Create a one-argument OSC message from a JSON value.
+    /** Broadcast a state change message via all registered OSC endpoints.
 
-        @param json Input JSON value.
-        @return OSC message containing an argument corresponding to json.
-        @throws ProdigyJsonTypeException.
+        @param path OSC path to use for broadcasting.
+        @param state Reference to the JSON state value to be used as an argument.
+        @param origin Optional source endpoint of the message.
+
+        @return true on sucess, false if the state value could not be converted.
+
+        @note In case of failure to convert the JSON value, i.e., when
+              false will be returned, an error will be logged.
+
+        @see OscAgent::broadcast
      */
-    static lo::Message json2osc (const nlohmann::json& json);
+    bool broadcastStateChange (std::string_view path, const nlohmann::json& state, const OscEndpoint* origin = nullptr) const;
+
+    /** Add one argument to an OSC message from a JSON value.
+
+        @param osc OSC message to add the value to.
+        @param json Input JSON value.
+        @return true on sucess, false if the value was not added (e.g., unsupported).
+     */
+    static bool addJson2osc (osc::Message& osc, const nlohmann::json& json);
+
+    /** Assign an OSC message argument to a JSON value.
+
+        @param json JSON value to assign to.
+        @param type OSC type tag of the OSC message argument to assign.
+        @param osc OSC message argument to assign.
+        @return true on sucess, false if the value was not assigned (e.g., unsupported).
+     */
+    static bool osc2json (nlohmann::json& json, char type, lo_arg* osc);
 
     /** Construct a Prodigy JSON state tree pointer from an OSC path.
 
@@ -117,28 +141,79 @@ private:
      */
     static nlohmann::json oscPath2objPointer (std::string_view oscPath);
 
+    /** Create an OSC path from a JSON pointer into the Prodigy matrix state.
+
+        This will convert the JSON pointer to a string and prepend the
+        /matrix prefix.
+
+        @param pointer JSON pointer into the matrix state.
+        @return String representing the OSC path corresponding to pointer.
+     */
+    static std::string matrixOscPathFromJsonPointer (const nlohmann::json::json_pointer& pointer);
+
+    /** Parse string to array index.
+
+        Parses the given string to a index (for array indexing). If
+        parsing fails, a ProdigyJsonNoArrayIndexException will the
+        thrown.
+
+        @param string String containing the representation of the array index.
+        @return On success, the resulting index.
+
+       @throws ProdigyJsonNoArrayIndexException
+     */
+    static uint32_t string2index (std::string_view string);
+
+    /** Find the Prodigy JSON state sub-array corresponding to a given index.
+
+        Iterates through the members of a JSON array in order to find
+        the sub-array containing the state that is referenced by
+        index. This implements the Prodigy state array handling
+        convention as described in Prodigy JSON procotol specification
+        1.0, section 2.2.8.1. In case the given array does not contain
+        indexed sub-arrays, an exception is thrown.
+
+       @param array Outer JSON array containing the indexed sub-arrays.
+       @param index Index whose corresponding sub-array to find.
+       @return JSON iterator into array pointing at the respective
+               sub-array or array.end() if not found.
+
+       @throws ProdigyJsonCorruptStateException
+     */
+    static nlohmann::json::iterator findSubArrayForIndex (nlohmann::json& array, uint32_t index);
+
+    /** Add an OSC method that will retrieve a value from the Prodigy JSON state.
+
+        The OSC method will listen to any incoming OSC messages whose
+        address pattern (aka path) can be matched against the JSON
+        state tree and respond with an OSC message back to the source
+        endpoint containing the current state as an argument. The
+        method will cover the entire subtree of the Prodigy matrix
+        state starting at the given node.
+
+        @param top Pointer into the JSON state indicating the
+               top-level node to add the method handler for.
+     */
+    void addStateGetterOscMethod (nlohmann::json::json_pointer top);
+
     /** Add an OSC method that will set a value in the Prodigy JSON state.
 
-        Helper to register an OSC method (using OscAgent::addMethod())
-        for a specified OSC path and type signature. The OSC method will
+        The OSC method will listen to any incoming OSC messages whose
+        address pattern (aka path) can be matched against the JSON
+        state tree and whose argument is type-compatible with the
+        referenced JSON state value.  The JSON state value will be set
+        according to the OSC message's argument and the updated state
+        will be both communicated to the Prodigy matrix and
+        broadcasted to the registered OSC endpoints. The method will
+        cover the entire subtree of the Prodigy matrix state starting
+        at the given node.
 
-        @li retrieve the value from the incoming OSC message using
-            the provided valueGetter function,
-        @li assign it to the referenced JSON state value,
-        @li send a corresponding 'set' JSON message to the Prodigy
-            matrix and
-        @li broadcast the state update to other OSC endpoints.
-
-        @param oscPath OSC path to register the method for.
-        @param oscTypes OSC type signature to listen for.
-        @param state Reference to the state value that should be set.
-        @param valueGetter Function to retrieve the value to be set
-               from the incoming OSC message's argument vector.
+        @param top Pointer into the JSON state indicating the
+               top-level node to add the method handler for.
      */
-    template <std::invocable<lo_arg**, int> ValueGetter>
-    void addStateSetterOscMethod (std::string_view oscPath, std::string_view oscTypes, nlohmann::json& state, ValueGetter&& valueGetter);
+    void addStateSetterOscMethod (nlohmann::json::json_pointer top);
 
-    /** Helper to invoke a function for primitive JSON values in a Prodigy state tree.
+    /** Helper to invoke a function for primitive JSON values in the Prodigy state tree.
 
         Recursively traverses a given payload JSON tree (e.g., as
         received by a Prodigy JSON 'update' message) until a primitive
@@ -157,10 +232,34 @@ private:
                (e.g., "/settings" in case payload only references the
                "settings" sub-tree of the matrix state).
 
-        @throws ProdigyJsonStateException
+        @throws ProdigyJsonProtocolException, ProdigyJsonCorruptStateException
      */
     template <std::invocable<const nlohmann::json&, nlohmann::json&, std::string_view> Func>
     void forEachPrimitiveInPayload (Func&& func, const nlohmann::json& payload, nlohmann::json::json_pointer top = nlohmann::json::json_pointer());
+
+    /** Helper to invoke a function for primitive JSON values in the Prodigy state tree.
+
+        Recursively traverses the internally stored Prodigy matrix
+        JSON state tree by wildcard-matching each segment of the given
+        OSC address pattern and executes the provided function for
+        each matching primitive JSON value (i.e., leafs of the state
+        tree). The function is called with a reference to the matching
+        value in the state tree and the OSC path that may be used to
+        address this value by OSC messages.
+
+        @param func Function to be called on each primitive state value.
+        @param oscPattern  JSON value representing the payload tree.
+        @param top JSON pointer into the internal matrix state tree
+               that should be used as the top-level for recursive
+               traversal (e.g., "/settings" in case only the
+               "settings" subtree should be matched). oscPattern is
+               still expected to begin with the top-level segments,
+               i.e., "/matrix/settings/..." in the given example.
+
+        @throws ProdigyJsonStateNotFoundException, ProdigyJsonCorruptStateException
+     */
+    template <std::invocable<nlohmann::json&, std::string_view> Func>
+    void forEachPrimitiveMatchingOscPattern (Func&& func, std::string_view oscPattern, nlohmann::json::json_pointer top = nlohmann::json::json_pointer());
 
     //==============================================================================
     /** Prodigy JSON control message fields. */
