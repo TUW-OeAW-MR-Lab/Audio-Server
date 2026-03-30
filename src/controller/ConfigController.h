@@ -112,7 +112,17 @@ public:
      */
     void unloadConfig (const juce::Identifier& id);
 
-    /** Read all configurations from the globally set Config dir. */
+    /** Remove all loaded configurations. */
+    void unloadAllConfigurations();
+
+    /** Read all configurations from the globally set Config dir.
+
+        @note This will reload all config files existing in the Config
+        dir but will not touch already loaded configs whose
+        corresponding files disappeared in the meantime. Use
+        unloadAllConfigurations() prior to calling this to start from
+        an empty state.
+     */
     void populateFromConfigDir();
 
     /** @returns the number of managed configurations. */

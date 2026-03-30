@@ -36,11 +36,11 @@ public:
 
 private:
     //==============================================================================
-    /** OSC message sending helper for /configinfo/list. */
-    void sendConfiginfoList (OscEndpoint* destination = nullptr);
+    /** OSC message sending helper for /configmgr/list. */
+    void sendConfigmgrList (OscEndpoint* destination = nullptr);
 
-    /** OSC message sending helper for /configinfo/num. */
-    void sendConfiginfoNum (OscEndpoint* destination = nullptr);
+    /** OSC message sending helper for /configmgr/num. */
+    void sendConfigmgrNum (OscEndpoint* destination = nullptr);
 
     /** Register OSC message handlers. */
     void addMethods();

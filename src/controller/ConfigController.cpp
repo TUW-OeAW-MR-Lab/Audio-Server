@@ -56,6 +56,13 @@ void ConfigController::unloadConfig (const juce::Identifier& id)
     listeners.call (&Listener::configHasBeenRemoved, id);
 }
 
+void ConfigController::unloadAllConfigurations()
+{
+    while (! configs.empty())
+        unloadConfig (configs.begin()->first);
+}
+
+
 void ConfigController::populateFromConfigDir()
 {
     const auto configDir = Globals::getConfigDir();

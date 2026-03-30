@@ -10,6 +10,7 @@
 #include "AppHandleOscAgent.h"
 #include "UdpEndpoint.h"
 #include "SubPathOscAgentWithEndpoint.h"
+#include <osc/Address.h>
 #include <yaml-cpp/yaml.h>
 
 namespace mrlab::controller
@@ -19,9 +20,9 @@ AppHandleOscAgent::AppHandleOscAgent (OscController& oscControllerIn, AppHandle&
     : OscAgent (oscControllerIn),
       oscController (oscControllerIn),
       appHandle (appHandleIn),
-      oscPathPrefix ("/app/")
+      oscPathPrefix (std::string (osc::Address::app) += '/')
 {
-    (oscPathPrefix += appHandle.getId().getCharPointer().getAddress()) += "/";
+    (oscPathPrefix += appHandle.getId().getCharPointer().getAddress()) += '/';
     oscPathState = oscPathPrefix + "state";
     oscPathExitCode = oscPathPrefix + "exitcode";
 
@@ -100,12 +101,12 @@ void AppHandleOscAgent::sendAppExitCode (OscEndpoint* destination)
 void AppHandleOscAgent::addMethods()
 {
     // Query the app state.
-    addMethod (oscPathState, "", [this] (OscEndpoint* source) {
-        juce::MessageManager::callAsync ([&] { sendAppState (source); });
+    addMethod (oscPathState, {}, [this] (OscEndpoint* source) {
+        sendAppState (source);
     });
 
     // Query the app exit code.
-    addMethod (oscPathExitCode, "", [this] (OscEndpoint* source) {
+    addMethod (oscPathExitCode, {}, [this] (OscEndpoint* source) {
         sendAppExitCode (source);
     });
 

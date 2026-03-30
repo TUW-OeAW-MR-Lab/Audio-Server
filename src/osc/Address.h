@@ -28,9 +28,14 @@ struct Address
     static constexpr std::string_view pong { "/pong" };
     static constexpr std::string_view error { "/error" };
 
-    // /configinfo
-    static constexpr std::string_view configinfo_list { "/configinfo/list" };
-    static constexpr std::string_view configinfo_num { "/configinfo/num" };
+    // configmgr + config sub-path
+    static constexpr std::string_view configmgr_list { "/configmgr/list" };
+    static constexpr std::string_view configmgr_num { "/configmgr/num" };
+    static constexpr std::string_view configmgr_control { "/configmgr/control" };
+    static constexpr std::string_view config { "/config" };
+
+    // app sub-path
+    static constexpr std::string_view app { "/app" };
 
     // matrix sub-path
     static constexpr std::string_view matrix { "/matrix" };

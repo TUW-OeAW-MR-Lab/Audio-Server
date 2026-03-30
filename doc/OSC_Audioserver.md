@@ -135,11 +135,12 @@ Example to stop all currently running apps:
 
 ### *Config* management
 
-| Kind    | Address                | Types  | Description                                                        |
-|---------|------------------------|--------|--------------------------------------------------------------------|
-| `STATE` | `/configmgr/num`       | `i`    | Number of available (i.e., currently loaded) configs               |
-| `STATE` | `/configmgr/list`      | `s...` | List of ids of available (i.e., currently loaded) configs          |
-| `CMD`   | `/config/<id>/control` | `s`    | `reload`: Trigger reloading the configuration from its config file |
+| Kind    | Address                | Types  | Description                                                                         |
+|---------|------------------------|--------|-------------------------------------------------------------------------------------|
+| `STATE` | `/configmgr/num`       | `i`    | Number of available (i.e., currently loaded) configs                                |
+| `STATE` | `/configmgr/list`      | `s...` | List of ids of available (i.e., currently loaded) configs                           |
+| `CMD`   | `/configmgr/control`   | `s`    | `rescan`: Trigger (re-)loading all files in config dir (including newly added ones) |
+| `CMD`   | `/config/<id>/control` | `s`    | `reload`: Trigger reloading the configuration from its config file                  |
 
 ### *App* management
 
