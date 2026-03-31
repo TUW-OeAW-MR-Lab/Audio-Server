@@ -17,6 +17,7 @@
 namespace mrlab::controller
 {
 class OscController;
+class MatrixControllerOscAgent;
 class MatrixOscAgent;
 
 //==============================================================================
@@ -87,6 +88,9 @@ public:
     //==============================================================================
     MatrixController (OscController& oscControllerIn);
     ~MatrixController() override;
+
+    /** Initialise OSC message handlers for controlling this. */
+    void initOscAgent();
 
     /** Get the current connection state of this controller.
 
@@ -187,7 +191,8 @@ private:
     State state;                  ///< Current connection state.
     juce::StreamingSocket socket; ///< Socket used for TCP communication.
     MatrixThread matrixThread;    ///< Thread used for communicating with the matrix.
-    std::unique_ptr<MatrixOscAgent> oscAgent; ///< OSC agent for this.
+    std::unique_ptr<MatrixControllerOscAgent> controllerOscAgent; ///< OSC agent for this.
+    std::unique_ptr<MatrixOscAgent> matrixOscAgent; ///< OSC agent for matrix communication.
 
     MRLAB_IMPLEMENT_LISTENER_INTERFACE
 

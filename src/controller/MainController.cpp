@@ -43,6 +43,7 @@ bool MainController::start()
 
     // This must not happen before the OscController was started.
     configController.initOscAgent (oscController);
+    matrixController.initOscAgent();
 
     if (! totalmixController.start())
         return false;

@@ -37,7 +37,9 @@ struct Address
     // app sub-path
     static constexpr std::string_view app { "/app" };
 
-    // matrix sub-path
+    // matrixmgr + matrix sub-path
+    static constexpr std::string_view matrixmgr_state { "/matrixmgr/state" };
+    static constexpr std::string_view matrixmgr_control { "/matrixmgr/control" };
     static constexpr std::string_view matrix { "/matrix" };
 
     // totalmix sub-path

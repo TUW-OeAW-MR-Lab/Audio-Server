@@ -36,6 +36,7 @@ enum class Error
     matrixStateArrayIndexExpected,
     matrixStateUnsupportedNumArguments,
     matrixStateIncompatibleArgumentType,
+    matrixMgrCommandUnknown,
 };
 
 /** Descriptive texts for OSC error codes. */
@@ -65,7 +66,7 @@ struct ErrorDescription
           { Error::matrixStateArrayIndexExpected, "Referencing a Prodigy matrix state expects an array index" },
           { Error::matrixStateUnsupportedNumArguments, "Unsupported number of arguments in Prodigy matrix state set request" },
           { Error::matrixStateIncompatibleArgumentType, "Could not assign argument value to Prodigy matrix state" },
-
+          { Error::matrixMgrCommandUnknown, "Matrix manager control command unknown" },
         });
 };
 

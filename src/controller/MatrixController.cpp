@@ -8,6 +8,7 @@
  */
 
 #include "MatrixController.h"
+#include "MatrixControllerOscAgent.h"
 #include "MatrixOscAgent.h"
 #include <Globals.h>
 #include <util/Logger.h>
@@ -28,6 +29,11 @@ MatrixController::~MatrixController()
     disconnect();
 }
 
+void MatrixController::initOscAgent()
+{
+    controllerOscAgent = std::make_unique<MatrixControllerOscAgent> (oscController, *this);
+}
+
 bool MatrixController::connect()
 {
     if (state == State::connected || state == State::connecting)
@@ -46,7 +52,7 @@ bool MatrixController::connect()
 
     if (success)
     {
-        oscAgent = std::make_unique<MatrixOscAgent> (oscController, *this);
+        matrixOscAgent = std::make_unique<MatrixOscAgent> (oscController, *this);
         startTimer (threadTimeoutMs);
     }
 
@@ -61,7 +67,7 @@ bool MatrixController::disconnect (bool reconnectAfterTimeout)
         return true;
 
     stopTimer();
-    oscAgent.reset();
+    matrixOscAgent.reset();
 
     auto result = matrixThread.stopThread (threadTimeoutMs);
 
@@ -81,8 +87,8 @@ bool MatrixController::disconnect (bool reconnectAfterTimeout)
 
 void MatrixController::received (nlohmann::json&& msg)
 {
-    if (oscAgent)
-        oscAgent->handleMatrixMessage (std::move (msg));
+    if (matrixOscAgent)
+        matrixOscAgent->handleMatrixMessage (std::move (msg));
 }
 
 void MatrixController::timerCallback()
