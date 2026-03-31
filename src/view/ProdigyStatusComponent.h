@@ -19,15 +19,23 @@ class ProdigyStatusComponent : public juce::Component,
                                public controller::MatrixController::Listener
 {
 public:
-    ProdigyStatusComponent() = default;
+    //==============================================================================
+    ProdigyStatusComponent (controller::MatrixController& matrixController);
 
     //==============================================================================
     void paint (juce::Graphics& g) override;
+    void resized() override;
 
     void stateChanged (controller::MatrixController& controller, controller::MatrixController::State newState) override;
 
 private:
+    //==============================================================================
+    static constexpr auto bulletSize = 20;
+
+    //==============================================================================
     controller::MatrixController::State state = controller::MatrixController::State::init;
+    juce::TextButton connectButton;
+    juce::Colour bulletColour;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProdigyStatusComponent)
 };

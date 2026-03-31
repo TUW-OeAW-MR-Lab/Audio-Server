@@ -15,7 +15,8 @@ namespace mrlab::view
 
 MainComponent::MainComponent (controller::MainController& controller)
     : mainController (controller),
-      loggingComponent (controller.getLogger())
+      loggingComponent (controller.getLogger()),
+      prodigyStatus (mainController.getMatrixController())
 {
     addAndMakeVisible (loggingComponent);
     addAndMakeVisible (prodigyStatus);
