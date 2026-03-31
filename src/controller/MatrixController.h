@@ -45,6 +45,7 @@ public:
     {
         init         = 0x0,     ///< Initial state, no connection attempt made yet.
         disconnected,           ///< Disconnected (after connection was closed or failed).
+        waitingToReconnect,     ///< Waiting for reconnection attempt.
         disconnecting,          ///< Disconnection in progress.
         connecting,             ///< Attempting to connect.
         connected,              ///< Currently connected.
@@ -62,6 +63,7 @@ public:
         inline static const auto description = std::map<State, std::string_view> (
             { { State::init, "" },
               { State::disconnected, "disconnected" },
+              { State::waitingToReconnect, "waiting to reconnect..." },
               { State::disconnecting, "disconnecting..." },
               { State::connecting, "connecting..." },
               { State::connected, "connected" } }
@@ -104,9 +106,12 @@ public:
 
     /** Disconnect from the Prodigy matrix.
 
+        @param reconnectAfterTimeout If true, attempt to reconnect after the
+                                     timeout interval determined in Globals.
+
         @return true on success, false if communication thread could not be stopped.
      */
-    bool disconnect();
+    bool disconnect (bool reconnectAfterTimeout = false);
 
     /** Send a Prodigy JSON control message to the matrix.
 

@@ -72,6 +72,9 @@ struct Globals
     /** @return Levelmeter interface port of the Prodigy audio matrix. */
     static uint16_t getMatrixLevelMeterPort() { return 5002; }
 
+    /** @return Number of milliseconds in between reconnection attempts to the Prodigy matrix. */
+    static int getMatrixAutoReconnectIntervalMs() { return 5000; }
+
     //==============================================================================
     /** @return The listening (inbound) port for RME Totalmix. */
     static uint16_t getTotalmixListeningPort() { return 9001; }

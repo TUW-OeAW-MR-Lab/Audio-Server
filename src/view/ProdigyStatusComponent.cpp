@@ -25,9 +25,12 @@ void ProdigyStatusComponent::paint (juce::Graphics& g)
         case controller::MatrixController::State::disconnected:
             colour = juce::Colours::red;
             break;
+        case controller::MatrixController::State::waitingToReconnect:
+            colour = juce::Colours::orange;
+            break;
         case controller::MatrixController::State::disconnecting:
         case controller::MatrixController::State::connecting:
-            colour = juce::Colours::orange;
+            colour = juce::Colours::yellow;
             break;
         case controller::MatrixController::State::connected:
             colour = juce::Colours::green;

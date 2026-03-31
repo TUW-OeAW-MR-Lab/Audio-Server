@@ -33,6 +33,8 @@ bool MatrixController::connect()
     if (state == State::connected || state == State::connecting)
         return true;
 
+    stopTimer(); // In case of pending auto-reconnect.
+
     if (matrixThread.isThreadRunning())
     {
         Logger::logError ("MatrixController::connect(): State is not reported as connected but matrix worker thread is running.");
@@ -53,9 +55,9 @@ bool MatrixController::connect()
     return success;
 }
 
-bool MatrixController::disconnect()
+bool MatrixController::disconnect (bool reconnectAfterTimeout)
 {
-    if (state != State::connected && state != State::connecting)
+    if (state != State::connected && state != State::connecting && state != State::waitingToReconnect)
         return true;
 
     stopTimer();
@@ -69,7 +71,10 @@ bool MatrixController::disconnect()
     jassert (! socket.isConnected());
     socket.close(); // Does not harm in case.
 
-    setStateAndNotify (State::disconnected);
+    if (reconnectAfterTimeout)
+        startTimer (Globals::getMatrixAutoReconnectIntervalMs());
+
+    setStateAndNotify (reconnectAfterTimeout ? State::waitingToReconnect : State::disconnected);
 
     return result;
 }
@@ -85,7 +90,14 @@ void MatrixController::timerCallback()
     // Disconnect if anything is wrong with socket state or the worker threads.
     if (state == State::connected && ! (socket.isConnected() && matrixThread.isThreadRunning()))
     {
-        disconnect();
+        disconnect (true);
+        return;
+    }
+
+    // If waiting for reconnect...
+    if (state == State::waitingToReconnect)
+    {
+        connect();
         return;
     }
 
@@ -103,7 +115,7 @@ void MatrixController::timerCallback()
         if (! matrixThread.isThreadRunning())
         {
             Logger::logWarn ("MatrixController: Connecting to Prodigy audio matrix failed.");
-            disconnect();
+            disconnect (true);
         }
     }
 }

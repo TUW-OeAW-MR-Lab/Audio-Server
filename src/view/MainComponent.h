@@ -10,7 +10,6 @@
 #pragma once
 
 #include <juce_gui_basics/juce_gui_basics.h>
-#include <controller/AppController.h>
 #include "LoggingComponent.h"
 #include "ProdigyStatusComponent.h"
 
