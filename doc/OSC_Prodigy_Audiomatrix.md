@@ -1,13 +1,14 @@
-# Prodigy.MP audio matrix OSC control interface
+# Prodigy.MP audio matrix state OSC control interface
 
-This file describes the OSC interface for controlling the Prodigy audio
-matrix via the audio server, along with a list of supported OSC messages.
+This file describes the OSC interface for controlling the Prodigy
+audio matrix state via the audio server, along with a list of
+supported OSC messages.
 
 The conventions of OSC audio server control that also apply here are
 to be found in the [OSC_Audioserver](OSC_Audioserver.md) document. All
 OSC messages described here are of the `STATE` or `STATE_RW` kinds.
 
-## General mechanism of Prodigy audio matrix OSC control
+## General mechanism of Prodigy audio matrix state OSC control
 
 The Prodigy audio matrix exposes its internal state for networked
 control through a JSON interface as documented in *DirectOut GmbH JSON
@@ -23,12 +24,13 @@ The OSC interface to the Prodigy state is "mounted" into the audio
 server's OSC address space below the `/matrix` top-level OSC
 address. Hence, all OSC messages whose address begins with `/matrix`
 directly refer to the Prodigy audio matrix state. For the same reason,
-OSC addresses that maintain the audio server's network connection
-state to the matrix or apply scene changes that indirectly affect the
-matrix state are *not* part of the `/matrix` namespace (refer to the
-[OSC_Audioserver documentation](OSC_Audioserver.md) for details).
+OSC addresses that issue Prodigy matrix command messages, or maintain
+the audio server's network connection state to the matrix or apply
+scene changes that indirectly affect the matrix state are *not* part
+of the `/matrix` namespace (refer to the [OSC_Audioserver
+documentation](OSC_Audioserver.md) for details).
 
-## Controlling the Prodigy audio matrix by OSC
+## Controlling the Prodigy audio matrix state by OSC
 
 The current value of a state node is queried by sending an OSC message
 without arguments (`STATE`):

@@ -182,6 +182,20 @@ private:
      */
     static nlohmann::json::iterator findSubArrayForIndex (nlohmann::json& array, uint32_t index);
 
+    /** Add OSC method(s) for issuing CMD messages to the Prodigy matrix.
+
+        The current implementation uses a generic method handler
+        listening to the /matrixcmd/... subtree in order to support
+        future extensions to Prodigy's CMD set. The OSC path segment
+        below the top-level /matrixcmd will be used as the CMD
+        selector (JSON obj). Any argument to the OSC message will be
+        sent as the message payload (only a single argument is
+        supported). The caller has to make sure that the CMD selector
+        is actually supported by the matrix, otherwise and error
+        message from the matrix will be reported.
+     */
+    void addCommandOscMethods();
+
     /** Add an OSC method that will retrieve a value from the Prodigy JSON state.
 
         The OSC method will listen to any incoming OSC messages whose
@@ -283,16 +297,18 @@ private:
         static constexpr std::string_view error = "error";
     };
 
-    /** Prodigy JSON control message commands. */
+    /** Prodigy JSON control message commands (selection). */
     struct Command
     {
-        static constexpr std::string_view flash = "flash";
         static constexpr std::string_view ping = "ping";
+        static constexpr std::string_view flash = "flash";
+        static constexpr std::string_view flash_mgmt = "flash_mgmt";
         static constexpr std::string_view reset_labels = "reset_labels";
+        static constexpr std::string_view reset_device = "reset_device";
+        static constexpr std::string_view reset_settings = "reset_settings";
         static constexpr std::string_view enable_auto_update = "enable_auto_update";
         static constexpr std::string_view disable_auto_update = "disable_auto_update";
-        static constexpr std::string_view start_snapshot_recall = "start_snapshot_recall";
-        static constexpr std::string_view stop_snapshot_recall = "stop_snapshot_recall";
+        static constexpr std::string_view shutdown = "shutdown";
     };
 
     //==============================================================================

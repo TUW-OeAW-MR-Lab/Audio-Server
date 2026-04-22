@@ -310,7 +310,8 @@ public:
 
     /** Dispatch an OSC message for a given OSC path (aka OSC address).
 
-        @param data View to the data block to dispatch.
+        @param path OSC path of the message to dispatch.
+        @param msg Message object encoding the message arguments.
         @param source Endpoint which received the message or nullptr if none.
 
         @note Calling this is thread-safe, message dispatching will be

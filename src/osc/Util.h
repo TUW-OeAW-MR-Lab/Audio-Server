@@ -25,12 +25,31 @@ struct Util
         @param path OSC path to check.
         @param allowEmpty Flag whether an empty path is regarded as valid.
      */
-    static bool validateOscPath (std::string_view path, bool allowEmpty = false)
+    static constexpr bool validateOscPath (std::string_view path, bool allowEmpty = false)
     {
         if (allowEmpty && path.empty())
             return true;
 
         return path.starts_with ('/') && ! path.ends_with ('/') && path.size() > 1;
+    }
+
+    /** Helper to retrieve the number of segments in an OSC path.
+
+        @param path Input OSC path.
+
+        @return The number of path segments in the OSC path.
+
+        @note This function does not perform OSC path validation, so
+              ill-formed paths will likely produce unexpected results.
+     */
+    static constexpr size_t getNumPathSegments (std::string_view path)
+    {
+        using namespace std::string_view_literals;
+
+        // Remove leading '/' before splitting.
+        path.remove_prefix (1);
+        auto split = std::views::split (path, "/"sv);
+        return size_t (std::ranges::distance (split));
     }
 
     /** Helper to retrieve the nth segment of an OSC path.
@@ -45,7 +64,7 @@ struct Util
         @note This function does not perform OSC path validation, so
               ill-formed paths will likely produce unexpected results.
      */
-    static std::string_view getPathSegment (std::string_view path, size_t n)
+    static constexpr std::string_view getPathSegment (std::string_view path, size_t n)
     {
         using namespace std::string_view_literals;
 

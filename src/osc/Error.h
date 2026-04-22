@@ -36,6 +36,8 @@ enum class Error
     matrixStateArrayIndexExpected,
     matrixStateUnsupportedNumArguments,
     matrixStateIncompatibleArgumentType,
+    matrixCommandUnsupportedNumArguments,
+    matrixCommandIncompatibleArgumentType,
     matrixMgrCommandUnknown,
 };
 
@@ -66,6 +68,8 @@ struct ErrorDescription
           { Error::matrixStateArrayIndexExpected, "Referencing a Prodigy matrix state expects an array index" },
           { Error::matrixStateUnsupportedNumArguments, "Unsupported number of arguments in Prodigy matrix state set request" },
           { Error::matrixStateIncompatibleArgumentType, "Could not assign argument value to Prodigy matrix state" },
+          { Error::matrixCommandUnsupportedNumArguments, "Unsupported number of arguments in Prodigy matrix command request" },
+          { Error::matrixCommandIncompatibleArgumentType, "Could not assign argument value to Prodigy matrix command payload" },
           { Error::matrixMgrCommandUnknown, "Matrix manager control command unknown" },
         });
 };
