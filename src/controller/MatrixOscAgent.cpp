@@ -307,9 +307,9 @@ nlohmann::json MatrixOscAgent::oscPath2objPointer (std::string_view oscPath)
 {
     using namespace std::string_view_literals;
 
-    // Strip "/matrix/".
-    jassert (oscPath.starts_with (osc::Address::matrix));
-    oscPath.remove_prefix (osc::Address::matrix.size() + 1); // +1 for trailing /
+    // Strip "/matrix/state".
+    jassert (oscPath.starts_with (osc::Address::matrix_state));
+    oscPath.remove_prefix (osc::Address::matrix_state.size() + 1); // +1 for trailing /
 
     // Split OSC path and build 'obj' JSON array.
     nlohmann::json obj;
@@ -335,7 +335,7 @@ nlohmann::json MatrixOscAgent::oscPath2objPointer (std::string_view oscPath)
 std::string MatrixOscAgent::matrixOscPathFromJsonPointer (const nlohmann::json::json_pointer& pointer)
 {
     auto oscPath = pointer.to_string();
-    oscPath.insert (0, osc::Address::matrix);
+    oscPath.insert (0, osc::Address::matrix_state);
     return oscPath;
 }
 
@@ -368,12 +368,13 @@ nlohmann::json::iterator MatrixOscAgent::findSubArrayForIndex (nlohmann::json& a
 
 void MatrixOscAgent::addCommandOscMethods()
 {
-    addMethod (std::string (osc::Address::matrixcmd) += "/*", [this] (OscEndpoint* source, std::string_view path, std::string_view types, lo_arg** argv, int argc) {
+    addMethod (std::string (osc::Address::matrix_cmd) += "/*", [this] (OscEndpoint* source, std::string_view path, std::string_view types, lo_arg** argv, int argc) {
         if (argc > 1)
             return sendError (source, osc::Error::matrixCommandUnsupportedNumArguments, path, argc);
 
-        // Get wildcard path segment, i.e., the CMD selector (JSON obj).
-        const auto cmd = osc::Util::getPathSegment (path, 1);
+        // Get wildcard path segment (segment after the matrix_cmd body), i.e., the CMD selector (JSON obj).
+        constexpr auto numPathSegments = osc::Util::getNumPathSegments (osc::Address::matrix_cmd);
+        const auto cmd = osc::Util::getPathSegment (path, numPathSegments);
 
         // Assign payload from OSC argument.
         nlohmann::json payload;
@@ -586,7 +587,7 @@ void MatrixOscAgent::forEachPrimitiveMatchingOscPattern (Func&& func, std::strin
     // Prepare initial OSC path.
     auto initialOscPath = matrixOscPathFromJsonPointer (top);
 
-    // Strip "/matrix/<top>" from oscPath.
+    // Strip "/matrix/state/<top>" from oscPath.
     jassert (oscPattern.starts_with (initialOscPath));
     oscPattern.remove_prefix (initialOscPath.size() + 1); // +1 for trailing /
 

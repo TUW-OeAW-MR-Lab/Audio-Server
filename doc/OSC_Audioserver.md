@@ -160,14 +160,14 @@ Example to stop all currently running apps:
 
 ### *Prodigy matrix* control
 
-See [OSC_Prodigy_Audiomatrix](OSC_Prodigy_Audiomatrix.md) for details on using the `/matrix/...` subtree (matrix state).
+See [OSC_Prodigy_Audiomatrix](OSC_Prodigy_Audiomatrix.md) for details on using the `/matrix/state/...` subtree (matrix state).
 
-| Kind       | Address              | Types | Description                                                                                                                      |
-|------------|----------------------|-------|----------------------------------------------------------------------------------------------------------------------------------|
-| `STATE`    | `/matrixmgr/state`   | `is`  | Current matrix connection state with arguments state code (`i`) and state description (`s`)                                      |
-| `CMD`      | `/matrixmgr/control` | `s`   | `connect`: Manually attempt to connect audioserver to matrix<br>`disconnect`: Manually disconnect audioserver from matrix        |
-| `CMD`      | `/matrixcmd/...`     | `...` | Issue a CMD message to the matrix, optionally with the given payload argument.                                                   |
-| `STATE_RW` | `/matrix/...`        | `...` | Subtree for controlling/querying the Prodigy MP audio matrix state tree, laid out according to the Prodigy JSON state hierarchy. |
+| Kind       | Address               | Types | Description                                                                                                                      |
+|------------|-----------------------|-------|----------------------------------------------------------------------------------------------------------------------------------|
+| `STATE`    | `/matrix/mgr/state`   | `is`  | Current matrix connection state with arguments state code (`i`) and state description (`s`)                                      |
+| `CMD`      | `/matrix/mgr/control` | `s`   | `connect`: Manually attempt to connect audioserver to matrix<br>`disconnect`: Manually disconnect audioserver from matrix        |
+| `CMD`      | `/matrix/cmd/...`     | `...` | Issue a CMD message to the matrix, optionally with the given payload argument.                                                   |
+| `STATE_RW` | `/matrix/state/...`   | `...` | Subtree for controlling/querying the Prodigy MP audio matrix state tree, laid out according to the Prodigy JSON state hierarchy. |
 
 ### *Totalmix* control
 

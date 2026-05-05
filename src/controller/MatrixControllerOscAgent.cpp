@@ -35,18 +35,18 @@ void MatrixControllerOscAgent::sendMatrixmgrState (OscEndpoint* destination)
     auto state = matrixController.getState();
     auto msg = osc::Message (int32_t (state), MatrixController::StateDescription::get (state));
 
-    sendOrBroadcast (destination, osc::Address::matrixmgr_state, msg);
+    sendOrBroadcast (destination, osc::Address::matrix_mgr_state, msg);
 }
 
 void MatrixControllerOscAgent::addMethods()
 {
     // Query the controller connection state.
-    addMethod (osc::Address::matrixmgr_state, {}, [this] (OscEndpoint* source) {
+    addMethod (osc::Address::matrix_mgr_state, {}, [this] (OscEndpoint* source) {
         sendMatrixmgrState (source);
     });
 
     // Control (matrix connect/disconnect).
-    addMethod (osc::Address::matrixmgr_control, "s", [this] (OscEndpoint* source, lo_arg** argv, int /*argc*/) {
+    addMethod (osc::Address::matrix_mgr_control, "s", [this] (OscEndpoint* source, lo_arg** argv, int /*argc*/) {
         std::string_view command = &argv[0]->s;
 
         if (command == "connect")
