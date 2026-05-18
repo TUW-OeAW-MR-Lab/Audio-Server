@@ -87,6 +87,10 @@ export function checkConnection()
       sendNoArgs('/app/Stereo_Walls/osc/CurvedDoor/Volume');
       sendNoArgs('/matrix/state/settings/sum_bus_master/0/gain'); // Curved PA Volume
       sendNoArgs('/matrix/state/settings/sum_bus_master/1/gain'); // Curved PA Volume
+      sendNoArgs('/matrix/state/settings/sum_bus_master/0/mute'); // get master mute
+      sendNoArgs('/matrix/state/settings/sum_bus_master/1/mute'); // get master mute
+      sendNoArgs('/matrix/state/settings/flex_channel/*/mute'); // get all mute states
+      sendNoArgs('/matrix/state/settings/flex_channel/*/gain'); // get all gain values
       enableInputSelectButtons(true);
       toggleWallStateApp('CAVEDoor', false, false, false);
       toggleWallStateApp('SA', false, false, false);
@@ -111,6 +115,7 @@ export function quit()
   toggleWallStateApp('SA', false, true, true);
   toggleWallStateApp('CurvedDoor', false, true, true);
   toggleWallStateCurvedPA(false, true, true);
+  sendValue('/matrix/state/settings/flex_channel/*/mute', 1);
   document.getElementById('Stereo_Walls-Total_VU-bar').style.height = '0%';
   document.getElementById('Stereo_Walls-Total_VU-number').innerText = '--';
 }
@@ -144,7 +149,7 @@ export function toggleWallStateApp(id, state, btn_disable, slider_disable = fals
 
 export function toggleWallStateCurvedPA(state, btn_disable, slider_disable = false)
 {
-	const btn = document.getElementById('btn-wall-CurvedPA');
+	const btn = document.getElementById('btn-sum_bus_master-mute');
 	const slider = document.getElementById('sum_bus_master-volume-slider');
 	if (!btn || !slider) return;
 
