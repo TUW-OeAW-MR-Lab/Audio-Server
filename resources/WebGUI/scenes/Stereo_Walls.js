@@ -81,7 +81,7 @@ export function checkConnection()
 			state = document.getElementById("Stereo_Walls-status");
 			state.innerText = "connected";
 			state.style.backgroundColor = "";
-	    sendValue('/app/Stereo_Walls/osc/Total/Volume/Set', 100); 
+	    sendValue('/app/Stereo_Walls/osc/Total/Volume/Set', 0); 
       sendNoArgs('/app/Stereo_Walls/osc/CAVEDoor/Volume');
       sendNoArgs('/app/Stereo_Walls/osc/SA/Volume');
       sendNoArgs('/app/Stereo_Walls/osc/CurvedDoor/Volume');
