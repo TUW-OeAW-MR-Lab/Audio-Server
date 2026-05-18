@@ -91,7 +91,7 @@ function renderInputControls(buttonContainerId, groupContainerId, sceneName, hid
                 let oscCmd = '';
                 if (matchingKeys.length > 0) {
                     matchingKeys.forEach(ch => {
-                        oscCmd += `sendValue('/matrix/settings/flex_channel/${ch}/gain', this.value); `;
+                        oscCmd += `sendValue('/matrix/state/settings/flex_channel/${ch}/gain', this.value); `;
                     });
                 } else {
                     oscCmd = ` `;
@@ -167,7 +167,7 @@ function toggleInputState(id, mute)
       let matchingKeys = Object.keys(inputFlexChannelMap).filter(key => inputFlexChannelMap[key] === id);
       if (matchingKeys.length > 0) {
           matchingKeys.forEach(ch => {
-              sendValue("/matrix/settings/flex_channel/" + ch + "/mute", 0);
+              sendValue("/matrix/state/settings/flex_channel/" + ch + "/mute", 0);
           });
       }
     }
@@ -176,7 +176,7 @@ function toggleInputState(id, mute)
       let matchingKeys = Object.keys(inputFlexChannelMap).filter(key => inputFlexChannelMap[key] === id);
       if (matchingKeys.length > 0) {
           matchingKeys.forEach(ch => {
-              send("/matrix/settings/flex_channel/" + ch + "/gain");
+              send("/matrix/state/settings/flex_channel/" + ch + "/gain");
           });
       }
     }
@@ -193,7 +193,7 @@ function toggleInputState(id, mute)
       let matchingKeys = Object.keys(inputFlexChannelMap).filter(key => inputFlexChannelMap[key] === id);
       if (matchingKeys.length > 0) {
           matchingKeys.forEach(ch => {
-              sendValue("/matrix/settings/flex_channel/" + ch + "/mute", 1);
+              sendValue("/matrix/state/settings/flex_channel/" + ch + "/mute", 1);
           });
       }
     }

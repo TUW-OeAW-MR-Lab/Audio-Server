@@ -29,12 +29,12 @@ export function init()
 export function Lock()
 {
   lockScene('Curved_LED_Stereo');
-  sendNoArgs('/matrix/settings/flex_channel/*/mute'); // get all mute states
-  sendNoArgs('/matrix/settings/flex_channel/*/gain'); // get all gain values
-  sendNoArgs('/matrix/settings/sum_bus_master/0/gain'); // get master gain
-  sendNoArgs('/matrix/settings/sum_bus_master/1/gain'); // get master gain
-  sendValue('/matrix/settings/sum_bus_master/0/mute', 0); // unmute in case that muted
-  sendValue('/matrix/settings/sum_bus_master/1/mute', 0);
+  sendNoArgs('/matrix/state/settings/flex_channel/*/mute'); // get all mute states
+  sendNoArgs('/matrix/state/settings/flex_channel/*/gain'); // get all gain values
+  sendNoArgs('/matrix/state/settings/sum_bus_master/0/gain'); // get master gain
+  sendNoArgs('/matrix/state/settings/sum_bus_master/1/gain'); // get master gain
+  sendValue('/matrix/state/settings/sum_bus_master/0/mute', 0); // unmute in case that muted
+  sendValue('/matrix/state/settings/sum_bus_master/1/mute', 0);
   enableInputSelectButtons(true);
   document.getElementById("sum_bus_master-volume-slider").disabled = false;
   //setTimeout(() => { triggerMeter(); }, 100);
@@ -42,7 +42,7 @@ export function Lock()
 
 function triggerMeter() // currently unused because the VU meter does not work in the matrix this way
 {
-  sendNoArgs('/matrix/settings/sum_bus_master/0/meter');
+  sendNoArgs('/matrix/state/settings/sum_bus_master/0/meter');
   if (!document.getElementById("sum_bus_master-volume-slider").disabled)
     setTimeout(() => { triggerMeter(); }, 100);
 }
@@ -57,7 +57,7 @@ export function Unlock()
 
 export function UndlockAndMute()
 {
-  sendValue('/matrix/settings/flex_channel/*/mute', 1);
+  sendValue('/matrix/state/settings/flex_channel/*/mute', 1);
   unlockScene('Curved_LED_Stereo');
   enableInputSelectButtons(false);
   showInputSection('none'); // Hide all input sections

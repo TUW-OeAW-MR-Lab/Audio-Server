@@ -30,7 +30,7 @@
         <div class="slider-group">
           <b>Volume</b>
           <input id="sum_bus_master-volume-slider" disabled class="volume-slider" style="height: 350px;" type=range min="-100" max="18" value="0" 
-            oninput="sendValue('/matrix/settings/sum_bus_master/0/gain', this.value); sendValue('/matrix/settings/sum_bus_master/1/gain', this.value); document.getElementById('sum_bus_master-volume-number').innerText = this.value + ' dB';">
+            oninput="sendValue('/matrix/state/settings/sum_bus_master/0/gain', this.value); sendValue('/matrix/state/settings/sum_bus_master/1/gain', this.value); document.getElementById('sum_bus_master-volume-number').innerText = this.value + ' dB';">
           <div id="sum_bus_master-volume-number" class="level-box">--</div>
           <span style="text-align: center; color: white;" id="sum_bus_master-gain">&nbsp;</span>
         </div>

@@ -85,8 +85,8 @@ export function checkConnection()
       sendNoArgs('/app/Stereo_Walls/osc/CAVEDoor/Volume');
       sendNoArgs('/app/Stereo_Walls/osc/SA/Volume');
       sendNoArgs('/app/Stereo_Walls/osc/CurvedDoor/Volume');
-      sendNoArgs('/matrix/settings/sum_bus_master/0/gain'); // Curved PA Volume
-      sendNoArgs('/matrix/settings/sum_bus_master/1/gain'); // Curved PA Volume
+      sendNoArgs('/matrix/state/settings/sum_bus_master/0/gain'); // Curved PA Volume
+      sendNoArgs('/matrix/state/settings/sum_bus_master/1/gain'); // Curved PA Volume
       enableInputSelectButtons(true);
       toggleWallStateApp('CAVEDoor', false, false, false);
       toggleWallStateApp('SA', false, false, false);
@@ -156,8 +156,8 @@ export function toggleWallStateCurvedPA(state, btn_disable, slider_disable = fal
     btn.disabled = btn_disable;
 		slider.disabled = slider_disable;
 		slider.style.opacity = "1.0";
-    sendValue('/matrix/settings/sum_bus_master/0/mute', 0);
-    sendValue('/matrix/settings/sum_bus_master/1/mute', 0);
+    sendValue('/matrix/state/settings/sum_bus_master/0/mute', 0);
+    sendValue('/matrix/state/settings/sum_bus_master/1/mute', 0);
     const vol = document.getElementById('sum_bus_master-gain');
 	} else {
 		btn.classList.remove('active-input');
@@ -165,8 +165,8 @@ export function toggleWallStateCurvedPA(state, btn_disable, slider_disable = fal
     btn.disabled = btn_disable;
 		slider.disabled = slider_disable;
 		slider.style.opacity = "0.5";
-    sendValue('/matrix/settings/sum_bus_master/0/mute', 1);
-    sendValue('/matrix/settings/sum_bus_master/1/mute', 1);
+    sendValue('/matrix/state/settings/sum_bus_master/0/mute', 1);
+    sendValue('/matrix/state/settings/sum_bus_master/1/mute', 1);
 	}
 }
 
@@ -177,7 +177,7 @@ export function toggleWallStateCAVE()
 
 export function setVolumeCurvedPA(value)
 {
-  sendValue('/matrix/settings/sum_bus_master/0/gain', value);
-  sendValue('/matrix/settings/sum_bus_master/1/gain', value);
+  sendValue('/matrix/state/settings/sum_bus_master/0/gain', value);
+  sendValue('/matrix/state/settings/sum_bus_master/1/gain', value);
   document.getElementById('sum_bus_master-volume-number').innerText = value + ' dB';
 }
