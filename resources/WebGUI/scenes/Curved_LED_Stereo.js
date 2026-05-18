@@ -33,11 +33,11 @@ export function Lock()
   sendNoArgs('/matrix/state/settings/flex_channel/*/gain'); // get all gain values
   sendNoArgs('/matrix/state/settings/sum_bus_master/0/gain'); // get master gain
   sendNoArgs('/matrix/state/settings/sum_bus_master/1/gain'); // get master gain
-  sendValue('/matrix/state/settings/sum_bus_master/0/mute', 0); // unmute in case that muted
-  sendValue('/matrix/state/settings/sum_bus_master/1/mute', 0);
+  sendNoArgs('/matrix/state/settings/sum_bus_master/0/mute'); // get master mute
+  sendNoArgs('/matrix/state/settings/sum_bus_master/1/mute'); // get master mute
   enableInputSelectButtons(true);
   document.getElementById("sum_bus_master-volume-slider").disabled = false;
-  //setTimeout(() => { triggerMeter(); }, 100);
+  document.getElementById("btn-sum_bus_master-mute").disabled = false;
 }
 
 function triggerMeter() // currently unused because the VU meter does not work in the matrix this way
@@ -53,13 +53,42 @@ export function Unlock()
   enableInputSelectButtons(false);
   showInputSection('none'); // Hide all input sections
   document.getElementById("sum_bus_master-volume-slider").disabled = true;
+  document.getElementById("btn-sum_bus_master-mute").disabled = true;
 }
 
-export function UndlockAndMute()
+export function UnlockAndMute()
 {
   sendValue('/matrix/state/settings/flex_channel/*/mute', 1);
+  toggleSumBusMasterMute(false, true, true);
   unlockScene('Curved_LED_Stereo');
   enableInputSelectButtons(false);
   showInputSection('none'); // Hide all input sections
   document.getElementById("sum_bus_master-volume-slider").disabled = true;
+}
+
+export function toggleSumBusMasterMute(state, btn_disable, slider_disable = false)
+{
+	const btn = document.getElementById('btn-sum_bus_master-mute');
+	const slider = document.getElementById('sum_bus_master-volume-slider');
+	if (!btn || !slider) return;
+
+	const isActive = btn.classList.contains('active-input');
+  const turnOn = state === undefined ? !isActive : state;
+	if (turnOn) {
+		btn.classList.add('active-input');
+		btn.innerText = "On";
+    btn.disabled = btn_disable;
+		slider.disabled = slider_disable;
+		slider.style.opacity = "1.0";
+    sendValue('/matrix/state/settings/sum_bus_master/0/mute', 0);
+    sendValue('/matrix/state/settings/sum_bus_master/1/mute', 0);
+	} else {
+		btn.classList.remove('active-input');
+		btn.innerText = "Off";
+    btn.disabled = btn_disable;
+		slider.disabled = slider_disable;
+		slider.style.opacity = "0.5";
+    sendValue('/matrix/state/settings/sum_bus_master/0/mute', 1);
+    sendValue('/matrix/state/settings/sum_bus_master/1/mute', 1);
+	}
 }

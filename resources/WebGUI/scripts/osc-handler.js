@@ -171,7 +171,24 @@ function sendResponseMatrixStateSettings(path, oscMsg)
       //console.log(oscMsg);
       switch (path[5])
       {
-        case 'mute':                  
+        case 'mute':
+          const st = document.getElementById('btn-sum_bus_master-mute');
+          if (!st) {
+            console.log("No OSC message handler for: 'btn-sum_bus_master-mute'");
+            return;
+          }
+          if (oscMsg.args[0].value == 1)
+          {
+            st.classList.remove('active-input');
+            st.innerText = "Off";
+          }
+          else
+          {
+            st.classList.add('active-input');
+            st.innerText = "On";
+          }
+          const statusEvent = new CustomEvent('updated', { detail: { time: Date.now() } });
+          st.dispatchEvent(statusEvent); // dispatch an event that the status has changed                      
           break;
 
         case 'gain':
