@@ -83,11 +83,10 @@ oscPort.on("message", function (oscMsg)
 
 		case 'matrix': // Messages related to the matrix
 			//console.log("Matrix message received", oscMsg);
-      const st = document.getElementById('system-status');  // update sign of life on any message from the matrix
-      st.innerHTML = '<span style="color: white;">&#11044;</span>';
       switch (path[1])
 			{
         case 'status': // Status received, path[1] == 'status'
+          document.getElementById('matrix_status').innerHTML = '<span style="color: green;">&#11044;</span>';  // update sign of life on any message from the matrix
           switch(path[2])
           {
             case 'ears_status':
@@ -99,7 +98,7 @@ oscPort.on("message", function (oscMsg)
           break;
 
         case 'state':
-          //console.log("Matrix state message received: " + path[2]);
+          document.getElementById('matrix_status').innerHTML = '<span style="color: green;">&#11044;</span>';  // update sign of life on any message from the matrix
           switch(path[2])
           {
             case 'settings':
@@ -122,6 +121,26 @@ oscPort.on("message", function (oscMsg)
           }
           break;
 
+        case 'mgr':
+          switch(path[2])
+          {
+            case 'state':
+              if (oscMsg.args[0].value == 0)
+              {
+                document.getElementById('matrix_status').innerHTML = '<span style="color: green;">&#11044;</span>';
+                document.getElementById('control-matrix_status').innerHTML = '<span style="color: green;">&#11044;</span>';
+              }
+              else
+              {
+                document.getElementById('matrix_status').innerHTML = '<span style="color: white;">&#9711;</span>';
+                document.getElementById('control-matrix_status').innerHTML = '<span style="color: black;">&#9711;</span>';
+              }
+              break;
+            default:
+              console.log("Unknown matrix message received: " + path[2]);
+              break;
+          }
+          break;
         default: 
           console.log("Unknown matrix message received:", oscMsg);
           break;

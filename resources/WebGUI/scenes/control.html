@@ -8,6 +8,19 @@
 			<p style="text-align: center; color: white;"> <b id="pdu_start-status">&nbsp;</b></p>
 		</div>
 
+ 		<div style="display: inline; width: 20%; text-align: center; font-weight: bold;">
+			Audio Matrix Status<br>
+			<table style="text-align: center;">
+				<thead style="font-weight: bold;">
+					<th>&nbsp;</th>
+				</thead>
+				<tr>
+					<td id="control-matrix_status" onclick="SystemStatusLegend();">&#9711;</td>
+				</tr>
+			</table>
+			<button id="matrix-Update_Status" class="small-button" style="margin: 0 auto;" onClick="sendNoArgs('/matrix/mgr/state');">Update Status</button>
+		</div>
+   
 		<div style="display: inline; width: 40%; text-align: center; font-weight: bold;">
 			Amplifier Status<br>
 			<table style="text-align: center;">

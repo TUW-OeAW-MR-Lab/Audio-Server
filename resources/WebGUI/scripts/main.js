@@ -195,7 +195,7 @@ function SystemStatusLegend()
     <thead><tr><th>Symbol</th><th>Meaning</th></tr></thead>
     <tbody>
 		<tr><td><span style="background-color: #0061a0; color: white;">&#9711;</span></td> <td>Unknown</td></tr>
-		<tr><td><span style="background-color: #0061a0; color: white;">&#11044;</span></td> <td>Sign of life received from the audio matrix</td></tr>
+		<tr><td><span style="background-color: #0061a0; color: green;">&#11044;</span></td> <td>Sign of life received from the audio matrix</td></tr>
     </tbody></table></div>`;
 	dialog.showModal();
 
