@@ -122,22 +122,25 @@ oscPort.on("message", function (oscMsg)
           break;
 
         case 'mgr':
+          //console.log("Matrix mgr message received:", oscMsg);
           switch(path[2])
           {
             case 'state':
-              if (oscMsg.args[0].value == 0)
-              {
+              if (oscMsg.args[0].value == 5)
+              { // connected
                 document.getElementById('matrix_status').innerHTML = '<span style="color: green;">&#11044;</span>';
                 document.getElementById('control-matrix_status').innerHTML = '<span style="color: green;">&#11044;</span>';
+                document.getElementById('matrix-Update_Status').disabled = false;
               }
               else
-              {
+              { // init, disconnected, waitingToReconnect, disconnecting, connecting
                 document.getElementById('matrix_status').innerHTML = '<span style="color: white;">&#9711;</span>';
                 document.getElementById('control-matrix_status').innerHTML = '<span style="color: black;">&#9711;</span>';
+                document.getElementById('matrix-Update_Status').disabled = false;
               }
               break;
             default:
-              console.log("Unknown matrix message received: " + path[2]);
+              console.log("Unknown matrix mgr message received: " + path[2]);
               break;
           }
           break;

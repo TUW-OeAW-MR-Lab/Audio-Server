@@ -18,7 +18,10 @@
 					<td id="control-matrix_status" onclick="SystemStatusLegend();">&#9711;</td>
 				</tr>
 			</table>
-			<button id="matrix-Update_Status" class="small-button" style="margin: 0 auto;" onClick="sendNoArgs('/matrix/mgr/state');">Update Status</button>
+			<button id="matrix-Update_Status" class="small-button" style="margin: 0 auto;" 
+        onClick="sendNoArgs('/matrix/mgr/state'); document.getElementById('matrix-Update_Status').disabled = true;">
+        Update Status
+      </button>
 		</div>
    
 		<div style="display: inline; width: 40%; text-align: center; font-weight: bold;">
