@@ -202,10 +202,23 @@ export function SetDanteLedPc()
 {
   setInputButtonExclusively('DANTE_CurvedLEDPC', 'SA_VBAP');
   sendValue('/app/SA_VBAP/osc/VirtualSource/3/Switch', 0);
+  sendValue('/matrix/state/settings/sum_bus_master/0/mute', 1); // Mute Curved PA Left
+  sendValue('/matrix/state/settings/sum_bus_master/1/mute', 1); // Mute Curved PA Right
+  sendValue('/matrix/state/settings/sum_bus_master/2/mute', 0); // Unmute Audio PC Left
+  sendValue('/matrix/state/settings/sum_bus_master/3/mute', 0); // Unmute Audio PC Right
+  sendValue('/matrix/state/settings/sum_bus_master/2/gain', 0); // set Audio PC Left to 0 dB
+  sendValue('/matrix/state/settings/sum_bus_master/3/gain', 0); // set Audio PC Right to 0 dB
 }
 
 export function SetDanteMobile()
 {
   setInputButtonExclusively('DANTE_Mobile', 'SA_VBAP');
   sendValue('/app/SA_VBAP/osc/VirtualSource/3/Switch', 0);
+  sendValue('/matrix/state/settings/sum_bus_master/*/mute', 1); // Mute all Sum Busses
+}
+
+export function quit()
+{
+  quitApp('SA_VBAP', 'SA_VBAP', SceneModule.init);
+  sendValue('/matrix/state/settings/sum_bus_master/*/mute', 1); // Mute all Sum Busses
 }

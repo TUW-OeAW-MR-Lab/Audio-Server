@@ -20,11 +20,11 @@ export function init()
     document.getElementById('Stereo_Walls-Total_VU-number').innerText = Math.round(vu.innerText) + ' dB';
   });			
 
-  document.getElementById('sum_bus_master-gain').addEventListener('updated', (e) => 
+  document.getElementById('sum_bus_PA-gain').addEventListener('updated', (e) => 
   {   // Curved PA Volume
-    const vol = document.getElementById('sum_bus_master-gain');
-    document.getElementById('sum_bus_master-volume-slider').value = Math.round(vol.innerText);
-    document.getElementById('sum_bus_master-volume-number').innerText = Math.round(vol.innerText) + " dB";
+    const vol = document.getElementById('sum_bus_PA-gain');
+    document.getElementById('sum_bus_PA-volume-slider').value = Math.round(vol.innerText);
+    document.getElementById('sum_bus_PA-volume-number').innerText = Math.round(vol.innerText) + " dB";
   });	
 
   document.getElementById('Stereo_Walls-CAVEDoor_Volume').addEventListener('updated', (e) => 
@@ -87,10 +87,14 @@ export function checkConnection()
       sendNoArgs('/app/Stereo_Walls/osc/CurvedDoor/Volume');
       sendNoArgs('/matrix/state/settings/sum_bus_master/0/gain'); // Curved PA Volume
       sendNoArgs('/matrix/state/settings/sum_bus_master/1/gain'); // Curved PA Volume
-      sendNoArgs('/matrix/state/settings/sum_bus_master/0/mute'); // get master mute
-      sendNoArgs('/matrix/state/settings/sum_bus_master/1/mute'); // get master mute
-      sendNoArgs('/matrix/state/settings/flex_channel/*/mute'); // get all mute states
-      sendNoArgs('/matrix/state/settings/flex_channel/*/gain'); // get all gain values
+      sendNoArgs('/matrix/state/settings/sum_bus_master/0/mute'); // get Curved PA mute
+      sendNoArgs('/matrix/state/settings/sum_bus_master/1/mute'); // get Curved PA mute
+      sendNoArgs('/matrix/state/settings/flex_channel/*/mute'); // get all Input mute states
+      sendNoArgs('/matrix/state/settings/flex_channel/*/gain'); // get all Input volumes
+      sendValue('/matrix/state/settings/sum_bus_master/2/mute', 0); // Unmute Audio PC Left
+      sendValue('/matrix/state/settings/sum_bus_master/3/mute', 0); // Unmute Audio PC Right
+      sendValue('/matrix/state/settings/sum_bus_master/2/gain', 0); // set Audio PC Left to 0 dB
+      sendValue('/matrix/state/settings/sum_bus_master/3/gain', 0); // set Audio PC Right to 0 dB
       enableInputSelectButtons(true);
       toggleWallStateApp('CAVEDoor', false, false, false);
       toggleWallStateApp('SA', false, false, false);
@@ -115,7 +119,8 @@ export function quit()
   toggleWallStateApp('SA', false, true, true);
   toggleWallStateApp('CurvedDoor', false, true, true);
   toggleWallStateCurvedPA(false, true, true);
-  sendValue('/matrix/state/settings/flex_channel/*/mute', 1);
+  sendValue('/matrix/state/settings/flex_channel/*/mute', 1); // Mute all inputs
+  sendValue('/matrix/state/settings/sum_bus_master/*/mute', 1); // Mute all sum busses
   document.getElementById('Stereo_Walls-Total_VU-bar').style.height = '0%';
   document.getElementById('Stereo_Walls-Total_VU-number').innerText = '--';
 }
@@ -149,8 +154,8 @@ export function toggleWallStateApp(id, state, btn_disable, slider_disable = fals
 
 export function toggleWallStateCurvedPA(state, btn_disable, slider_disable = false)
 {
-	const btn = document.getElementById('btn-sum_bus_master-mute');
-	const slider = document.getElementById('sum_bus_master-volume-slider');
+	const btn = document.getElementById('btn-sum_bus_PA-mute');
+	const slider = document.getElementById('sum_bus_PA-volume-slider');
 	if (!btn || !slider) return;
 
 	const isActive = btn.classList.contains('active-input');
@@ -163,7 +168,7 @@ export function toggleWallStateCurvedPA(state, btn_disable, slider_disable = fal
 		slider.style.opacity = "1.0";
     sendValue('/matrix/state/settings/sum_bus_master/0/mute', 0);
     sendValue('/matrix/state/settings/sum_bus_master/1/mute', 0);
-    const vol = document.getElementById('sum_bus_master-gain');
+    const vol = document.getElementById('sum_bus_PA-gain');
 	} else {
 		btn.classList.remove('active-input');
 		btn.innerText = "Off";
@@ -177,12 +182,42 @@ export function toggleWallStateCurvedPA(state, btn_disable, slider_disable = fal
 
 export function toggleWallStateCAVE()
 {
-  
+  const btn = document.getElementById('btn-sum_bus_CAVE-mute');
+	const slider = document.getElementById('sum_bus_CAVE-volume-slider');
+	if (!btn || !slider) return;
+
+	const isActive = btn.classList.contains('active-input');
+  const turnOn = state === undefined ? !isActive : state;
+	if (turnOn) {
+		btn.classList.add('active-input');
+		btn.innerText = "On";
+    btn.disabled = btn_disable;
+		slider.disabled = slider_disable;
+		slider.style.opacity = "1.0";
+    sendValue('/matrix/state/settings/sum_bus_master/4/mute', 0);
+    sendValue('/matrix/state/settings/sum_bus_master/5/mute', 0);
+    const vol = document.getElementById('sum_bus_PA-gain');
+	} else {
+		btn.classList.remove('active-input');
+		btn.innerText = "Off";
+    btn.disabled = btn_disable;
+		slider.disabled = slider_disable;
+		slider.style.opacity = "0.5";
+    sendValue('/matrix/state/settings/sum_bus_master/4/mute', 1);
+    sendValue('/matrix/state/settings/sum_bus_master/5/mute', 1);
+	}
 }
 
 export function setVolumeCurvedPA(value)
 {
   sendValue('/matrix/state/settings/sum_bus_master/0/gain', value);
   sendValue('/matrix/state/settings/sum_bus_master/1/gain', value);
-  document.getElementById('sum_bus_master-volume-number').innerText = value + ' dB';
+  document.getElementById('sum_bus_PA-volume-number').innerText = value + ' dB';
+}
+
+export function setVolumeCavePA(value)
+{
+  sendValue('/matrix/state/settings/sum_bus_master/4/gain', value);
+  sendValue('/matrix/state/settings/sum_bus_master/5/gain', value);
+  document.getElementById('sum_bus_CAVE-volume-number').innerText = value + ' dB';
 }

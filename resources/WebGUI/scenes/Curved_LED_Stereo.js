@@ -10,12 +10,12 @@ export function init()
   enableInputSelectButtons(true);
   GetStatus();
 
-  document.getElementById('sum_bus_master-gain').addEventListener('updated', (e) => 
+  document.getElementById('sum_bus_PA-gain').addEventListener('updated', (e) => 
   {
-    const vol = document.getElementById('sum_bus_master-gain');
+    const vol = document.getElementById('sum_bus_PA-gain');
     //console.log(vol.innerText);
-    document.getElementById('sum_bus_master-volume-slider').value = Math.round(vol.innerText);
-    document.getElementById('sum_bus_master-volume-number').innerText = Math.round(vol.innerText) + ' dB';
+    document.getElementById('sum_bus_PA-volume-slider').value = Math.round(vol.innerText);
+    document.getElementById('sum_bus_PA-volume-number').innerText = Math.round(vol.innerText) + ' dB';
   });	
     
 }
@@ -34,7 +34,7 @@ export function GetStatus()
 function triggerMeter() // currently unused because the VU meter does not work in the matrix this way
 {
   sendNoArgs('/matrix/state/settings/sum_bus_master/0/meter');
-  if (!document.getElementById("sum_bus_master-volume-slider").disabled)
+  if (!document.getElementById("sum_bus_PA-volume-slider").disabled)
     setTimeout(() => { triggerMeter(); }, 100);
 }
 
@@ -42,14 +42,14 @@ export function MuteAll()
 {
   sendValue('/matrix/state/settings/flex_channel/*/mute', 1);
   enableInputSelectButtons(true);
-  toggleSumBusMasterMute(false);
+  toggleSumBusPAMute(false);
   showInputSection('none'); // Hide all input sections
 }
 
-export function toggleSumBusMasterMute(state, btn_disable, slider_disable = false)
+export function toggleSumBusPAMute(state, btn_disable, slider_disable = false)
 {
-	const btn = document.getElementById('btn-sum_bus_master-mute');
-	const slider = document.getElementById('sum_bus_master-volume-slider');
+	const btn = document.getElementById('btn-sum_bus_PA-mute');
+	const slider = document.getElementById('sum_bus_PA-volume-slider');
 	if (!btn || !slider) return;
 
 	const isActive = btn.classList.contains('active-input');
