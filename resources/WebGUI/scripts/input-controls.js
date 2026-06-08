@@ -186,7 +186,7 @@ function toggleInputState(id, mute)
 		smallBtn.classList.remove('active-input');
 		smallBtn.innerText = "Input: Off";
 		bigBtn.classList.remove('active-input');
-		slider.disabled = true;
+		slider.disabled = false;
 		slider.style.opacity = "0.5";
     if (mute===undefined) // Only send OSC if the user is toggling the input state
     {  

@@ -1,16 +1,8 @@
 <div id="Curved_LED_Stereo" class="scene-main">
 
   <h3>Plays stereo audio via the Curved-LED loudspeakers. The spatial-audio area is not used.</h3>
-	<div class="start-container" style="height: 20%;">
-	
-		<div class="button-group">
-			<div style="gap: 10px;">
-				<button onClick="SceneModule.Lock()" class="big-button">Activate and Lock</button>				
-			</div>
-	 </div>		
-  </div>
 
-  <div class="start-container" style="height: 60%;">
+  <div class="start-container" style="height: 80%;">
     
     <div class="button-group" style="width: 66%; height: 100%; gap: 0px;">
       <span style="text-align: center; font-weight: bold; gap: 0px;">Inputs</span>
@@ -18,39 +10,30 @@
         <div id="input-buttons-container" style="text-align: center;">
           <!-- Input buttons will be injected here by input-controls.js -->
         </div>
-        <div id="input-group-container" class="input-group" style="gap: 0px;">
+        <div id="input-group-container" class="input-group" style="text-align: center; gap: 0px;">
           <!-- Input sections will be injected here by input-controls.js -->
         </div>
       </div>
 		</div>
     
     <div class="button-group" style="width: 33%; height: 100%; gap: 0px;">
-      <span style="text-align: center; font-weight: bold; gap: 0px;">Total</span>
+      <span style="text-align: center; font-weight: bold; gap: 0px;">PA</span>
       
         <div class="slider-group">
           <b>Volume</b>
-          <button disabled id="btn-sum_bus_master-mute" class="small-button" style="width: 50px;" onclick="SceneModule.toggleSumBusMasterMute()">Off</button>          
-          <input id="sum_bus_master-volume-slider" disabled class="volume-slider" style="height: 350px;" type=range min="-100" max="18" value="0" 
+          <button id="btn-sum_bus_master-mute" class="small-button" style="width: 50px;" onclick="SceneModule.toggleSumBusMasterMute()">Off</button>          
+          <input id="sum_bus_master-volume-slider" class="volume-slider" style="height: 350px; opacity: 0.5" type=range min="-100" max="18" value="0" 
             oninput="sendValue('/matrix/state/settings/sum_bus_master/0/gain', this.value); sendValue('/matrix/state/settings/sum_bus_master/1/gain', this.value); document.getElementById('sum_bus_master-volume-number').innerText = this.value + ' dB';">
           <div id="sum_bus_master-volume-number" class="level-box">--</div>
           <span style="text-align: center; color: white;" id="sum_bus_master-gain">&nbsp;</span>
         </div>
-        <!-- div class="slider-group">
-          <b>Level</b>
-          <div class="meter-container" style="height: 80%;">
-            <div class="meter-bar" id="sum_bus_master-meter-bar" style="width: 0%;"></div>
-          </div>
-          <div class="level-box" id="sum_bus_master-meter-number">--</div>
-          <span style="text-align: center; color: white;" id="sum_bus_master-meter">&nbsp;</span>
-        </div>-->
-      
     </div>
   </div>
   
   <div class="start-container" style="height: 8%; width: 100%; justify-content: center;">
-    <button class="big-button" style="width: 30%;" onClick="SceneModule.Unlock();">Unlock</button>
+    <button onClick="SceneModule.GetStatus()" class="big-button">Get Routing Status</button>
     &nbsp;
-    <button class="big-button" style="width: 30%;" onClick="SceneModule.UnlockAndMute();">Unlock and Mute</button>
+    <button class="big-button" onClick="SceneModule.MuteAll();">Mute All</button>
   </div>
 
 </div>
