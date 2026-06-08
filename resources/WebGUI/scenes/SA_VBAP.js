@@ -200,10 +200,12 @@ export function SetDanteLedPcChannel3()
 
 export function SetDanteLedPc()
 {
-  setInputButtonExclusively('DANTE_CurvedLEDPC', 'SA_VBAP')
+  setInputButtonExclusively('DANTE_CurvedLEDPC', 'SA_VBAP');
+  sendValue('/app/SA_VBAP/osc/VirtualSource/3/Switch', 0);
 }
 
 export function SetDanteMobile()
 {
   setInputButtonExclusively('DANTE_Mobile', 'SA_VBAP');
+  sendValue('/app/SA_VBAP/osc/VirtualSource/3/Switch', 0);
 }
