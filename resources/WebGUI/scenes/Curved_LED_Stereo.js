@@ -3,9 +3,7 @@ export function init()
     // Inject input controls and disabled buttons
    renderInputControls('input-buttons-container', 'input-group-container', 'Curved_LED_Stereo', 
       ["DANTE_CurvedLEDPC", "DANTE_CurvedLEDPC_Channel_3", "DANTE_Mobile", "Mic_Array", 
-        "DANTE_Mobile_Stereo", // to be setup later
         "DANTE_HDMI_Stereo", // to be setup later
-        "DANTE_Bluetooth", // to be setup later
         ]);
   enableInputSelectButtons(true);
   GetStatus();
