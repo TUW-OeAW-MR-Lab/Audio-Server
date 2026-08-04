@@ -8,12 +8,24 @@ export function init()
   enableInputSelectButtons(true);
   GetStatus();
 
-  document.getElementById('sum_bus_PA-gain').addEventListener('updated', (e) => 
+  document.getElementById('sum_bus_CurvedPA-gain').addEventListener('updated', (e) => 
   {
-    const vol = document.getElementById('sum_bus_PA-gain');
+    const vol = document.getElementById('sum_bus_CurvedPA-gain');
     //console.log(vol.innerText);
-    document.getElementById('sum_bus_PA-volume-slider').value = Math.round(vol.innerText);
-    document.getElementById('sum_bus_PA-volume-number').innerText = Math.round(vol.innerText) + ' dB';
+    document.getElementById('sum_bus_CurvedPA-volume-slider').value = Math.round(vol.innerText);
+    document.getElementById('sum_bus_CurvedPA-volume-number').innerText = Math.round(vol.innerText) + ' dB';
+  });	
+    
+  document.getElementById('btn-sum_bus_CurvedPA-mute').addEventListener('updated', (e) => 
+  {
+    const btn = document.getElementById('btn-sum_bus_CurvedPA-mute');
+    const isActive = btn.classList.contains('active-input');
+    const slider = document.getElementById('sum_bus_CurvedPA-volume-slider');
+    if (isActive) {
+		  slider.style.opacity = "1.0";
+    } else {
+		  slider.style.opacity = "0.5";
+    }  
   });	
     
 }
@@ -23,16 +35,14 @@ export function GetStatus()
   //lockScene('Curved_LED_Stereo');
   sendNoArgs('/matrix/state/settings/flex_channel/*/mute'); // get all mute states
   sendNoArgs('/matrix/state/settings/flex_channel/*/gain'); // get all gain values
-  sendNoArgs('/matrix/state/settings/sum_bus_master/0/gain'); // get master gain
-  sendNoArgs('/matrix/state/settings/sum_bus_master/1/gain'); // get master gain
-  sendNoArgs('/matrix/state/settings/sum_bus_master/0/mute'); // get master mute
-  sendNoArgs('/matrix/state/settings/sum_bus_master/1/mute'); // get master mute
+  sendNoArgs('/matrix/state/settings/sum_bus_master/*/gain'); // get bus master gains
+  sendNoArgs('/matrix/state/settings/sum_bus_master/*/mute'); // get bus master mutes
 }
 
 function triggerMeter() // currently unused because the VU meter does not work in the matrix this way
 {
   sendNoArgs('/matrix/state/settings/sum_bus_master/0/meter');
-  if (!document.getElementById("sum_bus_PA-volume-slider").disabled)
+  if (!document.getElementById("sum_bus_CurvedPA-volume-slider").disabled)
     setTimeout(() => { triggerMeter(); }, 100);
 }
 
@@ -46,8 +56,8 @@ export function MuteAll()
 
 export function toggleSumBusPAMute(state, btn_disable, slider_disable = false)
 {
-	const btn = document.getElementById('btn-sum_bus_PA-mute');
-	const slider = document.getElementById('sum_bus_PA-volume-slider');
+	const btn = document.getElementById('btn-sum_bus_CurvedPA-mute');
+	const slider = document.getElementById('sum_bus_CurvedPA-volume-slider');
 	if (!btn || !slider) return;
 
 	const isActive = btn.classList.contains('active-input');

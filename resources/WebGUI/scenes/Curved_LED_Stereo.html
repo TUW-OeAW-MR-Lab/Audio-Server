@@ -21,11 +21,11 @@
       
         <div class="slider-group">
           <b>Volume</b>
-          <button id="btn-sum_bus_PA-mute" class="small-button" style="width: 50px;" onclick="SceneModule.toggleSumBusPAMute()">Off</button>          
-          <input id="sum_bus_PA-volume-slider" class="volume-slider" style="height: 350px; opacity: 0.5" type=range min="-100" max="18" value="0" 
-            oninput="sendValue('/matrix/state/settings/sum_bus_master/0/gain', this.value); sendValue('/matrix/state/settings/sum_bus_master/1/gain', this.value); document.getElementById('sum_bus_PA-volume-number').innerText = this.value + ' dB';">
-          <div id="sum_bus_PA-volume-number" class="level-box">--</div>
-          <span style="text-align: center; color: white;" id="sum_bus_PA-gain">&nbsp;</span>
+          <button id="btn-sum_bus_CurvedPA-mute" class="small-button" style="width: 50px;" onclick="SceneModule.toggleSumBusPAMute()">Off</button>          
+          <input id="sum_bus_CurvedPA-volume-slider" class="volume-slider" style="height: 350px; opacity: 0.5" type=range min="-100" max="18" value="0" 
+            oninput="sendValue('/matrix/state/settings/sum_bus_master/0/gain', this.value); sendValue('/matrix/state/settings/sum_bus_master/1/gain', this.value); document.getElementById('sum_bus_CurvedPA-volume-number').innerText = this.value + ' dB';">
+          <div id="sum_bus_CurvedPA-volume-number" class="level-box">--</div>
+          <span style="text-align: center; color: white;" id="sum_bus_CurvedPA-gain">&nbsp;</span>
         </div>
     </div>
   </div>
