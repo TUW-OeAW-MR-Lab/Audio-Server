@@ -29,11 +29,11 @@
       <span style="text-align: center; font-weight: bold; gap: 0px;">CAVE PA</span>
       <div class="slider-group">
         <b>Volume</b><br>
-        <button disabled id="btn-sum_bus_CAVE-mute" class="small-button" style="width: 50px;" onclick="SceneModule.toggleWallStateCAVE()">Off</button>          
-        <input disabled id="sum_bus_CAVE-slider" class="volume-slider" style="opacity: 0.5; height: 182px;" type=range min="-60" max="20" value="-60" 
+        <button disabled id="btn-sum_bus_CAVEPA-mute" class="small-button" style="width: 50px;" onclick="SceneModule.toggleStateCAVEPA()">Off</button>          
+        <input disabled id="sum_bus_CAVEPA-volume-slider" class="volume-slider" style="opacity: 0.5; height: 182px;" type=range min="-60" max="20" value="-60" 
           oninput="SceneModule.setVolumeCavePA(this.value)">
-        <div id="sum_bus_CAVE-number" class="level-box">--</div>
-        <span style="text-align: center; color: white;" id="Stereo_Walls-CAVE_Volume">&nbsp;</span>
+        <div id="sum_bus_CAVEPA-volume-number" class="level-box">--</div>
+        <span id="sum_bus_CAVEPA-gain" style="text-align: center; color: white;">&nbsp;</span>
       </div>
     </div>
     
@@ -79,11 +79,11 @@
       <span style="text-align: center; font-weight: bold; gap: 0px;">Curved PA</span>
       <div class="slider-group">
         <b>Volume</b><br>
-        <button disabled id="btn-sum_bus_PA-mute" class="small-button" style="width: 50px;" onclick="SceneModule.toggleWallStateCurvedPA()">Off</button>
-        <input disabled id="sum_bus_PA-volume-slider" class="volume-slider" style="opacity: 0.5; height: 186px;" type=range min="-60" max="20" value="-60"
+        <button disabled id="btn-sum_bus_CurvedPA-mute" class="small-button" style="width: 50px;" onclick="SceneModule.toggleStateCurvedPA()">Off</button>
+        <input disabled id="sum_bus_CurvedPA-volume-slider" class="volume-slider" style="opacity: 0.5; height: 186px;" type=range min="-60" max="20" value="-60"
           oninput="SceneModule.setVolumeCurvedPA(this.value)">
-        <div id="sum_bus_PA-volume-number" class="level-box">--</div>
-        <span id="sum_bus_PA-gain" style="text-align: center; color: white;">&nbsp;</span>
+        <div id="sum_bus_CurvedPA-volume-number" class="level-box">--</div>
+        <span id="sum_bus_CurvedPA-gain" style="text-align: center; color: white;">&nbsp;</span>
       </div>
     </div>
 	</div>

@@ -18,11 +18,18 @@ export function init()
     document.getElementById('Stereo_Walls-Total_VU-number').innerText = Math.round(vu.innerText) + ' dB';
   });			
 
-  document.getElementById('sum_bus_PA-gain').addEventListener('updated', (e) => 
+  document.getElementById('sum_bus_CurvedPA-gain').addEventListener('updated', (e) => 
   {   // Curved PA Volume
-    const vol = document.getElementById('sum_bus_PA-gain');
-    document.getElementById('sum_bus_PA-volume-slider').value = Math.round(vol.innerText);
-    document.getElementById('sum_bus_PA-volume-number').innerText = Math.round(vol.innerText) + " dB";
+    const vol = document.getElementById('sum_bus_CurvedPA-gain');
+    document.getElementById('sum_bus_CurvedPA-volume-slider').value = Math.round(vol.innerText);
+    document.getElementById('sum_bus_CurvedPA-volume-number').innerText = Math.round(vol.innerText) + " dB";
+  });	
+
+  document.getElementById('sum_bus_CAVEPA-gain').addEventListener('updated', (e) => 
+  {   // CAVE PA Volume
+    const vol = document.getElementById('sum_bus_CAVEPA-gain');
+    document.getElementById('sum_bus_CAVEPA-volume-slider').value = Math.round(vol.innerText);
+    document.getElementById('sum_bus_CAVEPA-volume-number').innerText = Math.round(vol.innerText) + " dB";
   });	
 
   document.getElementById('Stereo_Walls-CAVEDoor_Volume').addEventListener('updated', (e) => 
@@ -83,12 +90,6 @@ export function checkConnection()
       sendNoArgs('/app/Stereo_Walls/osc/CAVEDoor/Volume');
       sendNoArgs('/app/Stereo_Walls/osc/SA/Volume');
       sendNoArgs('/app/Stereo_Walls/osc/CurvedDoor/Volume');
-      sendNoArgs('/matrix/state/settings/sum_bus_master/0/gain'); // Curved PA Volume
-      sendNoArgs('/matrix/state/settings/sum_bus_master/1/gain'); // Curved PA Volume
-      sendNoArgs('/matrix/state/settings/sum_bus_master/0/mute'); // get Curved PA mute
-      sendNoArgs('/matrix/state/settings/sum_bus_master/1/mute'); // get Curved PA mute
-      sendNoArgs('/matrix/state/settings/flex_channel/*/mute'); // get all Input mute states
-      sendNoArgs('/matrix/state/settings/flex_channel/*/gain'); // get all Input volumes
       sendValue('/matrix/state/settings/sum_bus_master/2/mute', 0); // Unmute Audio PC Left
       sendValue('/matrix/state/settings/sum_bus_master/3/mute', 0); // Unmute Audio PC Right
       sendValue('/matrix/state/settings/sum_bus_master/2/gain', 0); // set Audio PC Left to 0 dB
@@ -97,7 +98,12 @@ export function checkConnection()
       toggleWallStateApp('CAVEDoor', false, false, false);
       toggleWallStateApp('SA', false, false, false);
       toggleWallStateApp('CurvedDoor', false, false, false);
-      toggleWallStateCurvedPA(false, false, false);
+      toggleStateCurvedPA(false, false, false);
+      toggleStateCAVEPA(false, false, false);
+      sendNoArgs('/matrix/state/settings/sum_bus_master/*/gain'); // get all Bus Master volumes
+      sendNoArgs('/matrix/state/settings/sum_bus_master/*/mute'); // get all Bus Master mutes
+      sendNoArgs('/matrix/state/settings/flex_channel/*/mute'); // get all Input mute states
+      sendNoArgs('/matrix/state/settings/flex_channel/*/gain'); // get all Input volumes
 			break;
 	}
 	if (secWaited > timeout)
@@ -116,7 +122,8 @@ export function quit()
   toggleWallStateApp('CAVEDoor', false, true, true);
   toggleWallStateApp('SA', false, true, true);
   toggleWallStateApp('CurvedDoor', false, true, true);
-  toggleWallStateCurvedPA(false, true, true);
+  toggleStateCurvedPA(false, true, true);
+  toggleStateCAVEPA(false, true, true);
   sendValue('/matrix/state/settings/flex_channel/*/mute', 1); // Mute all inputs
   sendValue('/matrix/state/settings/sum_bus_master/*/mute', 1); // Mute all sum busses
   document.getElementById('Stereo_Walls-Total_VU-bar').style.height = '0%';
@@ -150,10 +157,10 @@ export function toggleWallStateApp(id, state, btn_disable, slider_disable = fals
 	}
 }
 
-export function toggleWallStateCurvedPA(state, btn_disable, slider_disable = false)
+export function toggleStateCurvedPA(state, btn_disable, slider_disable = false)
 {
-	const btn = document.getElementById('btn-sum_bus_PA-mute');
-	const slider = document.getElementById('sum_bus_PA-volume-slider');
+	const btn = document.getElementById('btn-sum_bus_CurvedPA-mute');
+	const slider = document.getElementById('sum_bus_CurvedPA-volume-slider');
 	if (!btn || !slider) return;
 
 	const isActive = btn.classList.contains('active-input');
@@ -166,7 +173,7 @@ export function toggleWallStateCurvedPA(state, btn_disable, slider_disable = fal
 		slider.style.opacity = "1.0";
     sendValue('/matrix/state/settings/sum_bus_master/0/mute', 0);
     sendValue('/matrix/state/settings/sum_bus_master/1/mute', 0);
-    const vol = document.getElementById('sum_bus_PA-gain');
+    const vol = document.getElementById('sum_bus_CurvedPA-gain');
 	} else {
 		btn.classList.remove('active-input');
 		btn.innerText = "Off";
@@ -178,10 +185,10 @@ export function toggleWallStateCurvedPA(state, btn_disable, slider_disable = fal
 	}
 }
 
-export function toggleWallStateCAVE()
+export function toggleStateCAVEPA(state, btn_disable, slider_disable = false)
 {
-  const btn = document.getElementById('btn-sum_bus_CAVE-mute');
-	const slider = document.getElementById('sum_bus_CAVE-volume-slider');
+  const btn = document.getElementById('btn-sum_bus_CAVEPA-mute');
+	const slider = document.getElementById('sum_bus_CAVEPA-volume-slider');
 	if (!btn || !slider) return;
 
 	const isActive = btn.classList.contains('active-input');
@@ -192,17 +199,29 @@ export function toggleWallStateCAVE()
     btn.disabled = btn_disable;
 		slider.disabled = slider_disable;
 		slider.style.opacity = "1.0";
-    sendValue('/matrix/state/settings/sum_bus_master/4/mute', 0);
-    sendValue('/matrix/state/settings/sum_bus_master/5/mute', 0);
-    const vol = document.getElementById('sum_bus_PA-gain');
+    sendValue('/matrix/state/settings/sum_bus_master/8/mute', 0);
+    sendValue('/matrix/state/settings/sum_bus_master/9/mute', 0);
+    sendValue('/matrix/state/settings/sum_bus_master/10/mute', 0);
+    sendValue('/matrix/state/settings/sum_bus_master/11/mute', 0);
+    sendValue('/matrix/state/settings/sum_bus_master/12/mute', 0);
+    sendValue('/matrix/state/settings/sum_bus_master/13/mute', 0);
+    sendValue('/matrix/state/settings/sum_bus_master/14/mute', 0);
+    sendValue('/matrix/state/settings/sum_bus_master/15/mute', 0);
+    const vol = document.getElementById('sum_bus_CAVEPA-gain');
 	} else {
 		btn.classList.remove('active-input');
 		btn.innerText = "Off";
     btn.disabled = btn_disable;
 		slider.disabled = slider_disable;
 		slider.style.opacity = "0.5";
-    sendValue('/matrix/state/settings/sum_bus_master/4/mute', 1);
-    sendValue('/matrix/state/settings/sum_bus_master/5/mute', 1);
+    sendValue('/matrix/state/settings/sum_bus_master/8/mute', 1);
+    sendValue('/matrix/state/settings/sum_bus_master/9/mute', 1);
+    sendValue('/matrix/state/settings/sum_bus_master/10/mute', 1);
+    sendValue('/matrix/state/settings/sum_bus_master/11/mute', 1);
+    sendValue('/matrix/state/settings/sum_bus_master/12/mute', 1);
+    sendValue('/matrix/state/settings/sum_bus_master/13/mute', 1);
+    sendValue('/matrix/state/settings/sum_bus_master/14/mute', 1);
+    sendValue('/matrix/state/settings/sum_bus_master/15/mute', 1);
 	}
 }
 
@@ -210,12 +229,18 @@ export function setVolumeCurvedPA(value)
 {
   sendValue('/matrix/state/settings/sum_bus_master/0/gain', value);
   sendValue('/matrix/state/settings/sum_bus_master/1/gain', value);
-  document.getElementById('sum_bus_PA-volume-number').innerText = value + ' dB';
+  document.getElementById('sum_bus_CurvedPA-volume-number').innerText = value + ' dB';
 }
 
 export function setVolumeCavePA(value)
 {
-  sendValue('/matrix/state/settings/sum_bus_master/4/gain', value);
-  sendValue('/matrix/state/settings/sum_bus_master/5/gain', value);
-  document.getElementById('sum_bus_CAVE-volume-number').innerText = value + ' dB';
+  sendValue('/matrix/state/settings/sum_bus_master/8/gain', value);
+  sendValue('/matrix/state/settings/sum_bus_master/9/gain', value);
+  sendValue('/matrix/state/settings/sum_bus_master/10/gain', value);
+  sendValue('/matrix/state/settings/sum_bus_master/11/gain', value);
+  sendValue('/matrix/state/settings/sum_bus_master/12/gain', value);
+  sendValue('/matrix/state/settings/sum_bus_master/13/gain', value);
+  sendValue('/matrix/state/settings/sum_bus_master/14/gain', value);
+  sendValue('/matrix/state/settings/sum_bus_master/15/gain', value);
+  document.getElementById('sum_bus_CAVEPA-volume-number').innerText = value + ' dB';
 }

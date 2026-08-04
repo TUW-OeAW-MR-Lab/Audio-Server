@@ -181,7 +181,7 @@ function toggleInputState(id, mute)
       let matchingKeys = Object.keys(inputFlexChannelMap).filter(key => inputFlexChannelMap[key] === id);
       if (matchingKeys.length > 0) {
           matchingKeys.forEach(ch => {
-              send("/matrix/state/settings/flex_channel/" + ch + "/gain");
+              sendNoArgs("/matrix/state/settings/flex_channel/" + ch + "/gain");
           });
       }
     }

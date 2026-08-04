@@ -180,9 +180,9 @@ function sendResponseMatrixStateSettings(path, oscMsg)
         case 'gain':
           if (inputFlexChannelMap[path[4]]!="")
           {
-            const st = document.getElementById('slider-input-' + inputFlexChannelMap[path[4]]);
+            var st = document.getElementById('slider-input-' + inputFlexChannelMap[path[4]]);
             st.value = oscMsg.args[0].value;  
-            const statusEvent = new CustomEvent('updated', { detail: { time: Date.now() } });
+            var statusEvent = new CustomEvent('updated', { detail: { time: Date.now() } });
             st.dispatchEvent(statusEvent); // dispatch an event that the status has changed    
           }
           break;
@@ -194,9 +194,29 @@ function sendResponseMatrixStateSettings(path, oscMsg)
       switch (path[5])
       {
         case 'mute':
-          const st = document.getElementById('btn-sum_bus_PA-mute');
+          switch (path[4])
+          {
+            case "0":
+            case "1":
+              var st = document.getElementById('btn-sum_bus_CurvedPA-mute');
+              break;
+            case "2":
+            case "3":
+              var st = document.getElementById('btn-sum_bus_AudioPC-mute');
+              break;
+            case "8":
+            case "9":
+            case "10":
+            case "11":
+            case "12":
+            case "13":
+            case "14":
+            case "15":
+              var st = document.getElementById('btn-sum_bus_CAVEPA-mute');
+            break;
+          }
           if (!st) {
-            console.log("No OSC message handler for: 'btn-sum_bus_PA-mute'");
+            //console.log("No OSC message handler for bus_master " + path[4] + " mute");
             return;
           }
           if (oscMsg.args[0].value == 1)
@@ -209,7 +229,7 @@ function sendResponseMatrixStateSettings(path, oscMsg)
             st.classList.add('active-input');
             st.innerText = "On";
           }
-          const statusEvent = new CustomEvent('updated', { detail: { time: Date.now() } });
+          var statusEvent = new CustomEvent('updated', { detail: { time: Date.now() } });
           st.dispatchEvent(statusEvent); // dispatch an event that the status has changed                      
           break;
 
@@ -219,35 +239,39 @@ function sendResponseMatrixStateSettings(path, oscMsg)
           {
             case "0":
             case "1": { // Output to Curved LED PA
-              console.log("Bus master gain 0 or 1");
-              const st = document.getElementById('sum_bus_PA-gain');
-              st.innerHTML = oscMsg.args[0].value;                
-              const statusEvent = new CustomEvent('updated', { detail: { time: Date.now() } });
-              st.dispatchEvent(statusEvent); // dispatch an event that the status has changed                                  
+              //console.log("Bus master gain 0 or 1");
+              var st = document.getElementById('sum_bus_CurvedPA-gain');                            
               break;
             }
             case "2":
             case "3": { // Output to Audio PC
-              console.log("Bus master gain 2 or 3");
-              const st = document.getElementById('sum_bus_PC-gain');
-              st.innerHTML = oscMsg.args[0].value;                
-              const statusEvent = new CustomEvent('updated', { detail: { time: Date.now() } });
-              st.dispatchEvent(statusEvent); // dispatch an event that the status has changed                                  
+              //console.log("Bus master gain 2 or 3");
+              var st = document.getElementById('sum_bus_AudioPC-gain');                                             
               break;
             }
-            case "4":
-            case "5": { // Output to CAVE
-              console.log("Bus master gain 4 or 5");
-              const st = document.getElementById('sum_bus_CAVE-gain');
-              st.innerHTML = oscMsg.args[0].value;                
-              const statusEvent = new CustomEvent('updated', { detail: { time: Date.now() } });
-              st.dispatchEvent(statusEvent); // dispatch an event that the status has changed                                  
+            case "8":
+            case "9":
+            case "10":
+            case "11":
+            case "12":
+            case "13":
+            case "14":
+            case "15": { // Output to CAVE
+              //console.log("Bus master gain 8 to 15");
+              var st = document.getElementById('sum_bus_CAVEPA-gain');
               break;
             }
             default:
-              console.log("Bus master gain: channel#" + path[3]);
+              //console.log("Bus master gain: channel#" + path[3]);
               break;
           }
+          if (!st) {
+            //console.log("No OSC message handler for bus_master " + path[4] + " gain");
+            return;
+          }
+          st.innerHTML = oscMsg.args[0].value;                
+          var statusEvent = new CustomEvent('updated', { detail: { time: Date.now() } });
+          st.dispatchEvent(statusEvent); // dispatch an event that the status has changed   
           break;
 
         case 'meter':
@@ -256,9 +280,9 @@ function sendResponseMatrixStateSettings(path, oscMsg)
             case "0":
             case "1": // Meter for Curved LED PA
               //console.log("Bus master meter 0 or 1", oscMsg);
-              const st = document.getElementById('sum_bus_PA-meter');
+              var st = document.getElementById('sum_bus_PA-meter');
               st.innerHTML = oscMsg.args[0].value;
-              const statusEvent = new CustomEvent('updated', { detail: { time: Date.now() } });
+              var statusEvent = new CustomEvent('updated', { detail: { time: Date.now() } });
               st.dispatchEvent(statusEvent); // dispatch an event that the status has changed
               break;
             default:
