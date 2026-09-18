@@ -1,0 +1,21 @@
+name: CAVE-VBAP
+description: Pd with VBAP for virtual sources in CAVE
+
+app:
+  startCommand:
+    - C:\MRLab\Audio-Apps\CAVE-VBAP\_LAUNCH SCENE.bat
+
+  stopCommand:
+    - C:\Windows\System32\taskkill
+    - /IM
+    - pd.com
+    - /T
+    - /F
+
+  workingDir: C:\MRLab\Audio-Apps\CAVE-VBAP
+
+  oscClients:
+    - id: cave_vbap
+      subPath: osc
+      listenPort: 9336
+      destination: [ localhost, 10003 ]

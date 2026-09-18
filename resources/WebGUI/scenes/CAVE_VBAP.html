@@ -1,0 +1,88 @@
+<div id="CAVE_VBAP" class="scene-main">
+
+	<h3>Plays virtual sound sources positioned in the CAVE area.</h3>
+
+	<div class="start-container" style="height: 30%;">
+    <div class="button-group" style="width: 30%;">
+      <button id="btn-CAVE_VBAP-launch" onClick="launchAppAndWait('CAVE_VBAP', 'CAVE_VBAP', 5, SceneModule.launch, SceneModule.connect);" class="big-button">Launch App</button>
+      <p style="text-align: center;">
+        Status: <b id="CAVE_VBAP-status">unclear</b>
+      	<br>
+        Version: <b id="CAVE_VBAP-Control_Version">unknown</b>
+      	<br>
+        Sample rate: <b id="CAVE_VBAP-Control_SampleRate">unknown</b> Hz
+      </p>				
+    </div>
+    <div class="button-group" style="width: 70%; height: 100%;">
+      <span style="text-align: center; font-weight: bold; gap: 0px;">
+        Doors
+        <span id="CAVE_VBAP-Control_Door" style="color: white;">unknown</span>
+      </span>
+      <div class="start-container" style="height: 100%;">
+        <div class="button-group" style="height: 100%;">
+          <p style="text-align: center;">
+            <b>CAVE side:</b> <span id="CAVE_VBAP-Door_CAVE">unknown</span>
+          </p>
+          <button disabled class="small-button" id="CAVE_VBAP-Door_CAVE_Open" onclick="SceneModule.Door_Change({state_cave: 0})">Open</button>
+          <button disabled class="small-button" id="CAVE_VBAP-Door_CAVE_Close" onclick="SceneModule.Door_Change({state_cave: 1})">Close</button>
+        </div>
+        <div class="button-group" style="height: 100%;">
+          <p style="text-align: center;">
+            <b>Curved side:</b> <span id="CAVE_VBAP-Door_Curved">unknown</span>
+          </p>
+          <button disabled class="small-button" id="CAVE_VBAP-Door_Curved_Open" onclick="SceneModule.Door_Change({state_curved: 0})">Open</button>
+          <button disabled class="small-button" id="CAVE_VBAP-Door_Curved_Close" onclick="SceneModule.Door_Change({state_curved: 1})">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+	<div class="start-container" style="height: 60%;">
+    <div class="button-group" style="width: 70%; height: 100%; gap: 0px;">
+      <span style="text-align: center; font-weight: bold; gap: 0px;">Input from:</span>
+      <div class="start-container" style="height: 100%; gap: 0px;">
+        <div id="input-buttons-container" style="text-align: center; width: 100%;">
+           <div style="max-height: 350px; overflow-y: auto; display: flex; flex-direction: column; align-items: center; gap: 10px;"> 
+            <button disabled id="btn-input-select-DANTE_CurvedLEDPC" onClick="SceneModule.SetDanteLedPc();" class="big-button">&nbsp;<br>Curved LED PC<br>&nbsp;</button> 
+            <button disabled id="btn-input-select-DANTE_Mobile" onClick="SceneModule.SetDanteMobile();" class="big-button">&nbsp;<br>Mobile Dante Station<br>&nbsp;</button> 
+            <br><br>
+            <button disabled id="btn-input-select-DANTE_CurvedLEDPC_Channel_3" onClick="SceneModule.SetDanteLedPcChannel3();" class="big-button">Debugging (Channel #3)</button> 
+           </div>
+        </div>
+      </div>
+		</div>
+
+    <div class="button-group" style="width: 70%; height: 100%; gap: 0px;">
+      <span style="text-align: center; font-weight: bold; gap: 0px;">Total</span>
+      <div class="start-container">
+        <div class="slider-group">
+          <span>Volume</span>
+          <input class="volume-slider" id="volume-slider" style="height: 350px;" type=range min="-80" max="20" value="0" 
+            oninput="sendValue('/app/CAVE_VBAP/osc/Total/Volume/Set', this.value); document.getElementById('volume-number').innerText = this.value + ' dB';">
+          <div class="level-box" id="volume-number">--</div>
+          <p style="text-align: center; color: white;"><b id="CAVE_VBAP-Total_Volume">&nbsp;</b></p>
+        </div>
+        <div class="slider-group">
+          <span>Level</span>
+          <div class="meter-container">
+            <div id="CAVE_VBAP-Total_VU-bar" class="meter-bar" style="height: 0%;"></div>
+          </div>
+          <div id="CAVE_VBAP-Total_VU-number" class="level-box">--</div>
+          <p style="text-align: center; color: white;"><b id="CAVE_VBAP-Total_VU">&nbsp;</b></p>
+        </div>
+        <div class="slider-group">
+          <span style="text-align: center">Subwoofer<br>Volume</span>
+          <input class="volume-slider" id="subwoofer-slider" style="height: 350px;" type="range" min="-40" max="10" value="0" 
+            oninput="sendValue('/app/CAVE_VBAP/osc/Subwoofer/Volume/Set', this.value); document.getElementById('subwoofer-number').innerText = this.value + ' dB';">
+          <div class="level-box" id="subwoofer-number">--</div>
+          <p style="text-align: center; color: white;"><b id="CAVE_VBAP-Subwoofer_Volume">&nbsp;</b></p>
+        </div>
+      </div>
+    </div>
+	</div>
+
+	<div class="start-container" style="height: 8%; width: 100%; justify-content: center;">
+		<button class="big-button" style="width: 30%;" onClick="SceneModule.quit();" >Quit App</button>
+	</div>
+	
+</div>
