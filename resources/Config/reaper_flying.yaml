@@ -1,0 +1,17 @@
+name: Reaper Flying Music
+description: Reaper DAW with a flying music example
+
+app:
+  startCommand:
+    - C:\Program Files\REAPER (x64)\reaper
+    - C:\MRLab\Audio-Apps\Demo-Flying\music.rpp
+
+  stopCommand: []
+
+  workingDir: ""
+
+  oscClients:
+    - id: reaper_flying
+      subPath: osc
+      listenPort: 9342
+      destination: [ localhost, 10009 ]

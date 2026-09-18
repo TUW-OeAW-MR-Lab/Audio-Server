@@ -1,0 +1,48 @@
+<div id="demo_flying" class="scene-main">
+  
+  <h3>Plays flying demo via Reaper.</h3>
+	<div class="start-container">
+	
+    <div class="slider-group">
+        <div style="gap: 20px;">
+          <button class="big-button" onClick="launchApp('demo_flying','reaper_flying');" >Launch App</button>
+          <p style="text-align: center;">
+            Status: <b id="reaper_flying-status">unclear</b>
+            <span id="reaper_flying-stop" style="text-align: center; color: white; font-size: 8px;"></span>
+          </p>		
+        </div>
+        
+        <div style="gap: 20px;">
+          <button id="reaper_flying-btn-play" class="big-button" onClick="sendNoArgs('/app/reaper_flying/osc/play')" >Play/Pause</button>
+          <p style="text-align: center;"><b id="timecode">0:0.0</b> of <b id="duration">4:20.0</b></p>
+          <button id="reaper_flying-btn-rewind" class="big-button" style="margin-bottom: 20px;" onClick="sendValue('/app/reaper_flying/osc/time', 0)">Rewind</button>
+          <button id="reaper_flying-btn-stop" class="big-button" onClick="sendNoArgs('/app/reaper_flying/osc/stop')">Stop</button>
+          <p style="text-align: center; color: white;"><b id="reaper_flying-time">0</b><b id="reaper_flying-Play_Duration">0</b></p>
+        </div>
+
+        <div style="gap: 20px;">
+          <button class="big-button" onClick="quitApp('demo_flying', 'reaper_flying', SceneModule.init())">Quit App</button>
+        </div>
+    </div>
+
+		<div class="slider-group">
+			<span>Volume</span>			
+			<input class="volume-slider" id="volume-slider" style="height: 400px;" type=range min="-88" max="12" value="0" oninput="sendValue('/app/reaper_flying/osc/track/7/volume/db', this.value); document.getElementById('volume-number').innerText = this.value + ' dB';">
+			<div class="level-box" style="width: 130px;" id="volume-number">0 dB</div>
+			<p style="text-align: center; color: white; font-size: 8px;"><b id="reaper_flying-track_7_volume_db">&nbsp;</b></p>
+		</div>
+
+		<div class="slider-group">
+			<span>Level</span>
+			<br>
+			<div class="meter-container" style="height: 400px;">
+				<div id="reaper_flying-Play_VU-bar" class="meter-bar" style="height: 0%;"></div>
+			</div>
+			<br>
+			<div id="reaper_flying-Play_VU-number" class="level-box">--</div>
+			<p style="text-align: center; color: white; font-size: 8px;"><b id="reaper_flying-track_7_vu">blah&nbsp;</b></p>
+		</div>
+
+	</div>
+	
+</div>
