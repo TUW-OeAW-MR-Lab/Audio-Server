@@ -1,6 +1,3 @@
-let state_curved;
-let state_cave;
-
 export function init()
 {
   document.getElementById("btn-CAVE_VBAP-launch").disabled = false;
@@ -8,19 +5,15 @@ export function init()
 	document.getElementById("CAVE_VBAP-status").style.backgroundColor = "";	
 	document.getElementById("CAVE_VBAP-Control_Version").innerText = "---";
 	document.getElementById("CAVE_VBAP-Control_SampleRate").innerText = "---"; 
-	document.getElementById("CAVE_VBAP-Control_Door").innerText = "---";
   document.getElementById('CAVE_VBAP-Total_VU-bar').style.height = '0%';
   document.getElementById('CAVE_VBAP-Total_VU-number').innerText = '--';
   
   enableInputSelectButtons(false);
   document.getElementById("btn-input-select-DANTE_CurvedLEDPC_Channel_3").classList.remove('active-input');
+  document.getElementById("btn-input-select-DANTE_CAVEPC").classList.remove('active-input');
   document.getElementById("btn-input-select-DANTE_CurvedLEDPC").classList.remove('active-input');
   document.getElementById("btn-input-select-DANTE_Mobile").classList.remove('active-input');
 
-  document.getElementById("CAVE_VBAP-Door_Curved_Open").disabled = true;
-  document.getElementById("CAVE_VBAP-Door_Curved_Close").disabled = true;
-  document.getElementById("CAVE_VBAP-Door_CAVE_Open").disabled = true;
-  document.getElementById("CAVE_VBAP-Door_CAVE_Close").disabled = true;
   document.getElementById('volume-slider').disabled = true;
   document.getElementById('subwoofer-slider').disabled = true;
 
@@ -46,11 +39,6 @@ export function init()
       document.getElementById('subwoofer-number').innerText = Math.round(subLabel.innerText) + " dB";
     });
   }
-
-  document.getElementById('CAVE_VBAP-Control_Door').addEventListener('updated', (e) => 
-  {
-    Door_Status();
-  });	
 }
 
 export function launch()
@@ -60,7 +48,6 @@ export function launch()
 	document.getElementById("CAVE_VBAP-status").style.backgroundColor = "";	
 	document.getElementById("CAVE_VBAP-Control_Version").innerText = "---";
 	document.getElementById("CAVE_VBAP-Control_SampleRate").innerText = "---"; 
-	document.getElementById("CAVE_VBAP-Control_Door").innerText = "---";
   enableInputSelectButtons(false);
   document.getElementById('volume-slider').disabled = true;
   document.getElementById('subwoofer-slider').disabled = true;
@@ -102,7 +89,6 @@ export function checkConnection()
 			sendNoArgs('/app/CAVE_VBAP/osc/Control/SampleRate');
 			sendNoArgs('/app/CAVE_VBAP/osc/Total/Volume');
       sendNoArgs('/app/CAVE_VBAP/osc/Subwoofer/Volume');
-      sendNoArgs('/app/CAVE_VBAP/osc/Control/Door');
       enableInputSelectButtons(true);
       document.getElementById('volume-slider').disabled = false;
       document.getElementById('subwoofer-slider').disabled = false;
@@ -117,72 +103,6 @@ export function checkConnection()
 	}
 }		
 
-export function Door_Change({ state_cave = undefined, state_curved =  undefined })
-{
-  if(state_curved === undefined)
-    state_curved = document.getElementById("CAVE_VBAP-Door_Curved_Close").disabled;
-  if(state_cave === undefined)
-    state_cave = document.getElementById("CAVE_VBAP-Door_CAVE_Close").disabled;
-
-  if(state_cave) state = 'C'; else state = 'O';
-  if(state_curved) state = `${state}C`; else state = `${state}O`;
-
-  send('/app/CAVE_VBAP/osc/Control/Door/Set', state);
-  sendNoArgs('/app/CAVE_VBAP/osc/Control/Door');
-
-  document.getElementById("CAVE_VBAP-Door_Curved_Open").disabled = true;
-  document.getElementById("CAVE_VBAP-Door_Curved_Close").disabled = true;
-  document.getElementById("CAVE_VBAP-Door_CAVE_Open").disabled = true;
-  document.getElementById("CAVE_VBAP-Door_CAVE_Close").disabled = true;
-}
-
-export function Door_Status()
-{
-  state = document.getElementById("CAVE_VBAP-Control_Door");
-  switch (state.innerText)
-  {
-    case "OO":
-      document.getElementById("CAVE_VBAP-Door_Curved_Open").disabled = true;
-      document.getElementById("CAVE_VBAP-Door_Curved_Close").disabled = false;
-      document.getElementById("CAVE_VBAP-Door_Curved").innerText = "Door is open";
-      document.getElementById("CAVE_VBAP-Door_CAVE_Open").disabled = true;
-      document.getElementById("CAVE_VBAP-Door_CAVE_Close").disabled = false;
-      document.getElementById("CAVE_VBAP-Door_CAVE").innerText = "Door is open";
-      break;
-    case "CO":
-      document.getElementById("CAVE_VBAP-Door_Curved_Open").disabled = true;
-      document.getElementById("CAVE_VBAP-Door_Curved_Close").disabled = false;
-      document.getElementById("CAVE_VBAP-Door_Curved").innerText = "Door is open";
-      document.getElementById("CAVE_VBAP-Door_CAVE_Open").disabled = false;
-      document.getElementById("CAVE_VBAP-Door_CAVE_Close").disabled = true;
-      break;
-    case "OC":
-      document.getElementById("CAVE_VBAP-Door_Curved_Open").disabled = false;
-      document.getElementById("CAVE_VBAP-Door_Curved_Close").disabled = true;
-      document.getElementById("CAVE_VBAP-Door_Curved").innerText = "Door is closed";
-      document.getElementById("CAVE_VBAP-Door_CAVE_Open").disabled = true;
-      document.getElementById("CAVE_VBAP-Door_CAVE_Close").disabled = false;
-      document.getElementById("CAVE_VBAP-Door_CAVE").innerText = "Door is open";
-      break;
-    case "CC":
-      document.getElementById("CAVE_VBAP-Door_Curved_Open").disabled = false;
-      document.getElementById("CAVE_VBAP-Door_Curved_Close").disabled = true;
-      document.getElementById("CAVE_VBAP-Door_Curved").innerText = "Door is closed";
-      document.getElementById("CAVE_VBAP-Door_CAVE_Open").disabled = false;
-      document.getElementById("CAVE_VBAP-Door_CAVE_Close").disabled = true;
-      document.getElementById("CAVE_VBAP-Door_CAVE").innerText = "Door is closed";
-      break;
-    default:
-      document.getElementById("CAVE_VBAP-Door_Curved_Open").disabled = true;
-      document.getElementById("CAVE_VBAP-Door_Curved_Close").disabled = true;
-      document.getElementById("CAVE_VBAP-Door_Curved").innerText = "Door is unknown";
-      document.getElementById("CAVE_VBAP-Door_CAVE_Open").disabled = true;
-      document.getElementById("CAVE_VBAP-Door_CAVE_Close").disabled = true;
-      document.getElementById("CAVE_VBAP-Door_CAVE").innerText = "Door is unknown";
-      break;
-  }
-}
-
 export function SetDanteLedPcChannel3()
 {
   if (setInputButtonExclusively('DANTE_CurvedLEDPC_Channel_3', 'CAVE_VBAP'))
@@ -195,6 +115,18 @@ export function SetDanteLedPcChannel3()
   { 
     send('/app/CAVE_VBAP/osc/VirtualSource/3/Switch', 0);
   }
+}
+
+export function SetDanteCavePc()
+{
+  setInputButtonExclusively('DANTE_CAVEPC', 'CAVE_VBAP');
+  sendValue('/app/CAVE_VBAP/osc/VirtualSource/3/Switch', 0);
+  sendValue('/matrix/state/settings/sum_bus_master/0/mute', 1); // Mute Curved PA Left
+  sendValue('/matrix/state/settings/sum_bus_master/1/mute', 1); // Mute Curved PA Right
+  sendValue('/matrix/state/settings/sum_bus_master/2/mute', 0); // Unmute Audio PC Left
+  sendValue('/matrix/state/settings/sum_bus_master/3/mute', 0); // Unmute Audio PC Right
+  sendValue('/matrix/state/settings/sum_bus_master/2/gain', 0); // set Audio PC Left to 0 dB
+  sendValue('/matrix/state/settings/sum_bus_master/3/gain', 0); // set Audio PC Right to 0 dB
 }
 
 export function SetDanteLedPc()

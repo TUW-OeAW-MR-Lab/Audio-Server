@@ -3,7 +3,7 @@
 	<h3>Plays virtual sound sources positioned in the CAVE area.</h3>
 
 	<div class="start-container" style="height: 30%;">
-    <div class="button-group" style="width: 30%;">
+    <div class="button-group" style="width: 100%;">
       <button id="btn-CAVE_VBAP-launch" onClick="launchAppAndWait('CAVE_VBAP', 'CAVE_VBAP', 5, SceneModule.launch, SceneModule.connect);" class="big-button">Launch App</button>
       <p style="text-align: center;">
         Status: <b id="CAVE_VBAP-status">unclear</b>
@@ -13,28 +13,6 @@
         Sample rate: <b id="CAVE_VBAP-Control_SampleRate">unknown</b> Hz
       </p>				
     </div>
-    <div class="button-group" style="width: 70%; height: 100%;">
-      <span style="text-align: center; font-weight: bold; gap: 0px;">
-        Doors
-        <span id="CAVE_VBAP-Control_Door" style="color: white;">unknown</span>
-      </span>
-      <div class="start-container" style="height: 100%;">
-        <div class="button-group" style="height: 100%;">
-          <p style="text-align: center;">
-            <b>CAVE side:</b> <span id="CAVE_VBAP-Door_CAVE">unknown</span>
-          </p>
-          <button disabled class="small-button" id="CAVE_VBAP-Door_CAVE_Open" onclick="SceneModule.Door_Change({state_cave: 0})">Open</button>
-          <button disabled class="small-button" id="CAVE_VBAP-Door_CAVE_Close" onclick="SceneModule.Door_Change({state_cave: 1})">Close</button>
-        </div>
-        <div class="button-group" style="height: 100%;">
-          <p style="text-align: center;">
-            <b>Curved side:</b> <span id="CAVE_VBAP-Door_Curved">unknown</span>
-          </p>
-          <button disabled class="small-button" id="CAVE_VBAP-Door_Curved_Open" onclick="SceneModule.Door_Change({state_curved: 0})">Open</button>
-          <button disabled class="small-button" id="CAVE_VBAP-Door_Curved_Close" onclick="SceneModule.Door_Change({state_curved: 1})">Close</button>
-        </div>
-      </div>
-    </div>
   </div>
 
 	<div class="start-container" style="height: 60%;">
@@ -43,6 +21,7 @@
       <div class="start-container" style="height: 100%; gap: 0px;">
         <div id="input-buttons-container" style="text-align: center; width: 100%;">
            <div style="max-height: 350px; overflow-y: auto; display: flex; flex-direction: column; align-items: center; gap: 10px;"> 
+            <button disabled id="btn-input-select-DANTE_CAVEPC" onClick="SceneModule.SetDanteCavePc();" class="big-button">&nbsp;<br>CAVE PC<br>&nbsp;</button> 
             <button disabled id="btn-input-select-DANTE_CurvedLEDPC" onClick="SceneModule.SetDanteLedPc();" class="big-button">&nbsp;<br>Curved LED PC<br>&nbsp;</button> 
             <button disabled id="btn-input-select-DANTE_Mobile" onClick="SceneModule.SetDanteMobile();" class="big-button">&nbsp;<br>Mobile Dante Station<br>&nbsp;</button> 
             <br><br>

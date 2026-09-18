@@ -1,5 +1,6 @@
 
 const inputNames = [
+    // "DANTE_CAVEPC",
     "DANTE_CurvedLEDPC",
     "DANTE_CurvedLEDPC_Stereo",
     "DANTE_CurvedLEDPC_Channel_3",
@@ -18,6 +19,7 @@ const inputNames = [
 ];
 
 const inputLabels = {
+    // "DANTE_CAVEPC": "CAVE PC",
     "DANTE_CurvedLEDPC": "Curved LED PC",
     "DANTE_CurvedLEDPC_Stereo": "Curved LED PC Stereo",
     "DANTE_CurvedLEDPC_Channel_3": "Curved LED PC Test VBAP on Channel #3",
