@@ -22,8 +22,6 @@
 			<button id="button-control" onclick="loadScene('control', this)">Control</button>
 			<div class="sidebar-spacer"></div>
 			<button  id="button-Curved_LED_Stereo" onclick="loadScene('Curved_LED_Stereo', this)">Curved PA: Stereo</button>
-			<!-- button disabled id="button-Curved_LED_Telco" onclick="loadScene('Curved_LED_Telco', this)">Curved PA: Telco</button -->
-			<!-- button disabled id="button-Curved_LED_Surround" onclick="loadScene('Curved_LED_Surround', this)">Curved Surround</button -->
 			<button  id="button-Stereo_Walls" onclick="loadScene('Stereo_Walls', this)">Stereo Walls</button>
       <button id="button-SA_VBAP" onclick="loadScene('SA_VBAP', this)">Spatial Audio: VBAP</button>			
       <!-- button id="button-CAVE_VBAP" onclick="loadScene('CAVE_VBAP', this)">CAVE: VBAP</button -->
@@ -36,13 +34,14 @@
 			<div class="sidebar-spacer"></div>
       <p style="text-align: center;"><span id="git-version">Loading version...</span></p>
       <p style="text-align: center;">
-        fan-i12minus: <span id="fan-i12minus">---</span><br>
-        fan-power: <span id="fan-power">---</span><br>
-        fan-imain: <span id="fan-imain">---</span><br>
-        fan-temp1: <span id="fan-temp1">---</span><br>
-        fan-temp2: <span id="fan-temp2">---</span><br>
-        fan-cpu_temp: <span id="fan-cpu_temp">---</span><br>
-        fan-temp_local: <span id="fan-temp_local">---</span><br>
+        <b>Audio Matrix:</b><br>
+        Main Power: <span id="fan-power">---</span> W<br>
+        Main Current: <span id="fan-imain">---</span> A<br>
+        12V Current: <span id="fan-i12minus">---</span> A<br>
+        Temp Zone 1: <span id="fan-temp1">---</span>&deg; C<br>
+        Temp Zone 2: <span id="fan-temp2">---</span>&deg; C<br>
+        Temp CPU: <span id="fan-cpu_temp">---</span>&deg; C<br>
+        Temp Main: <span id="fan-temp_local">---</span>&deg; C<br>
       </p>
 		</aside>
 
