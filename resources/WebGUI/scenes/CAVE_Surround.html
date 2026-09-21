@@ -1,0 +1,68 @@
+<div id="CAVE_Surround" class="scene-main">
+
+  <h3>Plays surround audio via the CAVE loudspeakers.</h3>
+
+  <div class="start-container" style="height: 80%;">
+    
+    <div class="button-group" style="width: 45%; height: 100%; gap: 0px;">
+      <span style="text-align: center; font-weight: bold; gap: 0px;">Inputs</span>
+      <div class="start-container" style="height: 100%; gap: 0px;">
+        <div id="input-buttons-container" style="text-align: center;">
+          <!-- Input buttons will be injected here by input-controls.js -->
+        </div>
+        <div id="input-group-container" class="input-group" style="text-align: center; gap: 0px;">
+          <!-- Input sections will be injected here by input-controls.js -->
+        </div>
+      </div>
+    </div>
+    
+    <div class="button-group" style="width: 55%; height: 100%; gap: 0px;">
+      <span style="text-align: center; font-weight: bold; gap: 0px;">CAVE Surround</span>
+      
+      <div class="start-container" style="height: 95%; text-align: center; gap: 0px; justify-content: space-evenly;">
+        <div class="slider-group" style="width: 25%;">
+          <b>Front</b>
+          <button id="btn-sum_bus_CAVE_Front-mute" class="small-button" style="width: 50px;" onclick="SceneModule.toggleFrontMute()">Off</button>          
+          <input id="sum_bus_CAVE_Front-volume-slider" class="volume-slider" style="height: 350px; opacity: 0.5;" type="range" min="-100" max="18" value="0" 
+            oninput="SceneModule.setVolumeFront(this.value)">
+          <div id="sum_bus_CAVE_Front-volume-number" class="level-box">--</div>
+          <span style="text-align: center; color: white;" id="sum_bus_CAVE_Front-gain">&nbsp;</span>
+        </div>
+
+        <div class="slider-group" style="width: 25%;">
+          <b>Left</b>
+          <button id="btn-sum_bus_CAVE_Left-mute" class="small-button" style="width: 50px;" onclick="SceneModule.toggleLeftMute()">Off</button>          
+          <input id="sum_bus_CAVE_Left-volume-slider" class="volume-slider" style="height: 350px; opacity: 0.5;" type="range" min="-100" max="18" value="0" 
+            oninput="SceneModule.setVolumeLeft(this.value)">
+          <div id="sum_bus_CAVE_Left-volume-number" class="level-box">--</div>
+          <span style="text-align: center; color: white;" id="sum_bus_CAVE_Left-gain">&nbsp;</span>
+        </div>
+
+        <div class="slider-group" style="width: 25%;">
+          <b>Right</b>
+          <button id="btn-sum_bus_CAVE_Right-mute" class="small-button" style="width: 50px;" onclick="SceneModule.toggleRightMute()">Off</button>          
+          <input id="sum_bus_CAVE_Right-volume-slider" class="volume-slider" style="height: 350px; opacity: 0.5;" type="range" min="-100" max="18" value="0" 
+            oninput="SceneModule.setVolumeRight(this.value)">
+          <div id="sum_bus_CAVE_Right-volume-number" class="level-box">--</div>
+          <span style="text-align: center; color: white;" id="sum_bus_CAVE_Right-gain">&nbsp;</span>
+        </div>
+
+        <div class="slider-group" style="width: 25%;">
+          <b>Back</b>
+          <button id="btn-sum_bus_CAVE_Back-mute" class="small-button" style="width: 50px;" onclick="SceneModule.toggleBackMute()">Off</button>          
+          <input id="sum_bus_CAVE_Back-volume-slider" class="volume-slider" style="height: 350px; opacity: 0.5;" type="range" min="-100" max="18" value="0" 
+            oninput="SceneModule.setVolumeBack(this.value)">
+          <div id="sum_bus_CAVE_Back-volume-number" class="level-box">--</div>
+          <span style="text-align: center; color: white;" id="sum_bus_CAVE_Back-gain">&nbsp;</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="start-container" style="height: 8%; width: 100%; justify-content: center;">
+    <button onClick="SceneModule.GetStatus()" class="big-button">Get Routing Status</button>
+    &nbsp;
+    <button class="big-button" onClick="SceneModule.MuteAll();">Mute All</button>
+  </div>
+
+</div>

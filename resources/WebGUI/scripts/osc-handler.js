@@ -206,14 +206,20 @@ function sendResponseMatrixStateSettings(path, oscMsg)
               break;
             case "8":
             case "9":
+              var st = document.getElementById('btn-sum_bus_CAVE_Front-mute') || document.getElementById('btn-sum_bus_CAVEPA-mute');
+              break;
             case "10":
-            case "11":
             case "12":
+              var st = document.getElementById('btn-sum_bus_CAVE_Left-mute') || document.getElementById('btn-sum_bus_CAVEPA-mute');
+              break;
+            case "11":
             case "13":
+              var st = document.getElementById('btn-sum_bus_CAVE_Right-mute') || document.getElementById('btn-sum_bus_CAVEPA-mute');
+              break;
             case "14":
             case "15":
-              var st = document.getElementById('btn-sum_bus_CAVEPA-mute');
-            break;
+              var st = document.getElementById('btn-sum_bus_CAVE_Back-mute') || document.getElementById('btn-sum_bus_CAVEPA-mute');
+              break;
           }
           if (!st) {
             //console.log("No OSC message handler for bus_master " + path[4] + " mute");
@@ -250,15 +256,23 @@ function sendResponseMatrixStateSettings(path, oscMsg)
               break;
             }
             case "8":
-            case "9":
+            case "9": { // Output to CAVE Front
+              var st = document.getElementById('sum_bus_CAVE_Front-gain') || document.getElementById('sum_bus_CAVEPA-gain');
+              break;
+            }
             case "10":
+            case "12": { // Output to CAVE Left
+              var st = document.getElementById('sum_bus_CAVE_Left-gain') || document.getElementById('sum_bus_CAVEPA-gain');
+              break;
+            }
             case "11":
-            case "12":
-            case "13":
+            case "13": { // Output to CAVE Right
+              var st = document.getElementById('sum_bus_CAVE_Right-gain') || document.getElementById('sum_bus_CAVEPA-gain');
+              break;
+            }
             case "14":
-            case "15": { // Output to CAVE
-              //console.log("Bus master gain 8 to 15");
-              var st = document.getElementById('sum_bus_CAVEPA-gain');
+            case "15": { // Output to CAVE Back
+              var st = document.getElementById('sum_bus_CAVE_Back-gain') || document.getElementById('sum_bus_CAVEPA-gain');
               break;
             }
             default:
