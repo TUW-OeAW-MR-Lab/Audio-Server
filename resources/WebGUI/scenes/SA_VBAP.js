@@ -191,6 +191,10 @@ export function SetDanteLedPcChannel3()
     sendValue('/app/SA_VBAP/osc/VirtualSource/3/Switch', 1);
     sendValue('/app/SA_VBAP/osc/VirtualSource/3/Volume/Set', 0);
     sendValues3('/app/SA_VBAP/osc/VirtualSource/3/Position/Set', 0, 0, 3.2);
+    sendValue('/matrix/state/settings/sum_bus_master/2/mute', 0); // Unmute Audio PC Left
+    sendValue('/matrix/state/settings/sum_bus_master/3/mute', 0); // Unmute Audio PC Right
+    sendValue('/matrix/state/settings/sum_bus_master/2/gain', 0); // set Audio PC Left to 0 dB
+    sendValue('/matrix/state/settings/sum_bus_master/3/gain', 0); // set Audio PC Right to 0 dB
   }
   else
   { 
