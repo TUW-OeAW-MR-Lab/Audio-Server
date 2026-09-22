@@ -80,3 +80,8 @@ export function toggleSumBusPAMute(state, btn_disable, slider_disable = false)
     sendValue('/matrix/state/settings/sum_bus_master/1/mute', 1);
 	}
 }
+
+export function EasyRouting()
+{
+  sendNoArgs('/matrix/state/settings/easy_routing/*');
+}

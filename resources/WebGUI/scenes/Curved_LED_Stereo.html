@@ -34,6 +34,12 @@
     <button onClick="SceneModule.GetStatus()" class="big-button">Get Routing Status</button>
     &nbsp;
     <button class="big-button" onClick="SceneModule.MuteAll();">Mute All</button>
+    &nbsp;
+    <button class="big-button" onClick="SceneModule.EasyRouting();">Easy Routing</button>
+    &nbsp;
+    <button class="big-button" onClick="sendValue('/matrix/state/settings/easy_routing/400', 128);">Set Curved PC</button>
+    &nbsp;
+    <button class="big-button" onClick="sendValue('/matrix/state/settings/easy_routing/400', 314);">Set Bluetooth</button>
   </div>
 
 </div>

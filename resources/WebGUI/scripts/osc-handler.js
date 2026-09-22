@@ -166,6 +166,9 @@ function sendResponseMatrixStateSettings(path, oscMsg)
 {
   switch (path[3])
   {
+    case 'easy_routing':
+      console.log("Received easy routing #"+ path[4] + " to " + oscMsg.args[0].value);
+      break;
     case 'flex_channel': 
       switch (path[5])
       {
