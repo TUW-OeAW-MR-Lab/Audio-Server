@@ -235,10 +235,8 @@ function setInputButtonExclusively(id, sceneName)
 	if (!isActive) // User wants to turn it ON
 	{
 		// Find any currently active simple buttons
-		inputNames.forEach(otherId => {
-			if (otherId === id) return;
-			const otherBtn = document.getElementById('btn-input-select-' + otherId);
-			if (otherBtn && otherBtn.classList.contains('active-input')) {
+		document.querySelectorAll('[id^="btn-input-select-"]').forEach(otherBtn => {
+			if (otherBtn !== bigBtn && otherBtn.classList.contains('active-input')) {
 				otherBtn.classList.remove('active-input');
 			}
 		});

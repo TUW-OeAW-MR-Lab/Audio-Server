@@ -1,0 +1,27 @@
+<div id="CAVE_Direct" class="scene-main">
+
+  <h3>Direct routing of audio inputs to CAVE loudspeakers.</h3>
+
+  <div class="start-container" style="height: 80%; justify-content: center; align-items: center;">
+    
+    <div class="button-group" style="width: 350px; height: 100%; gap: 0px;">
+      <span style="text-align: center; font-weight: bold; gap: 0px;">Input from:</span>
+      <div class="start-container" style="height: 100%; gap: 0px; justify-content: center; align-items: center;">
+        <div id="input-buttons-container" style="text-align: center; width: 100%;">
+          <div style="max-height: 350px; overflow-y: auto; display: flex; flex-direction: column; align-items: center; gap: 15px;">
+            <button id="btn-input-select-DANTE_CAVEPC" onClick="SceneModule.SetCavePc();" class="big-button">&nbsp;<br>CAVE PC<br>&nbsp;</button>
+            <button id="btn-input-select-DANTE_CurvedLEDPC" onClick="SceneModule.SetCurvedLedPc();" class="big-button">&nbsp;<br>Curved LED PC<br>&nbsp;</button>
+            <button id="btn-input-select-Curved_Wall_Bluetooth_Stereo" onClick="SceneModule.SetCurvedBluetooth();" class="big-button">&nbsp;<br>Curved Bluetooth<br>&nbsp;</button>
+            <button id="btn-input-select-DANTE_Mobile" onClick="SceneModule.SetDanteMobile();" class="big-button">&nbsp;<br>Mobile Dante<br>&nbsp;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="start-container" style="height: 8%; width: 100%; justify-content: center; align-items: center;">
+    <button id="btn-reset-default-routing" class="big-button" style="width: 250px;" onClick="SceneModule.ResetDefaultRouting();">Reset to Default</button>
+  </div>
+
+</div>
