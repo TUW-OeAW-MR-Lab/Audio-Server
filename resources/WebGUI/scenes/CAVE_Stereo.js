@@ -10,7 +10,7 @@ const sections = ['Front', 'Left', 'Right', 'Back'];
 export function init()
 {
   // Inject input controls and disabled buttons (same inputs as Curved_LED_Stereo)
-  renderInputControls('input-buttons-container', 'input-group-container', 'CAVE_Surround', 
+  renderInputControls('input-buttons-container', 'input-group-container', 'CAVE_Stereo', 
     ["DANTE_CurvedLEDPC", "DANTE_CurvedLEDPC_Channel_3", "DANTE_Mobile", "Mic_Array", 
       "DANTE_HDMI_Stereo", // to be setup later
     ]);
