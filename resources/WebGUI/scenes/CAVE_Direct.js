@@ -98,8 +98,8 @@ export function SetCurvedBluetooth()
     setActiveInput('btn-input-select-Curved_Wall_Bluetooth_Stereo');
     sendValue('/matrix/state/settings/easy_routing/400', 4136);
     sendValue('/matrix/state/settings/easy_routing/401', 4141);
-    sendValue('/matrix/state/settings/easy_routing/402', 314); // BT L to FL
-    sendValue('/matrix/state/settings/easy_routing/403', 315); // BT R to FR
+    sendValue('/matrix/state/settings/easy_routing/402', 314); // BT L to FWL
+    sendValue('/matrix/state/settings/easy_routing/403', 315); // BT R to FWR
     sendValue('/matrix/state/settings/easy_routing/404', 4156);
     sendValue('/matrix/state/settings/easy_routing/405', 4161);
     sendValue('/matrix/state/settings/easy_routing/406', 312); // BT Aux L to BL
