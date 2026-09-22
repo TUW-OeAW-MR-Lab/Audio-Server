@@ -4,7 +4,7 @@
 
   <div class="start-container" style="height: 80%;">
     
-    <div class="button-group" style="width: 45%; height: 100%; gap: 0px;">
+    <div class="button-group" style="width: 35%; height: 100%; gap: 0px;">
       <span style="text-align: center; font-weight: bold; gap: 0px;">Inputs</span>
       <div class="start-container" style="height: 100%; gap: 0px;">
         <div id="input-buttons-container" style="text-align: center;">
@@ -16,44 +16,80 @@
       </div>
     </div>
     
-    <div class="button-group" style="width: 55%; height: 100%; gap: 0px;">
+    <div class="button-group" style="width: 65%; height: 100%; gap: 0px;">
       <span style="text-align: center; font-weight: bold; gap: 0px;">CAVE Stereo</span>
       
-      <div class="start-container" style="height: 95%; text-align: center; gap: 0px; justify-content: space-evenly;">
-        <div class="slider-group" style="width: 25%;">
-          <b>Front</b>
-          <button id="btn-sum_bus_CAVE_Front-mute" class="small-button" style="width: 50px;" onclick="SceneModule.toggleFrontMute()">Off</button>          
-          <input id="sum_bus_CAVE_Front-volume-slider" class="volume-slider" style="height: 350px; opacity: 0.5;" type="range" min="-100" max="18" value="0" 
-            oninput="SceneModule.setVolumeFront(this.value)">
-          <div id="sum_bus_CAVE_Front-volume-number" class="level-box">--</div>
-          <span style="text-align: center; color: white;" id="sum_bus_CAVE_Front-gain">&nbsp;</span>
+      <div class="start-container" style="height: 95%; text-align: center; gap: 0px; justify-content: space-evenly; align-items: stretch;">
+        <div class="slider-group" style="width: 12.5%; height: 100%; justify-content: flex-start; padding-top: 130px;">
+          <b>BL</b>
+          <button id="btn-sum_bus_CAVE_BL-mute" class="small-button" style="width: 45px; padding: 5px 0;" onclick="SceneModule.toggleMute('BL')">Off</button>          
+          <input id="sum_bus_CAVE_BL-volume-slider" class="volume-slider" style="height: 190px; opacity: 0.5; margin: 8px 0px;" type="range" min="-100" max="18" value="0" 
+            oninput="SceneModule.setVolume('BL', this.value)">
+          <div id="sum_bus_CAVE_BL-volume-number" class="level-box" style="width: 55px; font-size: 0.8rem; padding: 3px 2px;">--</div>
+          <span style="text-align: center; color: white; font-size: 0.8rem;" id="sum_bus_CAVE_BL-gain">&nbsp;</span>
         </div>
 
-        <div class="slider-group" style="width: 25%;">
-          <b>Left</b>
-          <button id="btn-sum_bus_CAVE_Left-mute" class="small-button" style="width: 50px;" onclick="SceneModule.toggleLeftMute()">Off</button>          
-          <input id="sum_bus_CAVE_Left-volume-slider" class="volume-slider" style="height: 350px; opacity: 0.5;" type="range" min="-100" max="18" value="0" 
-            oninput="SceneModule.setVolumeLeft(this.value)">
-          <div id="sum_bus_CAVE_Left-volume-number" class="level-box">--</div>
-          <span style="text-align: center; color: white;" id="sum_bus_CAVE_Left-gain">&nbsp;</span>
+        <div class="slider-group" style="width: 12.5%; height: 100%; justify-content: flex-start; padding-top: 90px;">
+          <b>SL</b>
+          <button id="btn-sum_bus_CAVE_SL-mute" class="small-button" style="width: 45px; padding: 5px 0;" onclick="SceneModule.toggleMute('SL')">Off</button>          
+          <input id="sum_bus_CAVE_SL-volume-slider" class="volume-slider" style="height: 190px; opacity: 0.5; margin: 8px 0px;" type="range" min="-100" max="18" value="0" 
+            oninput="SceneModule.setVolume('SL', this.value)">
+          <div id="sum_bus_CAVE_SL-volume-number" class="level-box" style="width: 55px; font-size: 0.8rem; padding: 3px 2px;">--</div>
+          <span style="text-align: center; color: white; font-size: 0.8rem;" id="sum_bus_CAVE_SL-gain">&nbsp;</span>
         </div>
 
-        <div class="slider-group" style="width: 25%;">
-          <b>Right</b>
-          <button id="btn-sum_bus_CAVE_Right-mute" class="small-button" style="width: 50px;" onclick="SceneModule.toggleRightMute()">Off</button>          
-          <input id="sum_bus_CAVE_Right-volume-slider" class="volume-slider" style="height: 350px; opacity: 0.5;" type="range" min="-100" max="18" value="0" 
-            oninput="SceneModule.setVolumeRight(this.value)">
-          <div id="sum_bus_CAVE_Right-volume-number" class="level-box">--</div>
-          <span style="text-align: center; color: white;" id="sum_bus_CAVE_Right-gain">&nbsp;</span>
+        <div class="slider-group" style="width: 12.5%; height: 100%; justify-content: flex-start; padding-top: 50px;">
+          <b>FWL</b>
+          <button id="btn-sum_bus_CAVE_FWL-mute" class="small-button" style="width: 45px; padding: 5px 0;" onclick="SceneModule.toggleMute('FWL')">Off</button>          
+          <input id="sum_bus_CAVE_FWL-volume-slider" class="volume-slider" style="height: 190px; opacity: 0.5; margin: 8px 0px;" type="range" min="-100" max="18" value="0" 
+            oninput="SceneModule.setVolume('FWL', this.value)">
+          <div id="sum_bus_CAVE_FWL-volume-number" class="level-box" style="width: 55px; font-size: 0.8rem; padding: 3px 2px;">--</div>
+          <span style="text-align: center; color: white; font-size: 0.8rem;" id="sum_bus_CAVE_FWL-gain">&nbsp;</span>
         </div>
 
-        <div class="slider-group" style="width: 25%;">
-          <b>Back</b>
-          <button id="btn-sum_bus_CAVE_Back-mute" class="small-button" style="width: 50px;" onclick="SceneModule.toggleBackMute()">Off</button>          
-          <input id="sum_bus_CAVE_Back-volume-slider" class="volume-slider" style="height: 350px; opacity: 0.5;" type="range" min="-100" max="18" value="0" 
-            oninput="SceneModule.setVolumeBack(this.value)">
-          <div id="sum_bus_CAVE_Back-volume-number" class="level-box">--</div>
-          <span style="text-align: center; color: white;" id="sum_bus_CAVE_Back-gain">&nbsp;</span>
+        <div class="slider-group" style="width: 12.5%; height: 100%; justify-content: flex-start; padding-top: 10px;">
+          <b>FL</b>
+          <button id="btn-sum_bus_CAVE_FL-mute" class="small-button" style="width: 45px; padding: 5px 0;" onclick="SceneModule.toggleMute('FL')">Off</button>          
+          <input id="sum_bus_CAVE_FL-volume-slider" class="volume-slider" style="height: 190px; opacity: 0.5; margin: 8px 0px;" type="range" min="-100" max="18" value="0" 
+            oninput="SceneModule.setVolume('FL', this.value)">
+          <div id="sum_bus_CAVE_FL-volume-number" class="level-box" style="width: 55px; font-size: 0.8rem; padding: 3px 2px;">--</div>
+          <span style="text-align: center; color: white; font-size: 0.8rem;" id="sum_bus_CAVE_FL-gain">&nbsp;</span>
+        </div>
+
+        <div class="slider-group" style="width: 12.5%; height: 100%; justify-content: flex-start; padding-top: 10px;">
+          <b>FR</b>
+          <button id="btn-sum_bus_CAVE_FR-mute" class="small-button" style="width: 45px; padding: 5px 0;" onclick="SceneModule.toggleMute('FR')">Off</button>          
+          <input id="sum_bus_CAVE_FR-volume-slider" class="volume-slider" style="height: 190px; opacity: 0.5; margin: 8px 0px;" type="range" min="-100" max="18" value="0" 
+            oninput="SceneModule.setVolume('FR', this.value)">
+          <div id="sum_bus_CAVE_FR-volume-number" class="level-box" style="width: 55px; font-size: 0.8rem; padding: 3px 2px;">--</div>
+          <span style="text-align: center; color: white; font-size: 0.8rem;" id="sum_bus_CAVE_FR-gain">&nbsp;</span>
+        </div>
+
+        <div class="slider-group" style="width: 12.5%; height: 100%; justify-content: flex-start; padding-top: 50px;">
+          <b>FWR</b>
+          <button id="btn-sum_bus_CAVE_FWR-mute" class="small-button" style="width: 45px; padding: 5px 0;" onclick="SceneModule.toggleMute('FWR')">Off</button>          
+          <input id="sum_bus_CAVE_FWR-volume-slider" class="volume-slider" style="height: 190px; opacity: 0.5; margin: 8px 0px;" type="range" min="-100" max="18" value="0" 
+            oninput="SceneModule.setVolume('FWR', this.value)">
+          <div id="sum_bus_CAVE_FWR-volume-number" class="level-box" style="width: 55px; font-size: 0.8rem; padding: 3px 2px;">--</div>
+          <span style="text-align: center; color: white; font-size: 0.8rem;" id="sum_bus_CAVE_FWR-gain">&nbsp;</span>
+        </div>
+
+        <div class="slider-group" style="width: 12.5%; height: 100%; justify-content: flex-start; padding-top: 90px;">
+          <b>SR</b>
+          <button id="btn-sum_bus_CAVE_SR-mute" class="small-button" style="width: 45px; padding: 5px 0;" onclick="SceneModule.toggleMute('SR')">Off</button>          
+          <input id="sum_bus_CAVE_SR-volume-slider" class="volume-slider" style="height: 190px; opacity: 0.5; margin: 8px 0px;" type="range" min="-100" max="18" value="0" 
+            oninput="SceneModule.setVolume('SR', this.value)">
+          <div id="sum_bus_CAVE_SR-volume-number" class="level-box" style="width: 55px; font-size: 0.8rem; padding: 3px 2px;">--</div>
+          <span style="text-align: center; color: white; font-size: 0.8rem;" id="sum_bus_CAVE_SR-gain">&nbsp;</span>
+        </div>
+
+        <div class="slider-group" style="width: 12.5%; height: 100%; justify-content: flex-start; padding-top: 130px;">
+          <b>BR</b>
+          <button id="btn-sum_bus_CAVE_BR-mute" class="small-button" style="width: 45px; padding: 5px 0;" onclick="SceneModule.toggleMute('BR')">Off</button>          
+          <input id="sum_bus_CAVE_BR-volume-slider" class="volume-slider" style="height: 190px; opacity: 0.5; margin: 8px 0px;" type="range" min="-100" max="18" value="0" 
+            oninput="SceneModule.setVolume('BR', this.value)">
+          <div id="sum_bus_CAVE_BR-volume-number" class="level-box" style="width: 55px; font-size: 0.8rem; padding: 3px 2px;">--</div>
+          <span style="text-align: center; color: white; font-size: 0.8rem;" id="sum_bus_CAVE_BR-gain">&nbsp;</span>
         </div>
       </div>
     </div>

@@ -1,11 +1,15 @@
 const sectionChannels = {
-  'Front': [8, 9],
-  'Left': [10, 12],
-  'Right': [11, 13],
-  'Back': [14, 15]
+  'FL': 8,
+  'FR': 9,
+  'FWL': 10,
+  'FWR': 11,
+  'SL': 12,
+  'SR': 13,
+  'BL': 14,
+  'BR': 15
 };
 
-const sections = ['Front', 'Left', 'Right', 'Back'];
+const sections = ['BL', 'SL', 'FWL', 'FL', 'FR', 'FWR', 'SR', 'BR'];
 
 export function init()
 {
@@ -57,10 +61,9 @@ export function MuteAll()
 {
   sendValue('/matrix/state/settings/flex_channel/*/mute', 1);
   enableInputSelectButtons(true);
-  toggleFrontMute(false);
-  toggleLeftMute(false);
-  toggleRightMute(false);
-  toggleBackMute(false);
+  sections.forEach(sec => {
+    toggleMute(sec, false);
+  });
   showInputSection('none'); // Hide all input sections
 }
 
@@ -72,7 +75,7 @@ export function toggleMute(section, state, btn_disable, slider_disable = false)
 
   const isActive = btn.classList.contains('active-input');
   const turnOn = state === undefined ? !isActive : state;
-  const channels = sectionChannels[section] || [];
+  const ch = sectionChannels[section];
 
   if (turnOn) {
     btn.classList.add('active-input');
@@ -80,61 +83,58 @@ export function toggleMute(section, state, btn_disable, slider_disable = false)
     btn.disabled = btn_disable;
     slider.disabled = slider_disable;
     slider.style.opacity = "1.0";
-    channels.forEach(ch => {
-      sendValue(`/matrix/state/settings/sum_bus_master/${ch}/mute`, 0);
-    });
+    if (ch !== undefined) {
+      const channels = Array.isArray(ch) ? ch : [ch];
+      channels.forEach(c => {
+        sendValue(`/matrix/state/settings/sum_bus_master/${c}/mute`, 0);
+      });
+    }
   } else {
     btn.classList.remove('active-input');
     btn.innerText = "Off";
     btn.disabled = btn_disable;
     slider.disabled = slider_disable;
     slider.style.opacity = "0.5";
-    channels.forEach(ch => {
-      sendValue(`/matrix/state/settings/sum_bus_master/${ch}/mute`, 1);
-    });
+    if (ch !== undefined) {
+      const channels = Array.isArray(ch) ? ch : [ch];
+      channels.forEach(c => {
+        sendValue(`/matrix/state/settings/sum_bus_master/${c}/mute`, 1);
+      });
+    }
   }
-}
-
-export function toggleFrontMute(state, btn_disable, slider_disable = false) {
-  toggleMute('Front', state, btn_disable, slider_disable);
-}
-
-export function toggleLeftMute(state, btn_disable, slider_disable = false) {
-  toggleMute('Left', state, btn_disable, slider_disable);
-}
-
-export function toggleRightMute(state, btn_disable, slider_disable = false) {
-  toggleMute('Right', state, btn_disable, slider_disable);
-}
-
-export function toggleBackMute(state, btn_disable, slider_disable = false) {
-  toggleMute('Back', state, btn_disable, slider_disable);
 }
 
 export function setVolume(section, value)
 {
-  const channels = sectionChannels[section] || [];
-  channels.forEach(ch => {
-    sendValue(`/matrix/state/settings/sum_bus_master/${ch}/gain`, value);
-  });
+  const ch = sectionChannels[section];
+  if (ch !== undefined) {
+    const channels = Array.isArray(ch) ? ch : [ch];
+    channels.forEach(c => {
+      sendValue(`/matrix/state/settings/sum_bus_master/${c}/gain`, value);
+    });
+  }
   const num = document.getElementById(`sum_bus_CAVE_${section}-volume-number`);
   if (num) {
     num.innerText = value + ' dB';
   }
 }
 
-export function setVolumeFront(value) {
-  setVolume('Front', value);
-}
+// Section-specific toggle wrappers
+export function toggleFLMute(state, btn_disable, slider_disable = false) { toggleMute('FL', state, btn_disable, slider_disable); }
+export function toggleFRMute(state, btn_disable, slider_disable = false) { toggleMute('FR', state, btn_disable, slider_disable); }
+export function toggleFWLMute(state, btn_disable, slider_disable = false) { toggleMute('FWL', state, btn_disable, slider_disable); }
+export function toggleFWRMute(state, btn_disable, slider_disable = false) { toggleMute('FWR', state, btn_disable, slider_disable); }
+export function toggleSLMute(state, btn_disable, slider_disable = false) { toggleMute('SL', state, btn_disable, slider_disable); }
+export function toggleSRMute(state, btn_disable, slider_disable = false) { toggleMute('SR', state, btn_disable, slider_disable); }
+export function toggleBLMute(state, btn_disable, slider_disable = false) { toggleMute('BL', state, btn_disable, slider_disable); }
+export function toggleBRMute(state, btn_disable, slider_disable = false) { toggleMute('BR', state, btn_disable, slider_disable); }
 
-export function setVolumeLeft(value) {
-  setVolume('Left', value);
-}
-
-export function setVolumeRight(value) {
-  setVolume('Right', value);
-}
-
-export function setVolumeBack(value) {
-  setVolume('Back', value);
-}
+// Section-specific volume wrappers
+export function setVolumeFL(value) { setVolume('FL', value); }
+export function setVolumeFR(value) { setVolume('FR', value); }
+export function setVolumeFWL(value) { setVolume('FWL', value); }
+export function setVolumeFWR(value) { setVolume('FWR', value); }
+export function setVolumeSL(value) { setVolume('SL', value); }
+export function setVolumeSR(value) { setVolume('SR', value); }
+export function setVolumeBL(value) { setVolume('BL', value); }
+export function setVolumeBR(value) { setVolume('BR', value); }

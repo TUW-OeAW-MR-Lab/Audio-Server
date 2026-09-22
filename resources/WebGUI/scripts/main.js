@@ -39,7 +39,7 @@ async function loadScene(scene, clickedButton)
 	const activeScene = document.getElementById('scene-port');
 	try 
 	{		// Load the GUI page
-		const response = await fetch('scenes/' + scene + '.html');
+		const response = await fetch('scenes/' + scene + '.html', { cache: 'no-cache' });
 		if (!response.ok) throw new Error('Page not found');
 		const html = await response.text();
 		activeScene.innerHTML = html;

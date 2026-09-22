@@ -205,20 +205,28 @@ function sendResponseMatrixStateSettings(path, oscMsg)
               var st = document.getElementById('btn-sum_bus_AudioPC-mute');
               break;
             case "8":
+              var st = document.getElementById('btn-sum_bus_CAVE_FL-mute') || document.getElementById('btn-sum_bus_CAVEPA-mute');
+              break;
             case "9":
-              var st = document.getElementById('btn-sum_bus_CAVE_Front-mute') || document.getElementById('btn-sum_bus_CAVEPA-mute');
+              var st = document.getElementById('btn-sum_bus_CAVE_FR-mute') || document.getElementById('btn-sum_bus_CAVEPA-mute');
               break;
             case "10":
-            case "12":
-              var st = document.getElementById('btn-sum_bus_CAVE_Left-mute') || document.getElementById('btn-sum_bus_CAVEPA-mute');
+              var st = document.getElementById('btn-sum_bus_CAVE_FWL-mute') || document.getElementById('btn-sum_bus_CAVEPA-mute');
               break;
             case "11":
+              var st = document.getElementById('btn-sum_bus_CAVE_FWR-mute') || document.getElementById('btn-sum_bus_CAVEPA-mute');
+              break;
+            case "12":
+              var st = document.getElementById('btn-sum_bus_CAVE_SL-mute') || document.getElementById('btn-sum_bus_CAVEPA-mute');
+              break;
             case "13":
-              var st = document.getElementById('btn-sum_bus_CAVE_Right-mute') || document.getElementById('btn-sum_bus_CAVEPA-mute');
+              var st = document.getElementById('btn-sum_bus_CAVE_SR-mute') || document.getElementById('btn-sum_bus_CAVEPA-mute');
               break;
             case "14":
+              var st = document.getElementById('btn-sum_bus_CAVE_BL-mute') || document.getElementById('btn-sum_bus_CAVEPA-mute');
+              break;
             case "15":
-              var st = document.getElementById('btn-sum_bus_CAVE_Back-mute') || document.getElementById('btn-sum_bus_CAVEPA-mute');
+              var st = document.getElementById('btn-sum_bus_CAVE_BR-mute') || document.getElementById('btn-sum_bus_CAVEPA-mute');
               break;
           }
           if (!st) {
@@ -255,24 +263,36 @@ function sendResponseMatrixStateSettings(path, oscMsg)
               var st = document.getElementById('sum_bus_AudioPC-gain');                                             
               break;
             }
-            case "8":
-            case "9": { // Output to CAVE Front
-              var st = document.getElementById('sum_bus_CAVE_Front-gain') || document.getElementById('sum_bus_CAVEPA-gain');
+            case "8": { // Output to CAVE FL
+              var st = document.getElementById('sum_bus_CAVE_FL-gain') || document.getElementById('sum_bus_CAVEPA-gain');
               break;
             }
-            case "10":
-            case "12": { // Output to CAVE Left
-              var st = document.getElementById('sum_bus_CAVE_Left-gain') || document.getElementById('sum_bus_CAVEPA-gain');
+            case "9": { // Output to CAVE FR
+              var st = document.getElementById('sum_bus_CAVE_FR-gain') || document.getElementById('sum_bus_CAVEPA-gain');
               break;
             }
-            case "11":
-            case "13": { // Output to CAVE Right
-              var st = document.getElementById('sum_bus_CAVE_Right-gain') || document.getElementById('sum_bus_CAVEPA-gain');
+            case "10": { // Output to CAVE FWL
+              var st = document.getElementById('sum_bus_CAVE_FWL-gain') || document.getElementById('sum_bus_CAVEPA-gain');
               break;
             }
-            case "14":
-            case "15": { // Output to CAVE Back
-              var st = document.getElementById('sum_bus_CAVE_Back-gain') || document.getElementById('sum_bus_CAVEPA-gain');
+            case "11": { // Output to CAVE FWR
+              var st = document.getElementById('sum_bus_CAVE_FWR-gain') || document.getElementById('sum_bus_CAVEPA-gain');
+              break;
+            }
+            case "12": { // Output to CAVE SL
+              var st = document.getElementById('sum_bus_CAVE_SL-gain') || document.getElementById('sum_bus_CAVEPA-gain');
+              break;
+            }
+            case "13": { // Output to CAVE SR
+              var st = document.getElementById('sum_bus_CAVE_SR-gain') || document.getElementById('sum_bus_CAVEPA-gain');
+              break;
+            }
+            case "14": { // Output to CAVE BL
+              var st = document.getElementById('sum_bus_CAVE_BL-gain') || document.getElementById('sum_bus_CAVEPA-gain');
+              break;
+            }
+            case "15": { // Output to CAVE BR
+              var st = document.getElementById('sum_bus_CAVE_BR-gain') || document.getElementById('sum_bus_CAVEPA-gain');
               break;
             }
             default:
