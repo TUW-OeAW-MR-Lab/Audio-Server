@@ -19,7 +19,7 @@ function confirmDirectRouting(onConfirm)
     return;
   }
   document.getElementById('confirmTitle').innerText = "Warning!";
-  document.getElementById('confirmText').innerText = "This will route the outputs one-to-one, without any level changes to the CAVE speakers. Confirm that you have lowered the leves on your device to avoid speaker damage!";
+  document.getElementById('confirmText').innerText = "This will route the outputs one-to-one, without any level changes to the CAVE speakers. \n\n Confirm that you have lowered the levels on your source device to avoid speaker damage!";
   dialog.showModal();
 
   document.getElementById('okBtn').onclick = () => {
