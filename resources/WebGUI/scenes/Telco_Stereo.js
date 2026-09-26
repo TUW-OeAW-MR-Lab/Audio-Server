@@ -90,62 +90,89 @@ function enableDirectButtons(enable = true)
   });
 }
 
-export function SetCavePc()
+function updateInputButtonsAvailability(disabledInputId)
 {
-  setActiveInput('btn-direct-select-DANTE_CAVEPC');
-  sendValue('/matrix/state/settings/easy_routing/400', 256);
-  sendValue('/matrix/state/settings/easy_routing/401', 257);
-  sendValue('/matrix/state/settings/easy_routing/402', 258);
-  sendValue('/matrix/state/settings/easy_routing/403', 259);
-  sendValue('/matrix/state/settings/easy_routing/404', 260);
-  sendValue('/matrix/state/settings/easy_routing/405', 261);
-  sendValue('/matrix/state/settings/easy_routing/406', 262);
-  sendValue('/matrix/state/settings/easy_routing/407', 263);
+  const container = document.getElementById('input-buttons-container');
+  if (!container) return;
+  const buttons = container.querySelectorAll('button');
+  buttons.forEach(btn => {
+    btn.disabled = false;
+  });
+
+  if (disabledInputId) {
+    const targetBtn = document.getElementById('btn-input-select-' + disabledInputId);
+    if (targetBtn) {
+      targetBtn.disabled = true;
+      // If this input was active, mute it
+      if (targetBtn.classList.contains('active-input')) {
+        toggleInputState(disabledInputId, false);
+      }
+      // If this input's section was visible, hide it
+      const section = document.getElementById('input-section-' + disabledInputId);
+      if (section && section.style.display !== 'none') {
+        section.style.display = 'none';
+      }
+    }
+  }
 }
 
 export function SetCurvedLedPc()
 {
+  ResetDefaultRouting();
   setActiveInput('btn-direct-select-DANTE_CurvedLEDPC');
-  sendValue('/matrix/state/settings/easy_routing/400', 128);
-  sendValue('/matrix/state/settings/easy_routing/401', 129);
-  sendValue('/matrix/state/settings/easy_routing/402', 130);
-  sendValue('/matrix/state/settings/easy_routing/403', 131);
-  sendValue('/matrix/state/settings/easy_routing/404', 132);
-  sendValue('/matrix/state/settings/easy_routing/405', 133);
-  sendValue('/matrix/state/settings/easy_routing/406', 134);
-  sendValue('/matrix/state/settings/easy_routing/407', 135);
+  updateInputButtonsAvailability('DANTE_CurvedLEDPC_Stereo');
+  sendValue('/matrix/state/settings/easy_routing/128', 4096); // Curved PC L from Summing Bus Curved PA L
+  sendValue('/matrix/state/settings/easy_routing/129', 4101); // Curved PC R from Summing Bus Curved PA R
+  sendValue('/matrix/state/settings/easy_routing/318', 128); // Curved PA L from Curved PC L
+  sendValue('/matrix/state/settings/easy_routing/319', 129); // Curved PA R from Curved PC R
+  sendValue('/matrix/state/settings/easy_routing/400', 128); // CAVE PA FWL from Curved PC L
+  sendValue('/matrix/state/settings/easy_routing/401', 129); // CAVE PA FWR from Curved PC R
+}
+
+export function SetCavePc()
+{
+  ResetDefaultRouting();
+  setActiveInput('btn-direct-select-DANTE_CAVEPC');
+  updateInputButtonsAvailability('DANTE_CAVEPC_Stereo');
+  sendValue('/matrix/state/settings/easy_routing/256', 4136); // CAVE PC L from Summing Bus CAVE PA L
+  sendValue('/matrix/state/settings/easy_routing/257', 4141); // CAVE PC R from Summing Bus CAVE PA R
+  sendValue('/matrix/state/settings/easy_routing/318', 256); // Curved PA L from CAVE PC L
+  sendValue('/matrix/state/settings/easy_routing/319', 257); // Curved PA R from CAVE PC R
+  sendValue('/matrix/state/settings/easy_routing/400', 256); // CAVE PA FWL from CAVE PC L
+  sendValue('/matrix/state/settings/easy_routing/401', 257); // CAVE PA FWR from CAVE PC R
 }
 
 export function SetCurvedBluetooth()
 {
+  ResetDefaultRouting();
   setActiveInput('btn-direct-select-Curved_Wall_Bluetooth_Stereo');
-  sendValue('/matrix/state/settings/easy_routing/400', 4136);
-  sendValue('/matrix/state/settings/easy_routing/401', 4141);
-  sendValue('/matrix/state/settings/easy_routing/402', 314); // BT L to FWL
-  sendValue('/matrix/state/settings/easy_routing/403', 315); // BT R to FWR
-  sendValue('/matrix/state/settings/easy_routing/404', 4156);
-  sendValue('/matrix/state/settings/easy_routing/405', 4161);
-  sendValue('/matrix/state/settings/easy_routing/406', 312); // BT Aux L to BL
-  sendValue('/matrix/state/settings/easy_routing/407', 313); // BT Aux R to BR
+  updateInputButtonsAvailability('Curved_Wall_Bluetooth_Stereo');
+  sendValue('/matrix/state/settings/easy_routing/314', 4116); // CurvedWall BT L from Summing Bus CurvedWall BT L
+  sendValue('/matrix/state/settings/easy_routing/315', 4121); // CurvedWall BT R from Summing Bus CurvedWall BT R
+  sendValue('/matrix/state/settings/easy_routing/318', 378); // Curved PA L from CurvedWall BT L
+  sendValue('/matrix/state/settings/easy_routing/319', 379); // Curved PA R from CurvedWall BT R
+  sendValue('/matrix/state/settings/easy_routing/400', 378); // CAVE PA FWL from CurvedWall BT L
+  sendValue('/matrix/state/settings/easy_routing/401', 379); // CAVE PA FWR from CurvedWall BT R
 }
 
 export function SetDanteMobile()
 {
+  ResetDefaultRouting();
   setActiveInput('btn-direct-select-DANTE_Mobile');
-  sendValue('/matrix/state/settings/easy_routing/400', 160);
-  sendValue('/matrix/state/settings/easy_routing/401', 161);
-  sendValue('/matrix/state/settings/easy_routing/402', 162);
-  sendValue('/matrix/state/settings/easy_routing/403', 163);
-  sendValue('/matrix/state/settings/easy_routing/404', 164);
-  sendValue('/matrix/state/settings/easy_routing/405', 165);
-  sendValue('/matrix/state/settings/easy_routing/406', 166);
-  sendValue('/matrix/state/settings/easy_routing/407', 167);
+  updateInputButtonsAvailability('DANTE_Mobile_Stereo');
+  sendValue('/matrix/state/settings/easy_routing/160', 4126); // Mobile Dante L from Summing Bus Mobile Dante L
+  sendValue('/matrix/state/settings/easy_routing/161', 4131); // Mobile Dante R from Summing Bus Mobile Dante R
+  sendValue('/matrix/state/settings/easy_routing/318', 160); // Curved PA L from Mobile Dante L
+  sendValue('/matrix/state/settings/easy_routing/319', 161); // Curved PA R from Mobile Dante R
+  sendValue('/matrix/state/settings/easy_routing/400', 160); // CAVE PA FWL from Mobile Dante L
+  sendValue('/matrix/state/settings/easy_routing/401', 161); // CAVE PA FWR from Mobile Dante R
 }
 
 export function ResetDefaultRouting()
 {
   sendNoArgs('/matrix/cmd/recall_snapshot_5');
   clearActiveInputs();
+  updateInputButtonsAvailability(null);
 }
 
 export function setVolumeCurvedPA(value)
@@ -254,9 +281,4 @@ export function MuteAll()
   toggleSumBusCurvedPAMute(false);
   toggleStateCAVEPA(false);
   showInputSection('none'); // Hide all input sections
-}
-
-export function EasyRouting()
-{
-  sendNoArgs('/matrix/state/settings/easy_routing/*');
 }
