@@ -36,20 +36,18 @@
         
         <div class="slider-group">
           <b>CAVE PA</b>
-          <button id="btn-sum_bus_CAVEPA-mute" class="small-button" style="width: 50px;" onclick="SceneModule.toggleStateCAVEPA()">Off</button>          
-          <input id="sum_bus_CAVEPA-volume-slider" class="volume-slider" style="height: 350px; opacity: 0.5;" type="range" min="-100" max="18" value="0" 
+          <input id="output_gain_CAVEPA-volume-slider" class="volume-slider" style="height: 350px;" type="range" min="-100" max="18" value="0" 
             oninput="SceneModule.setVolumeCavePA(this.value)">
-          <div id="sum_bus_CAVEPA-volume-number" class="level-box">--</div>
-          <span style="text-align: center; color: white;" id="sum_bus_CAVEPA-gain">&nbsp;</span>
+          <div id="output_gain_CAVEPA-volume-number" class="level-box">--</div>
+          <span style="text-align: center; color: white;" id="output_gain_CAVEPA-gain">&nbsp;</span>
         </div>
 
         <div class="slider-group">
           <b>Curved PA</b>
-          <button id="btn-sum_bus_CurvedPA-mute" class="small-button" style="width: 50px;" onclick="SceneModule.toggleSumBusCurvedPAMute()">Off</button>          
-          <input id="sum_bus_CurvedPA-volume-slider" class="volume-slider" style="height: 350px; opacity: 0.5;" type="range" min="-100" max="18" value="0" 
+          <input id="output_gain_CurvedPA-volume-slider" class="volume-slider" style="height: 350px;" type="range" min="-100" max="18" value="0" 
             oninput="SceneModule.setVolumeCurvedPA(this.value)">
-          <div id="sum_bus_CurvedPA-volume-number" class="level-box">--</div>
-          <span style="text-align: center; color: white;" id="sum_bus_CurvedPA-gain">&nbsp;</span>
+          <div id="output_gain_CurvedPA-volume-number" class="level-box">--</div>
+          <span style="text-align: center; color: white;" id="output_gain_CurvedPA-gain">&nbsp;</span>
         </div>
 
       </div>

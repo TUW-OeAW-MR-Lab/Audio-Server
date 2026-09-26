@@ -328,6 +328,31 @@ function sendResponseMatrixStateSettings(path, oscMsg)
           }
           break;
       }
-      break;                   
+      break;
+
+    case 'output_gain':
+      var ch = path[4];
+      if (ch === 'gain' && path[5]) ch = path[5];
+      var st = null;
+      switch (ch)
+      {
+        case "318":
+        case "319": // Output to Curved LED PA
+          st = document.getElementById('output_gain_CurvedPA-gain');
+          break;
+        case "400":
+        case "401": // Output to CAVE PA FWL/FWR
+          st = document.getElementById('output_gain_CAVEPA-gain');
+          break;
+        default:
+          break;
+      }
+      if (!st) {
+        return;
+      }
+      st.innerHTML = oscMsg.args[0].value;
+      var statusEvent = new CustomEvent('updated', { detail: { time: Date.now() } });
+      st.dispatchEvent(statusEvent); // dispatch an event that the status has changed
+      break;
   }
 }
