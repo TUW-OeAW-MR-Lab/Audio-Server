@@ -74,6 +74,7 @@ export function SetCavePc()
     sendValue('/matrix/state/settings/easy_routing/405', 261);
     sendValue('/matrix/state/settings/easy_routing/406', 262);
     sendValue('/matrix/state/settings/easy_routing/407', 263);
+    lockScene('CAVE_Direct');
   });
 }
 
@@ -89,6 +90,7 @@ export function SetCurvedLedPc()
     sendValue('/matrix/state/settings/easy_routing/405', 133);
     sendValue('/matrix/state/settings/easy_routing/406', 134);
     sendValue('/matrix/state/settings/easy_routing/407', 135);
+    lockScene('CAVE_Direct');
   });
 }
 
@@ -104,6 +106,7 @@ export function SetCurvedBluetooth()
     sendValue('/matrix/state/settings/easy_routing/405', 4161);
     sendValue('/matrix/state/settings/easy_routing/406', 312); // BT Aux L to BL
     sendValue('/matrix/state/settings/easy_routing/407', 313); // BT Aux R to BR
+    lockScene('CAVE_Direct');
   });
 }
 
@@ -119,11 +122,21 @@ export function SetDanteMobile()
     sendValue('/matrix/state/settings/easy_routing/405', 165);
     sendValue('/matrix/state/settings/easy_routing/406', 166);
     sendValue('/matrix/state/settings/easy_routing/407', 167);
+    lockScene('CAVE_Direct');
   });
 }
 
-export function ResetDefaultRouting()
+export async function ResetDefaultRouting()
 {
-  sendNoArgs('/matrix/cmd/recall_snapshot_5');
-  clearActiveInputs();
+  const btn = document.getElementById('btn-reset-default-routing');
+
+  if (btn) btn.disabled = true;
+
+  try {
+    sendNoArgs('/matrix/cmd/recall_snapshot_5');
+    await new Promise(resolve => setTimeout(resolve, 500));
+    clearActiveInputs();
+  } finally {
+    if (btn) btn.disabled = false;
+  }
 }

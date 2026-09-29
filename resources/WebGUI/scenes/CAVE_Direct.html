@@ -1,6 +1,6 @@
 <div id="CAVE_Direct" class="scene-main">
 
-  <h3>Direct routing of audio inputs to CAVE loudspeakers.</h3>
+  <h3>Direct routing of up to 8 audio inputs from a device to the CAVE loudspeakers. The spatial-audio area is not used.</h3>
 
   <div class="start-container" style="height: 80%; justify-content: center; align-items: center;">
     
@@ -21,7 +21,7 @@
   </div>
 
   <div class="start-container" style="height: 8%; width: 100%; justify-content: center; align-items: center;">
-    <button id="btn-reset-default-routing" class="big-button" style="width: 250px;" onClick="SceneModule.ResetDefaultRouting();">Reset to Default</button>
+    <button id="btn-reset-default-routing" class="big-button" style="width: 250px;" onClick="SceneModule.ResetDefaultRouting(); unlockScene('CAVE_Direct');">Reset and Quit</button>
   </div>
 
 </div>

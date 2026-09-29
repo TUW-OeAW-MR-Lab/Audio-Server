@@ -195,13 +195,9 @@ export function SetDanteMobile()
   });
 }
 
-export async function ResetDefaultRouting(eventOrButton)
+export async function ResetDefaultRouting()
 {
-  const btn = (eventOrButton instanceof HTMLElement) ? eventOrButton
-    : (eventOrButton?.currentTarget instanceof HTMLElement) ? eventOrButton.currentTarget
-    : document.getElementById('btn-reset-default-routing')
-    || document.querySelector("button[onclick*='ResetDefaultRouting' i]")
-    || Array.from(document.querySelectorAll('button')).find(b => b.textContent.trim() === 'Reset to Default');
+  const btn = document.getElementById('btn-reset-default-routing');
 
   if (btn) btn.disabled = true;
 

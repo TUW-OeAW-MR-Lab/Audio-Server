@@ -1,6 +1,6 @@
 <div id="Telco_Stereo" class="scene-main">
 
-  <h3>Teleconference: A device records from stereo inputs and plays via two channels of a PA.</h3>
+  <h3>Teleconference: A device records stereo inputs and plays via two channels of a PA. The spatial-audio area is not used.</h3>
 
   <div class="start-container" style="height: 80%;">
     
@@ -56,11 +56,7 @@
   </div>
   
   <div class="start-container" style="height: 8%; width: 100%; justify-content: center;">
-    <button onClick="SceneModule.GetStatus()" class="big-button">Get Routing Status</button>
-    &nbsp;
-    <button class="big-button" onClick="SceneModule.MuteAll();">Mute All</button>
-    &nbsp;
-    <button class="big-button" onClick="SceneModule.ResetDefaultRouting(); unlockScene('Telco_Stereo');">Reset to Default</button>
+    <button id="btn-reset-default-routing" class="big-button" onClick="SceneModule.ResetDefaultRouting(); unlockScene('Telco_Stereo');">Reset and Quit</button>
   </div>
 
 </div>
