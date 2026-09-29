@@ -1,6 +1,7 @@
 
 let secWaited = 0; // Global counter for seconds waited after some action
 let SceneModule = null; // Module for all Scene-related scripts, will be loaded from scripts/%scene-name%.js
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
     // Load the version number
 fetch('version.txt')

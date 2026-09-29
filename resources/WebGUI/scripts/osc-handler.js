@@ -167,7 +167,7 @@ function sendResponseMatrixStateSettings(path, oscMsg)
   switch (path[3])
   {
     case 'easy_routing':
-      console.log("Received easy routing #"+ path[4] + " to " + oscMsg.args[0].value);
+      // console.log("Received easy routing #"+ path[4] + " to " + oscMsg.args[0].value);
       break;
     case 'flex_channel': 
       switch (path[5])
@@ -175,7 +175,7 @@ function sendResponseMatrixStateSettings(path, oscMsg)
         case 'mute':
           if (inputFlexChannelMap[path[4]]!="")
           {
-            console.log("Received mute #"+ path[4] + " -> " + inputFlexChannelMap[path[4]]);
+            //console.log("Received mute #"+ path[4] + " -> " + inputFlexChannelMap[path[4]]);
             toggleInputState(inputFlexChannelMap[path[4]], !oscMsg.args[0].value);
           }
           break;
