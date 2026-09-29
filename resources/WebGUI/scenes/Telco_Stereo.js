@@ -90,83 +90,129 @@ function updateInputButtonsAvailability(disabledInputId)
   }
 }
 
+function confirmRoutingReset(onConfirm)
+{
+  const dialog = document.getElementById('confirmDialog');
+  if (!dialog) {
+    onConfirm();
+    return;
+  }
+  document.getElementById('confirmTitle').innerText = "Warning!";
+  document.getElementById('confirmText').innerText = "This will reset the current routing! Confirm to continue...";
+  dialog.showModal();
+
+  document.getElementById('okBtn').onclick = () => {
+    dialog.close();
+    onConfirm();
+  };
+
+  document.getElementById('cancelBtn').onclick = () => {
+    dialog.close();
+  };
+}
+
 export function SetCurvedLedPc()
 {
-  ResetDefaultRouting();
-  setActiveInput('btn-direct-select-DANTE_CurvedLEDPC');
-  updateInputButtonsAvailability('DANTE_CurvedLEDPC_Stereo');
-  sendValue('/matrix/state/settings/output_gain/318', -100); // Mute Curved PA L
-  sendValue('/matrix/state/settings/output_gain/319', -100); // Mute Curved PA R
-  sendValue('/matrix/state/settings/output_gain/400', -100); // Mute CAVE PA FWL
-  sendValue('/matrix/state/settings/output_gain/401', -100); // Mute CAVE PA FWR
-  sendValue('/matrix/state/settings/easy_routing/318', 128); // Curved PA L from Curved PC L
-  sendValue('/matrix/state/settings/easy_routing/319', 129); // Curved PA R from Curved PC R
-  sendValue('/matrix/state/settings/easy_routing/400', 128); // CAVE PA FWL from Curved PC L
-  sendValue('/matrix/state/settings/easy_routing/401', 129); // CAVE PA FWR from Curved PC R
-  GetStatus();
-  sendValue('/matrix/state/settings/sum_bus_master/0/mute', 0); // Unmute Summing Bus Curved PA L 
-  sendValue('/matrix/state/settings/sum_bus_master/1/mute', 0); // Unmute Summing Bus Curved PA R*/
+  confirmRoutingReset(async () => {
+    await ResetDefaultRouting();
+    setActiveInput('btn-direct-select-DANTE_CurvedLEDPC');
+    updateInputButtonsAvailability('DANTE_CurvedLEDPC_Stereo');
+    sendValue('/matrix/state/settings/output_gain/318', -100); // Mute Curved PA L
+    sendValue('/matrix/state/settings/output_gain/319', -100); // Mute Curved PA R
+    sendValue('/matrix/state/settings/output_gain/400', -100); // Mute CAVE PA FWL
+    sendValue('/matrix/state/settings/output_gain/401', -100); // Mute CAVE PA FWR
+    sendValue('/matrix/state/settings/easy_routing/318', 128); // Curved PA L from Curved PC L
+    sendValue('/matrix/state/settings/easy_routing/319', 129); // Curved PA R from Curved PC R
+    sendValue('/matrix/state/settings/easy_routing/400', 128); // CAVE PA FWL from Curved PC L
+    sendValue('/matrix/state/settings/easy_routing/401', 129); // CAVE PA FWR from Curved PC R
+    GetStatus();
+    sendValue('/matrix/state/settings/sum_bus_master/0/mute', 0); // Unmute Summing Bus Curved PA L 
+    sendValue('/matrix/state/settings/sum_bus_master/1/mute', 0); // Unmute Summing Bus Curved PA R*/
+    lockScene('Telco_Stereo');
+  });
 }
 
 export async function SetCavePc()
 {
-  ResetDefaultRouting();
-  setActiveInput('btn-direct-select-DANTE_CAVEPC');
-  updateInputButtonsAvailability('DANTE_CAVEPC_Stereo');
-  sendValue('/matrix/state/settings/output_gain/318', -100); // Mute Curved PA L
-  sendValue('/matrix/state/settings/output_gain/319', -100); // Mute Curved PA R
-  sendValue('/matrix/state/settings/output_gain/400', -100); // Mute CAVE PA FWL
-  sendValue('/matrix/state/settings/output_gain/401', -100); // Mute CAVE PA FWR
-  sendValue('/matrix/state/settings/easy_routing/318', 256); // Curved PA L from CAVE PC L
-  sendValue('/matrix/state/settings/easy_routing/319', 257); // Curved PA R from CAVE PC R
-  sendValue('/matrix/state/settings/easy_routing/400', 256); // CAVE PA FWL from CAVE PC L
-  sendValue('/matrix/state/settings/easy_routing/401', 257); // CAVE PA FWR from CAVE PC R
-  GetStatus();
-  sendValue('/matrix/state/settings/sum_bus_master/8/mute', 0); // Unmute Summing Bus CAVE PA FWL 
-  sendValue('/matrix/state/settings/sum_bus_master/9/mute', 0); // Unmute Summing Bus CAVE PA FWR
+  confirmRoutingReset(async () => {
+    await ResetDefaultRouting();
+    setActiveInput('btn-direct-select-DANTE_CAVEPC');
+    updateInputButtonsAvailability('DANTE_CAVEPC_Stereo');
+    sendValue('/matrix/state/settings/output_gain/318', -100); // Mute Curved PA L
+    sendValue('/matrix/state/settings/output_gain/319', -100); // Mute Curved PA R
+    sendValue('/matrix/state/settings/output_gain/400', -100); // Mute CAVE PA FWL
+    sendValue('/matrix/state/settings/output_gain/401', -100); // Mute CAVE PA FWR
+    sendValue('/matrix/state/settings/easy_routing/318', 256); // Curved PA L from CAVE PC L
+    sendValue('/matrix/state/settings/easy_routing/319', 257); // Curved PA R from CAVE PC R
+    sendValue('/matrix/state/settings/easy_routing/400', 256); // CAVE PA FWL from CAVE PC L
+    sendValue('/matrix/state/settings/easy_routing/401', 257); // CAVE PA FWR from CAVE PC R
+    GetStatus();
+    sendValue('/matrix/state/settings/sum_bus_master/8/mute', 0); // Unmute Summing Bus CAVE PA FWL 
+    sendValue('/matrix/state/settings/sum_bus_master/9/mute', 0); // Unmute Summing Bus CAVE PA FWR
+    lockScene('Telco_Stereo');
+  });
 }
 
 export function SetCurvedBluetooth()
 {
-  ResetDefaultRouting();
-  setActiveInput('btn-direct-select-Curved_Wall_Bluetooth_Stereo');
-  updateInputButtonsAvailability('Curved_Wall_Bluetooth_Stereo');
-  sendValue('/matrix/state/settings/output_gain/318', -100); // Mute Curved PA L
-  sendValue('/matrix/state/settings/output_gain/319', -100); // Mute Curved PA R
-  sendValue('/matrix/state/settings/output_gain/400', -100); // Mute CAVE PA FWL
-  sendValue('/matrix/state/settings/output_gain/401', -100); // Mute CAVE PA FWR
-  sendValue('/matrix/state/settings/easy_routing/318', 314); // Curved PA L from CurvedWall BT L
-  sendValue('/matrix/state/settings/easy_routing/319', 315); // Curved PA R from CurvedWall BT R
-  sendValue('/matrix/state/settings/easy_routing/400', 314); // CAVE PA FWL from CurvedWall BT L
-  sendValue('/matrix/state/settings/easy_routing/401', 315); // CAVE PA FWR from CurvedWall BT R
-  GetStatus();
-  sendValue('/matrix/state/settings/sum_bus_master/4/mute', 0); // Unmute Summing Bus CurvedWall BT L 
-  sendValue('/matrix/state/settings/sum_bus_master/5/mute', 0); // Unmute Summing Bus CurvedWall BT R
+  confirmRoutingReset(async () => {
+    await ResetDefaultRouting();
+    setActiveInput('btn-direct-select-Curved_Wall_Bluetooth_Stereo');
+    updateInputButtonsAvailability('Curved_Wall_Bluetooth_Stereo');
+    sendValue('/matrix/state/settings/output_gain/318', -100); // Mute Curved PA L
+    sendValue('/matrix/state/settings/output_gain/319', -100); // Mute Curved PA R
+    sendValue('/matrix/state/settings/output_gain/400', -100); // Mute CAVE PA FWL
+    sendValue('/matrix/state/settings/output_gain/401', -100); // Mute CAVE PA FWR
+    sendValue('/matrix/state/settings/easy_routing/318', 314); // Curved PA L from CurvedWall BT L
+    sendValue('/matrix/state/settings/easy_routing/319', 315); // Curved PA R from CurvedWall BT R
+    sendValue('/matrix/state/settings/easy_routing/400', 314); // CAVE PA FWL from CurvedWall BT L
+    sendValue('/matrix/state/settings/easy_routing/401', 315); // CAVE PA FWR from CurvedWall BT R
+    GetStatus();
+    sendValue('/matrix/state/settings/sum_bus_master/4/mute', 0); // Unmute Summing Bus CurvedWall BT L 
+    sendValue('/matrix/state/settings/sum_bus_master/5/mute', 0); // Unmute Summing Bus CurvedWall BT R
+    lockScene('Telco_Stereo');
+  });
 }
 
 export function SetDanteMobile()
 {
-  ResetDefaultRouting();
-  setActiveInput('btn-direct-select-DANTE_Mobile');
-  updateInputButtonsAvailability('DANTE_Mobile_Stereo');
-  sendValue('/matrix/state/settings/output_gain/318', -100); // Mute Curved PA L
-  sendValue('/matrix/state/settings/output_gain/319', -100); // Mute Curved PA R
-  sendValue('/matrix/state/settings/output_gain/400', -100); // Mute CAVE PA FWL
-  sendValue('/matrix/state/settings/output_gain/401', -100); // Mute CAVE PA FWR
-  sendValue('/matrix/state/settings/easy_routing/318', 160); // Curved PA L from Mobile Dante L
-  sendValue('/matrix/state/settings/easy_routing/319', 161); // Curved PA R from Mobile Dante R
-  sendValue('/matrix/state/settings/easy_routing/400', 160); // CAVE PA FWL from Mobile Dante L
-  sendValue('/matrix/state/settings/easy_routing/401', 161); // CAVE PA FWR from Mobile Dante R
-  GetStatus();
-  sendValue('/matrix/state/settings/sum_bus_master/6/mute', 0); // Unmute Summing Bus Mobile Dante L 
-  sendValue('/matrix/state/settings/sum_bus_master/7/mute', 0); // Unmute Summing Bus Mobile Dante R
+  confirmRoutingReset(async () => {
+    await ResetDefaultRouting();
+    setActiveInput('btn-direct-select-DANTE_Mobile');
+    updateInputButtonsAvailability('DANTE_Mobile_Stereo');
+    sendValue('/matrix/state/settings/output_gain/318', -100); // Mute Curved PA L
+    sendValue('/matrix/state/settings/output_gain/319', -100); // Mute Curved PA R
+    sendValue('/matrix/state/settings/output_gain/400', -100); // Mute CAVE PA FWL
+    sendValue('/matrix/state/settings/output_gain/401', -100); // Mute CAVE PA FWR
+    sendValue('/matrix/state/settings/easy_routing/318', 160); // Curved PA L from Mobile Dante L
+    sendValue('/matrix/state/settings/easy_routing/319', 161); // Curved PA R from Mobile Dante R
+    sendValue('/matrix/state/settings/easy_routing/400', 160); // CAVE PA FWL from Mobile Dante L
+    sendValue('/matrix/state/settings/easy_routing/401', 161); // CAVE PA FWR from Mobile Dante R
+    GetStatus();
+    sendValue('/matrix/state/settings/sum_bus_master/6/mute', 0); // Unmute Summing Bus Mobile Dante L 
+    sendValue('/matrix/state/settings/sum_bus_master/7/mute', 0); // Unmute Summing Bus Mobile Dante R
+    lockScene('Telco_Stereo');
+  });
 }
 
-export function ResetDefaultRouting()
+export async function ResetDefaultRouting(eventOrButton)
 {
-  sendNoArgs('/matrix/cmd/recall_snapshot_5');
-  clearActiveInputs();
-  updateInputButtonsAvailability(null);
+  const btn = (eventOrButton instanceof HTMLElement) ? eventOrButton
+    : (eventOrButton?.currentTarget instanceof HTMLElement) ? eventOrButton.currentTarget
+    : document.getElementById('btn-reset-default-routing')
+    || document.querySelector("button[onclick*='ResetDefaultRouting' i]")
+    || Array.from(document.querySelectorAll('button')).find(b => b.textContent.trim() === 'Reset to Default');
+
+  if (btn) btn.disabled = true;
+
+  try {
+    sendNoArgs('/matrix/cmd/recall_snapshot_5');
+    await new Promise(resolve => setTimeout(resolve, 500));
+    clearActiveInputs();
+    updateInputButtonsAvailability(null);
+  } finally {
+    if (btn) btn.disabled = false;
+  }
 }
 
 export function setVolumeCurvedPA(value)
