@@ -1,0 +1,82 @@
+<div id="Headphones" class="scene-main">
+
+  <h3>Headphone outputs with per-input routing switches, mute control, and master levels.</h3>
+
+  <div class="start-container" style="height: 80%;">
+    
+    <div class="button-group" style="width: 35%; height: 100%; gap: 0px;">
+      <span style="text-align: center; font-weight: bold; gap: 0px;">Inputs</span>
+      <div class="start-container" style="height: 100%; gap: 0px;">
+        <div id="input-buttons-container" style="text-align: center;">
+          <!-- Input buttons will be injected here by input-controls.js -->
+        </div>
+        <div id="input-group-container" class="input-group" style="text-align: center; gap: 0px;">
+          <!-- Input sections will be injected here by input-controls.js -->
+        </div>
+      </div>
+    </div>
+    
+    <div class="button-group" style="width: 65%; height: 100%; gap: 0px;">
+      <span style="text-align: center; font-weight: bold; gap: 0px;">Headphones</span>
+      
+      <div class="start-container" style="height: 95%; text-align: center; gap: 0px; justify-content: space-evenly; align-items: stretch;">
+        
+        <!-- HP 1 -->
+        <div class="slider-group" style="width: 22%; height: 100%; justify-content: flex-start; padding-top: 25px;">
+          <button id="btn-hp-switch-1" class="small-button" style="width: 50px; padding: 5px 0; margin-bottom: 15px; visibility: hidden;" onclick="SceneModule.toggleHpSwitch(1)">Off</button>
+          <b>HP 1</b>
+          <button id="btn-hp-1-mute" class="small-button" style="width: 50px; padding: 5px 0; margin-top: 5px;" onclick="SceneModule.toggleMute(1)">Off</button>
+          <input id="hp-1-volume-slider" class="volume-slider" style="height: 190px; opacity: 0.5; margin: 8px 0px;" type="range" min="-100" max="18" value="0" 
+            oninput="SceneModule.setVolume(1, this.value)">
+          <div id="hp-1-volume-number" class="level-box" style="width: 55px; font-size: 0.8rem; padding: 3px 2px;">--</div>
+          <span style="text-align: center; color: white; font-size: 0.8rem;" id="hp-1-gain">&nbsp;</span>
+        </div>
+
+        <!-- HP 2 -->
+        <div class="slider-group" style="width: 22%; height: 100%; justify-content: flex-start; padding-top: 25px;">
+          <button id="btn-hp-switch-2" class="small-button" style="width: 50px; padding: 5px 0; margin-bottom: 15px; visibility: hidden;" onclick="SceneModule.toggleHpSwitch(2)">Off</button>
+          <b>HP 2</b>
+          <button id="btn-hp-2-mute" class="small-button" style="width: 50px; padding: 5px 0; margin-top: 5px;" onclick="SceneModule.toggleMute(2)">Off</button>
+          <input id="hp-2-volume-slider" class="volume-slider" style="height: 190px; opacity: 0.5; margin: 8px 0px;" type="range" min="-100" max="18" value="0" 
+            oninput="SceneModule.setVolume(2, this.value)">
+          <div id="hp-2-volume-number" class="level-box" style="width: 55px; font-size: 0.8rem; padding: 3px 2px;">--</div>
+          <span style="text-align: center; color: white; font-size: 0.8rem;" id="hp-2-gain">&nbsp;</span>
+        </div>
+
+        <!-- HP 3 -->
+        <div class="slider-group" style="width: 22%; height: 100%; justify-content: flex-start; padding-top: 25px;">
+          <button id="btn-hp-switch-3" class="small-button" style="width: 50px; padding: 5px 0; margin-bottom: 15px; visibility: hidden;" onclick="SceneModule.toggleHpSwitch(3)">Off</button>
+          <b>HP 3</b>
+          <button id="btn-hp-3-mute" class="small-button" style="width: 50px; padding: 5px 0; margin-top: 5px;" onclick="SceneModule.toggleMute(3)">Off</button>
+          <input id="hp-3-volume-slider" class="volume-slider" style="height: 190px; opacity: 0.5; margin: 8px 0px;" type="range" min="-100" max="18" value="0" 
+            oninput="SceneModule.setVolume(3, this.value)">
+          <div id="hp-3-volume-number" class="level-box" style="width: 55px; font-size: 0.8rem; padding: 3px 2px;">--</div>
+          <span style="text-align: center; color: white; font-size: 0.8rem;" id="hp-3-gain">&nbsp;</span>
+        </div>
+
+        <!-- HP 4 -->
+        <div class="slider-group" style="width: 22%; height: 100%; justify-content: flex-start; padding-top: 25px;">
+          <button id="btn-hp-switch-4" class="small-button" style="width: 50px; padding: 5px 0; margin-bottom: 15px; visibility: hidden;" onclick="SceneModule.toggleHpSwitch(4)">Off</button>
+          <b>HP 4</b>
+          <button id="btn-hp-4-mute" class="small-button" style="width: 50px; padding: 5px 0; margin-top: 5px;" onclick="SceneModule.toggleMute(4)">Off</button>
+          <input id="hp-4-volume-slider" class="volume-slider" style="height: 190px; opacity: 0.5; margin: 8px 0px;" type="range" min="-100" max="18" value="0" 
+            oninput="SceneModule.setVolume(4, this.value)">
+          <div id="hp-4-volume-number" class="level-box" style="width: 55px; font-size: 0.8rem; padding: 3px 2px;">--</div>
+          <span style="text-align: center; color: white; font-size: 0.8rem;" id="hp-4-gain">&nbsp;</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="start-container" style="height: 8%; width: 100%; justify-content: center;">
+    <button onClick="SceneModule.GetStatus();" class="big-button">Get Input Status</button>
+    &nbsp;
+    <button class="big-button" onClick="SceneModule.MuteAllInputs();">Mute All Inputs</button>
+    &nbsp;
+    <button class="big-button" onClick="SceneModule.MuteAllHPs();">Mute All Headphones</button>
+    &nbsp;
+    <button class="big-button" onClick="SceneModule.ResetToDefault();">Reset to Default</button>
+  </div>
+
+</div>

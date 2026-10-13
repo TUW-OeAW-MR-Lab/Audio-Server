@@ -77,6 +77,44 @@ const inputFlexChannelMap = {
     31: "",
 };
 
+const inputFlexChannelSide = {
+    0: "LR",
+    1: "LR",
+    2: "LR",
+    3: "LR",
+    4: "LR",
+    5: "LR",
+    6: "L",
+    7: "R",
+    8: "L",
+    9: "R",
+    10: "L",
+    11: "R",
+    12: "L",
+    13: "R",
+    14: "L",
+    15: "R",
+    16: "L",
+    17: "R",
+    18: "L",
+    19: "R",
+    20: "L",
+    21: "R",
+    22: "",
+    23: "",
+    24: "L",
+    25: "R",
+    26: "",
+    27: "",
+    28: "",
+    29: "",
+    30: "",
+    31: "",
+};
+
+window.inputFlexChannelMap = inputFlexChannelMap;
+window.inputFlexChannelSide = inputFlexChannelSide;
+
 function renderInputControls(buttonContainerId, groupContainerId, sceneName, hiddenInputs = []) {
     const btnContainer = document.getElementById(buttonContainerId);
     if (btnContainer) {
@@ -148,6 +186,9 @@ function showInputSection(id)
 	// show the selected input section
 	const section = document.getElementById('input-section-' + id);
 	if (section) section.style.display = 'flex';
+
+	const event = new CustomEvent('inputSectionChanged', { detail: { inputId: id } });
+	document.dispatchEvent(event);
 }
 
     // id: input name, see inputNames

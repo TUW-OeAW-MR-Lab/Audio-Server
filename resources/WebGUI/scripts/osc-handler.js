@@ -192,6 +192,10 @@ function sendResponseMatrixStateSettings(path, oscMsg)
       }
       break;
 
+    case 'sum_bus_assign_dsp':
+      console.log("Received sum bus assign dsp #" + path[4] + " and segment #" + path[6] + " set to: " + oscMsg.args[0].value);
+      break;
+
     case 'sum_bus_master':
       //console.log(oscMsg);
       switch (path[5])
@@ -230,6 +234,18 @@ function sendResponseMatrixStateSettings(path, oscMsg)
               break;
             case "15":
               var st = document.getElementById('btn-sum_bus_CAVE_BR-mute') || document.getElementById('btn-sum_bus_CAVEPA-mute');
+              break;
+            case "24", "25":
+              var st = document.getElementById('btn-sum_bus_HP1-mute');
+              break;
+            case "26", "27":
+              var st = document.getElementById('btn-sum_bus_HP2-mute');
+              break;
+            case "28", "29":
+              var st = document.getElementById('btn-sum_bus_HP3-mute');
+              break;
+            case "30", "31":
+              var st = document.getElementById('btn-sum_bus_HP4-mute');
               break;
           }
           if (!st) {
@@ -296,6 +312,22 @@ function sendResponseMatrixStateSettings(path, oscMsg)
             }
             case "15": { // Output to CAVE BR
               var st = document.getElementById('sum_bus_CAVE_BR-gain') || document.getElementById('sum_bus_CAVEPA-gain');
+              break;
+            }
+            case "24", "25": { // Output to HP1
+              var st = document.getElementById('sum_bus_HP1-gain');
+              break;
+            }
+            case "26", "27": { // Output to HP2
+              var st = document.getElementById('sum_bus_HP2-gain');
+              break;
+            }
+            case "28", "29": { // Output to HP3
+              var st = document.getElementById('sum_bus_HP3-gain');
+              break;
+            }
+            case "30", "31": { // Output to HP4
+              var st = document.getElementById('sum_bus_HP4-gain');
               break;
             }
             default:
