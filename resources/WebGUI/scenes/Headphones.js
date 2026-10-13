@@ -37,7 +37,7 @@ export function init()
 
   // Attach event listeners for each headphone section
   hpSections.forEach(hp => {
-    const gainSpan = document.getElementById(`hp-${hp}-gain`);
+    const gainSpan = document.getElementById(`sum_bus_HP${hp}-gain`);
     if (gainSpan) {
       gainSpan.addEventListener('updated', (e) => {
         const slider = document.getElementById(`hp-${hp}-volume-slider`);
@@ -50,7 +50,7 @@ export function init()
       });
     }
 
-    const muteBtn = document.getElementById(`btn-hp-${hp}-mute`);
+    const muteBtn = document.getElementById(`btn-sum_bus_HP${hp}-mute`);
     if (muteBtn) {
       muteBtn.addEventListener('updated', (e) => {
         const isActive = muteBtn.classList.contains('active-input');
@@ -321,10 +321,10 @@ export function setHpSwitch(input, hpIndex, state)
     if (btn) {
       if (state) {
         btn.classList.add('active-input');
-        btn.innerText = "On";
+        btn.innerText = "Linked";
       } else {
         btn.classList.remove('active-input');
-        btn.innerText = "Off";
+        btn.innerText = "Link?";
       }
     }
   }
@@ -363,6 +363,34 @@ export function MuteAllHPs()
   });
 }
 
+export function UnlinkAllHPs()
+{
+  for (const hpIdx in hpSumBus)
+  {
+    let hp = hpSumBus[hpIdx];
+    sendValue(`/matrix/state/settings/sum_bus_assign_dsp/${hp}/segment/0`, 0);
+    sendValue(`/matrix/state/settings/sum_bus_assign_dsp/${hp}/segment/1`, 0);
+    sendValue(`/matrix/state/settings/sum_bus_assign_dsp/${hp}/segment/2`, 0);
+    sendValue(`/matrix/state/settings/sum_bus_assign_dsp/${hp}/segment/3`, 0);
+    sendValue(`/matrix/state/settings/sum_bus_assign_dsp/${hp}/segment/4`, 0);
+    sendValue(`/matrix/state/settings/sum_bus_assign_dsp/${hp+1}/segment/0`, 0);
+    sendValue(`/matrix/state/settings/sum_bus_assign_dsp/${hp+1}/segment/1`, 0);
+    sendValue(`/matrix/state/settings/sum_bus_assign_dsp/${hp+1}/segment/2`, 0);
+    sendValue(`/matrix/state/settings/sum_bus_assign_dsp/${hp+1}/segment/3`, 0);
+    sendValue(`/matrix/state/settings/sum_bus_assign_dsp/${hp+1}/segment/4`, 0);
+  }
+ // Initialize all hpSwitchStates to false
+  for (const input in hpSwitchStates) {
+    hpSwitchStates[input] = { 1: false, 2: false, 3: false, 4: false };
+  }
+  if (typeof inputNames !== 'undefined') {
+    inputNames.forEach(input => {
+      hpSwitchStates[input] = { 1: false, 2: false, 3: false, 4: false };
+    });
+  }
+  updateSwitchButtonsDisplay(); 
+}
+
 export function ResetToDefault()
 {
   sendNoArgs('/matrix/cmd/recall_snapshot_5');
@@ -396,7 +424,7 @@ export function ResetToDefault()
  */
 export function toggleMute(hpIndex, state, btn_disable, slider_disable = false)
 {
-  const btn = document.getElementById(`btn-hp-${hpIndex}-mute`);
+  const btn = document.getElementById(`btn-sum_bus_HP${hpIndex}-mute`);
   const slider = document.getElementById(`hp-${hpIndex}-volume-slider`);
   if (!btn || !slider) return;
 

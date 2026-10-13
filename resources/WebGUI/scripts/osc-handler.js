@@ -235,16 +235,20 @@ function sendResponseMatrixStateSettings(path, oscMsg)
             case "15":
               var st = document.getElementById('btn-sum_bus_CAVE_BR-mute') || document.getElementById('btn-sum_bus_CAVEPA-mute');
               break;
-            case "24", "25":
+            case "24":
+            case "25":
               var st = document.getElementById('btn-sum_bus_HP1-mute');
               break;
-            case "26", "27":
+            case "26":
+            case "27":
               var st = document.getElementById('btn-sum_bus_HP2-mute');
               break;
-            case "28", "29":
+            case "28":
+            case "29":
               var st = document.getElementById('btn-sum_bus_HP3-mute');
               break;
-            case "30", "31":
+            case "30":
+            case "31":
               var st = document.getElementById('btn-sum_bus_HP4-mute');
               break;
           }
@@ -314,19 +318,23 @@ function sendResponseMatrixStateSettings(path, oscMsg)
               var st = document.getElementById('sum_bus_CAVE_BR-gain') || document.getElementById('sum_bus_CAVEPA-gain');
               break;
             }
-            case "24", "25": { // Output to HP1
+            case "24":
+            case "25": { // Output to HP1
               var st = document.getElementById('sum_bus_HP1-gain');
               break;
             }
-            case "26", "27": { // Output to HP2
+            case "26":
+            case "27": { // Output to HP2
               var st = document.getElementById('sum_bus_HP2-gain');
               break;
             }
-            case "28", "29": { // Output to HP3
+            case "28":
+            case "29": { // Output to HP3
               var st = document.getElementById('sum_bus_HP3-gain');
               break;
             }
-            case "30", "31": { // Output to HP4
+            case "30":
+            case "31": { // Output to HP4
               var st = document.getElementById('sum_bus_HP4-gain');
               break;
             }
