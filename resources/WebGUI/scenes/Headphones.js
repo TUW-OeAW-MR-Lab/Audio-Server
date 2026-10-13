@@ -132,7 +132,7 @@ export function selectInput(id)
 }
 
 /**
- * Updates the visibility of the switch buttons on top of each HP section
+ * Updates the visibility of the input link switch buttons on top of each HP section
  * @param {boolean} visible
  */
 function updateSwitchButtonsVisibility(visible)
@@ -147,7 +147,7 @@ function updateSwitchButtonsVisibility(visible)
 }
 
 /**
- * Updates the visual state (On / Off, active-input class) of the 4 switch buttons
+ * Updates the visual state (On / Off, active-input class) of the input link switch buttons
  * based on the remembered states for the currently selected input
  */
 function updateSwitchButtonsDisplay()
@@ -161,17 +161,17 @@ function updateSwitchButtonsDisplay()
       const isOn = !!states[hp];
       if (isOn) {
         btn.classList.add('active-input');
-        btn.innerText = "On";
+        btn.innerText = "Linked";
       } else {
         btn.classList.remove('active-input');
-        btn.innerText = "Off";
+        btn.innerText = "Link?";
       }
     }
   });
 }
 
 /**
- * Toggles the switch button for a specific Headphone when pressed in the GUI
+ * Toggles the input link switch button for a specific Headphone
  * @param {number} hpIndex - The HP index (1, 2, 3, or 4)
  */
 export function toggleHpSwitch(hpIndex)
@@ -194,10 +194,10 @@ export function toggleHpSwitch(hpIndex)
   if (btn) {
     if (newState) {
       btn.classList.add('active-input');
-      btn.innerText = "On";
+      btn.innerText = "Linked";
     } else {
       btn.classList.remove('active-input');
-      btn.innerText = "Off";
+      btn.innerText = "Link?";
     }
   }
 
@@ -282,54 +282,6 @@ export function onHpSwitch(input, hpIndex, state)
     sendValue(`/matrix/state/settings/sum_bus_assign_dsp/${x+1}/segment/3`, segments[3]);
     sendValue(`/matrix/state/settings/sum_bus_assign_dsp/${x+1}/segment/4`, segments[4]);
   }
-}
-
-// Aliases for callback function compatibility
-export function handleHpSwitch(input, hpIndex, state)
-{
-  return onHpSwitch(input, hpIndex, state);
-}
-
-export function switchButtonPressed(input, hpIndex, state)
-{
-  return onHpSwitch(input, hpIndex, state);
-}
-
-/**
- * Programmatically get the switch state for a given input and HP index
- */
-export function getHpSwitchState(input, hpIndex)
-{
-  if (hpSwitchStates[input]) {
-    return !!hpSwitchStates[input][hpIndex];
-  }
-  return false;
-}
-
-/**
- * Programmatically set the switch state for a given input and HP index
- */
-export function setHpSwitch(input, hpIndex, state)
-{
-  if (!hpSwitchStates[input]) {
-    hpSwitchStates[input] = { 1: false, 2: false, 3: false, 4: false };
-  }
-  hpSwitchStates[input][hpIndex] = !!state;
-
-  if (currentSelectedInput === input) {
-    const btn = document.getElementById(`btn-hp-switch-${hpIndex}`);
-    if (btn) {
-      if (state) {
-        btn.classList.add('active-input');
-        btn.innerText = "Linked";
-      } else {
-        btn.classList.remove('active-input');
-        btn.innerText = "Link?";
-      }
-    }
-  }
-
-  onHpSwitch(input, hpIndex, !!state);
 }
 
 /**
