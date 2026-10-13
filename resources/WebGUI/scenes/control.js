@@ -213,6 +213,12 @@ export function init()
 	});
 }
 	
+export function GetMatrixStatus()
+{
+	sendNoArgs('/matrix/mgr/state');
+	document.getElementById('matrix-Update_Status').disabled = true;
+  document.getElementById('control-matrix_status').innerHTML = "&#9711";
+}
 
 export function AmpsShutdown()
 {
@@ -242,6 +248,8 @@ export function SystemStart()
 
 export function SystemShutdown()
 {
+  sendNoArgs('/matrix/cmd/recall_snapshot_5');
+  
 	const dialog = document.getElementById('confirmDialog');
 	document.getElementById('confirmTitle').innerText = "Shutdown the Audio System?";
 	document.getElementById('confirmText').innerText = "This will shutdown the audio system. If the amplifiers are unmuted, this will create a loud 'pop'. If the amplifiers have not been shutdown, this might create a damage in their configuration. \n\nIf the amplifiers are not muted or shutdown, press Cancel and mute and shutdown them. \n\nTo shutdown the audio system, press OK.";

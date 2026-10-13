@@ -355,12 +355,14 @@ button:disabled {
   width: 300px;
 }
 
-#infoDialog {
+#infoDialog,
+#reconnectDialog {
   padding: 20px;
   text-align: center;
 }
 
-#infoDialog::backdrop {
+#infoDialog::backdrop,
+#reconnectDialog::backdrop {
   background-color: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
 }

@@ -192,11 +192,13 @@ function SystemStatusLegend()
     <div>
     This symbol indicates the status of the system. Currently it just watches for a sign of life from the audio matrix.
     <br><br>
-    <table style="margin: 0 auto; width:50%;">
+    <table style="margin: 0 auto; width:70%;">
     <thead><tr><th>Symbol</th><th>Meaning</th></tr></thead>
     <tbody>
-		<tr><td><span style="background-color: #0061a0; color: white;">&#9711;</span></td> <td>Unknown</td></tr>
-		<tr><td><span style="background-color: #0061a0; color: green;">&#11044;</span></td> <td>Sign of life received from the audio matrix</td></tr>
+		<tr><td><span style="background-color: #0061a0; color: green;">&#11044;</span></td> <td>Connected / sign of life received from audio matrix</td></tr>
+		<tr><td><span style="background-color: #0061a0; color: orange;">&#9711;</span></td> <td>Connecting or reconnecting to audio server</td></tr>
+		<tr><td><span style="background-color: #0061a0; color: red;">&#9711;</span></td> <td>Disconnected from audio server</td></tr>
+		<tr><td><span style="background-color: #0061a0; color: white;">&#9711;</span></td> <td>Initial state / unknown</td></tr>
     </tbody></table></div>`;
 	dialog.showModal();
 

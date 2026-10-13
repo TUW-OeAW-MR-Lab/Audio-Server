@@ -2,11 +2,187 @@ var oscPort = new osc.WebSocketPort({
 		url: "/ws", // WebSocket resource at current URL context.
 		metadata: true
 });
-oscPort.open();
+
+// Reconnection & Connection State Management
+let reconnectTimer = null;
+let reconnectDelay = 1000;
+const INITIAL_RECONNECT_DELAY = 1000;
+const MAX_RECONNECT_DELAY = 5000;
+let isConnecting = false;
+let isConnected = false;
+let lastMessageTime = Date.now();
+
+function updateConnectionUI(status) {
+	const el = document.getElementById('matrix_status');
+	if (el) {
+		switch (status) {
+			case 'connected':
+				el.innerHTML = '<span style="color: green;" title="Connected to audio server">&#11044;</span>';
+				break;
+			case 'connecting':
+			case 'reconnecting':
+				el.innerHTML = '<span style="color: orange;" title="Connecting to audio server...">&#9711;</span>';
+				break;
+			case 'disconnected':
+			default:
+				el.innerHTML = '<span style="color: red;" title="Disconnected from audio server">&#9711;</span>';
+				break;
+		}
+	}
+	const cms = document.getElementById('control-matrix_status');
+	if (cms) {
+		cms.innerHTML = (status === 'connected')
+			? '<span style="color: green;">&#11044;</span>'
+			: '<span style="color: red;">&#9711;</span>';
+	}
+}
+
+function openOscPort() {
+	if (oscPort.socket) {
+		if (oscPort.socket.readyState === WebSocket.OPEN) {
+			isConnected = true;
+			isConnecting = false;
+			return;
+		}
+		if (oscPort.socket.readyState === WebSocket.CONNECTING) {
+			return;
+		}
+		// Clean up dead or closing socket event handlers before reopening
+		try {
+			oscPort.socket.onopen = null;
+			oscPort.socket.onerror = null;
+			oscPort.socket.onmessage = null;
+			oscPort.socket.onclose = null;
+			if (oscPort.socket.readyState !== WebSocket.CLOSED) {
+				oscPort.socket.close();
+			}
+		} catch (e) {
+			// ignore cleanup error
+		}
+		oscPort.socket = null;
+	}
+
+	oscPort.open();
+}
+
+function tryConnect() {
+	if (isConnecting) return;
+	isConnecting = true;
+	updateConnectionUI('connecting');
+	try {
+		openOscPort();
+	} catch (err) {
+		console.warn("Failed to initiate WebSocket connection:", err);
+		isConnecting = false;
+		scheduleReconnect();
+	}
+}
+
+let reconnectDialogTimer = null;
+let wakeUpTimestamp = 0;
+
+function showReconnectDialog(duration = 2000) {
+	const dialog = document.getElementById('reconnectDialog') || document.getElementById('infoDialog');
+	if (!dialog) return;
+
+	const title = document.getElementById('reconnectTitle') || document.getElementById('infoTitle');
+	const text = document.getElementById('reconnectText') || document.getElementById('infoText');
+	const okBtn = document.getElementById('infoOkBtn');
+
+	if (title) title.innerText = "Reconnecting";
+	if (text) text.innerText = "Reconnecting to audio server...";
+	if (okBtn && dialog.id === 'infoDialog') okBtn.style.display = "none";
+
+	if (reconnectDialogTimer) {
+		clearTimeout(reconnectDialogTimer);
+		reconnectDialogTimer = null;
+	}
+
+	try {
+		if (!dialog.open) {
+			dialog.showModal();
+		}
+	} catch (e) {
+		console.warn("Could not show reconnect dialog:", e);
+	}
+
+	reconnectDialogTimer = setTimeout(() => {
+		reconnectDialogTimer = null;
+		try {
+			if (dialog.open) {
+				dialog.close();
+			}
+		} catch (e) {}
+		if (okBtn && dialog.id === 'infoDialog') okBtn.style.display = "";
+	}, duration);
+}
+
+function scheduleReconnect(immediate = false) {
+	isConnected = false;
+	if (reconnectTimer) {
+		if (!immediate) return;
+		clearTimeout(reconnectTimer);
+		reconnectTimer = null;
+	}
+
+	// Show reconnect dialog if reconnecting right after wake up
+	if (Date.now() - wakeUpTimestamp < 3000) {
+		showReconnectDialog(2000);
+	}
+
+	const delay = immediate ? 0 : reconnectDelay;
+	updateConnectionUI('reconnecting');
+
+	reconnectTimer = setTimeout(() => {
+		reconnectTimer = null;
+		reconnectDelay = Math.min(reconnectDelay * 1.5, MAX_RECONNECT_DELAY);
+		tryConnect();
+	}, delay);
+}
+
+function checkConnectionAndReconnect(fromWakeup = false) {
+	if (!oscPort.socket || oscPort.socket.readyState !== WebSocket.OPEN) {
+		if (fromWakeup) {
+			showReconnectDialog(2000);
+		}
+		scheduleReconnect(true);
+	} else {
+		// Verify socket liveness
+		try {
+			oscPort.send({ address: "/ping" });
+		} catch (e) {
+			if (fromWakeup) {
+				showReconnectDialog(2000);
+			}
+			scheduleReconnect(true);
+		}
+	}
+}
+
+// Initial connection
+tryConnect();
+
+// Safe send wrapper preventing uncaught exceptions when socket is not open
+function safeSend(packet) {
+	if (oscPort.socket && oscPort.socket.readyState === WebSocket.OPEN) {
+		try {
+			oscPort.send(packet);
+			return true;
+		} catch (err) {
+			console.warn("Error sending OSC packet:", err);
+			scheduleReconnect(true);
+			return false;
+		}
+	} else {
+		console.warn("Cannot send OSC message (port not open):", packet.address);
+		scheduleReconnect(true);
+		return false;
+	}
+}
 
 function send(address, value) 
 {
-	oscPort.send({ 
+	safeSend({ 
 		address: address,
 		args: [{ type: "s", value: value }]
 	});
@@ -14,16 +190,15 @@ function send(address, value)
 
 function sendValue(address, value) 
 {
-	oscPort.send({
+	safeSend({
 		address: address,
 		args: [{ type: "f", value: value }]
 	});
-  //console.log("OSC message sent: ", address, value);
 }
 
 function sendValues3(address, value1, value2, value3) 
 {
-	oscPort.send({
+	safeSend({
 		address: address,
 		args: [{ type: "f", value: value1 }, { type: "f", value: value2 }, { type: "f", value: value3 }]
 	});
@@ -31,7 +206,7 @@ function sendValues3(address, value1, value2, value3)
 			
 function sendResponse(address,port) 
 {
-	oscPort.send({
+	safeSend({
 		address: address,
 		args: [
 			{ type: "s", value: "connect" },
@@ -43,17 +218,110 @@ function sendResponse(address,port)
 
 function sendNoArgs(address) 
 {
-	oscPort.send({ address: address });
-  //console.log("OSC message sent: ", address);
+	safeSend({ address: address });
 }
 
 oscPort.on("ready", function () 
 {
-	oscPort.send({ address: "/ping" });
+	console.log("OSC WebSocket connected.");
+	isConnecting = false;
+	isConnected = true;
+	reconnectDelay = INITIAL_RECONNECT_DELAY;
+	if (reconnectTimer) {
+		clearTimeout(reconnectTimer);
+		reconnectTimer = null;
+	}
+	lastMessageTime = Date.now();
+	updateConnectionUI('connected');
+
+	// If reconnect dialog is currently active, update it to connected
+	if (reconnectDialogTimer) {
+		const title = document.getElementById('reconnectTitle');
+		const text = document.getElementById('reconnectText');
+		if (title) title.innerText = "Connected";
+		if (text) text.innerText = "Connection restored.";
+	}
+
+	try {
+		oscPort.send({ address: "/ping" });
+	} catch (e) {}
+
+	// Re-sync active scene status if available
+	if (typeof SceneModule !== 'undefined' && SceneModule && typeof SceneModule.GetStatus === 'function') {
+		try {
+			SceneModule.GetStatus();
+		} catch (e) {
+			console.warn("Error re-syncing scene status on reconnect:", e);
+		}
+	}
 });
+
+oscPort.on("close", function (e) 
+{
+	console.warn("OSC WebSocket closed:", e);
+	isConnected = false;
+	isConnecting = false;
+	updateConnectionUI('disconnected');
+	scheduleReconnect();
+});
+
+oscPort.on("error", function (err) 
+{
+	console.warn("OSC WebSocket error:", err);
+	isConnected = false;
+	isConnecting = false;
+	updateConnectionUI('disconnected');
+	scheduleReconnect();
+});
+
+// Tablet lifecycle & network reconnect triggers
+document.addEventListener("visibilitychange", function () {
+	if (document.visibilityState === "visible") {
+		wakeUpTimestamp = Date.now();
+		console.log("Tablet visibility changed to visible, checking connection...");
+		checkConnectionAndReconnect(true);
+	}
+});
+
+window.addEventListener("online", function () {
+	console.log("Network online event detected, reconnecting OSC...");
+	scheduleReconnect(true);
+});
+
+window.addEventListener("pageshow", function () {
+	checkConnectionAndReconnect();
+});
+
+window.addEventListener("focus", function () {
+	checkConnectionAndReconnect();
+});
+
+// Periodic heartbeat & zombie connection detection
+setInterval(function () {
+	if (oscPort.socket && oscPort.socket.readyState === WebSocket.OPEN) {
+		const now = Date.now();
+		if (now - lastMessageTime > 30000) {
+			console.warn("OSC connection silent for > 30s, reconnecting...");
+			try {
+				oscPort.socket.close();
+			} catch (e) {}
+			scheduleReconnect(true);
+			return;
+		}
+		try {
+			oscPort.send({ address: "/ping" });
+		} catch (e) {
+			scheduleReconnect(true);
+		}
+	} else if (!isConnecting && !reconnectTimer) {
+		scheduleReconnect();
+	}
+}, 10000);
 
 oscPort.on("message", function (oscMsg) 
 {
+	lastMessageTime = Date.now();
+	isConnected = true;
 	pathstr= oscMsg.address.substring(1);
 	path = pathstr.split("/");
 		// Format of the message: device/scenename/osc/command1/command2/.../commandN
@@ -193,7 +461,7 @@ function sendResponseMatrixStateSettings(path, oscMsg)
       break;
 
     case 'sum_bus_assign_dsp':
-      console.log("Received sum bus assign dsp #" + path[4] + " and segment #" + path[6] + " set to: " + oscMsg.args[0].value);
+      //console.log("Received sum bus assign dsp #" + path[4] + " and segment #" + path[6] + " set to: " + oscMsg.args[0].value);
       break;
 
     case 'sum_bus_master':
